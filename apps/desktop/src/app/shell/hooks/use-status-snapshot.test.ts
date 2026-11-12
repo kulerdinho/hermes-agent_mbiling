@@ -4,8 +4,8 @@ import { createElement, type ReactElement, type ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { NotificationStack } from '@/components/notifications'
-import { getStatus } from '@/hermes'
 import { I18nProvider, type Locale, TRANSLATIONS, type Translations } from '@/i18n'
+import { getStatus } from '@/mbiling'
 import { $freeTierStatus } from '@/store/free-tier'
 import { $setupReadyTick, notifySetupReady } from '@/store/live-sync'
 import { $notifications, clearNotifications } from '@/store/notifications'
@@ -17,7 +17,7 @@ import { deferred } from '../../../test/deferred'
 
 import { useStatusSnapshot } from './use-status-snapshot'
 
-vi.mock('@/hermes', () => ({
+vi.mock('@/mbiling', () => ({
   getStatus: vi.fn()
 }))
 
@@ -573,7 +573,7 @@ describe('useStatusSnapshot', () => {
     await flushAsync()
     expect(result.current.inferenceStatus).toMatchObject({ ready: false, source: 'runtime_check' })
 
-    // User leaves Hermes for the browser to complete OAuth; no focus event fires.
+    // User leaves Mbiling for the browser to complete OAuth; no focus event fires.
     vi.mocked(document.hasFocus).mockReturnValue(false)
     healthy = true
 

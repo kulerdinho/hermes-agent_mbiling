@@ -9,7 +9,7 @@ import { $desktopOnboarding, type DesktopOnboardingState, type OnboardingContext
 markOnboardingDecided()
 
 const SERVER_OFF =
-  'The local model server is turned off. Start it from the Mbiling desktop app or `hermes model` → Local models, or switch to another model with /model.'
+  'The local model server is turned off. Start it from the Mbiling desktop app or `mbiling model` → Local models, or switch to another model with /model.'
 
 function coldState(): DesktopOnboardingState {
   return {
@@ -44,7 +44,7 @@ describe('refreshOnboarding with the local model server down', () => {
   beforeEach(() => {
     window.localStorage.clear()
     $desktopOnboarding.set(coldState())
-    Object.defineProperty(window, 'hermesDesktop', {
+    Object.defineProperty(window, 'mbilingDesktop', {
       configurable: true,
       value: { api: async () => ({ providers: [] }) }
     })

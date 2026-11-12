@@ -29,14 +29,14 @@ function request(sequence: number = 65536, token: string = 'ab12cd34ef56ab78'): 
     identity: {
       token,
       displayName: 'Mbiling no-registry-needed',
-      appId: `com.nousresearch.hermes-channel-${token}`,
-      appNamePascal: `HermesChannel${token}`,
-      artifactNamePascal: `HermesChannel${token}`,
-      cliName: 'hermes-no-registry-needed',
-      windowsExecutableName: 'hermes-no-registry-needed',
-      msixAppIdWithOrg: `NousResearch.HermesChannel${token}`
+      appId: `com.nousresearch.mbiling-channel-${token}`,
+      appNamePascal: `MbilingChannel${token}`,
+      artifactNamePascal: `MbilingChannel${token}`,
+      cliName: 'mbiling-no-registry-needed',
+      windowsExecutableName: 'mbiling-no-registry-needed',
+      msixAppIdWithOrg: `NousResearch.MbilingChannel${token}`
     },
-    bundleEnv: { HERMES_PREVIEW_FULL_CONNECTORS: '1' },
+    bundleEnv: { MBILING_PREVIEW_FULL_CONNECTORS: '1' },
     publicBase: 'https://builds.example.test'
   }
 }
@@ -46,12 +46,12 @@ interface PackagingFacts {
   config: Configuration
 }
 interface StampPayload {
-  runtime: { repoDir: string; commands: { hermes: string } }
+  runtime: { repoDir: string; commands: { mbiling: string } }
 }
 
 function load(build: ChannelBuildRequest): PackagingFacts {
-  process.env.HERMES_DESKTOP_VARIANT = 'bundled'
-  process.env._HERMES_CHANNEL_REQUEST_JSON = JSON.stringify(build)
+  process.env.MBILING_DESKTOP_VARIANT = 'bundled'
+  process.env._MBILING_CHANNEL_REQUEST_JSON = JSON.stringify(build)
 
   for (const file of ['../product-identity.cjs', '../electron-builder.config.cjs']) {
     delete require.cache[require.resolve(file)]
@@ -62,10 +62,10 @@ function load(build: ChannelBuildRequest): PackagingFacts {
 
 afterEach((): void => {
   for (const key of [
-    '_HERMES_CHANNEL_REQUEST_JSON',
-    'HERMES_DESKTOP_VARIANT',
-    'HERMES_BUILD_COMMIT',
-    'HERMES_PAYLOAD_TAG'
+    '_MBILING_CHANNEL_REQUEST_JSON',
+    'MBILING_DESKTOP_VARIANT',
+    'MBILING_BUILD_COMMIT',
+    'MBILING_PAYLOAD_TAG'
   ]) {
     delete process.env[key]
   }
@@ -136,7 +136,7 @@ test('channel packaging reuses admitted identity and rejects unsupported or unsa
       channel: 'latest'
     }
   ])
-  process.env.HERMES_DESKTOP_VARIANT = 'light'
+  process.env.MBILING_DESKTOP_VARIANT = 'light'
   delete require.cache[require.resolve('../product-identity.cjs')]
   assert.throws((): void => {
     require('../product-identity.cjs')
@@ -154,7 +154,7 @@ test('channel packaging reuses admitted identity and rejects unsupported or unsa
 })
 
 test('a channel that copies the stable identity packages and runs as the regular app', (): void => {
-  process.env.HERMES_DESKTOP_VARIANT = 'bundled'
+  process.env.MBILING_DESKTOP_VARIANT = 'bundled'
 
   for (const file of ['../product-identity.cjs', '../electron-builder.config.cjs']) {
     delete require.cache[require.resolve(file)]
@@ -245,13 +245,13 @@ test('channel stamps verify the real checkout and retain source version and nati
 
     const env: NodeJS.ProcessEnv = {
       ...process.env,
-      HERMES_DESKTOP_VARIANT: 'bundled',
-      _HERMES_CHANNEL_REQUEST_JSON: JSON.stringify(build),
+      MBILING_DESKTOP_VARIANT: 'bundled',
+      _MBILING_CHANNEL_REQUEST_JSON: JSON.stringify(build),
       GITHUB_SHA: 'd'.repeat(40)
     }
 
     const provenance: InstallStamp = resolveStamp({ env, repoRoot: dir })
-    const payload: StampPayload = { runtime: { repoDir: 'repo', commands: { hermes: 'bin/hermes' } } }
+    const payload: StampPayload = { runtime: { repoDir: 'repo', commands: { mbiling: 'bin/mbiling' } } }
     const built: InstallStamp = buildStampPayload(provenance, env, 'darwin', payload)
     assert.equal(built.source, 'channel-build')
     assert.equal(built.updateMechanism, 'electron-updater')
@@ -267,13 +267,13 @@ test('channel stamps verify the real checkout and retain source version and nati
       JSON.parse(fs.readFileSync(path.join(dir, 'out/agent-payload/repo/install-stamp.json'), 'utf8'))
     )
     assert.throws((): void => {
-      resolveStamp({ env: { ...env, _HERMES_CHANNEL_REQUEST_JSON: JSON.stringify(request()) }, repoRoot: dir })
+      resolveStamp({ env: { ...env, _MBILING_CHANNEL_REQUEST_JSON: JSON.stringify(request()) }, repoRoot: dir })
     }, /checkout/)
-    delete process.env._HERMES_CHANNEL_REQUEST_JSON
-    process.env.HERMES_PAYLOAD_TAG = 'v0.0.1'
+    delete process.env._MBILING_CHANNEL_REQUEST_JSON
+    process.env.MBILING_PAYLOAD_TAG = 'v0.0.1'
     delete require.cache[require.resolve('../product-identity.cjs')]
     const official: ProductIdentity = require('../product-identity.cjs')
-    delete process.env.HERMES_PAYLOAD_TAG
+    delete process.env.MBILING_PAYLOAD_TAG
 
     const receiver: ChannelBuildRequest = {
       ...build,
@@ -288,7 +288,7 @@ test('channel stamps verify the real checkout and retain source version and nati
       identity: { ...official, token: build.identity.token }
     }
 
-    const receiverEnv: NodeJS.ProcessEnv = { ...env, _HERMES_CHANNEL_REQUEST_JSON: JSON.stringify(receiver) }
+    const receiverEnv: NodeJS.ProcessEnv = { ...env, _MBILING_CHANNEL_REQUEST_JSON: JSON.stringify(receiver) }
 
     const stable: InstallStamp = buildStampPayload(
       resolveStamp({ env: receiverEnv, repoRoot: dir }),
@@ -328,7 +328,7 @@ test('channel stamps verify the real checkout and retain source version and nati
       verifyBundleStamp(built, { commit: receiver.commit, platform: 'darwin', channelRequest: receiver })
     })
     execFileSync(
-      process.env.HERMES_PYTHON || 'python3',
+      process.env.MBILING_PYTHON || 'python3',
       [
         '-c',
         `
@@ -386,10 +386,10 @@ test('actual MSIX manifest writer consumes the channel quad across rollover inst
       'scripts/release-content-types.json',
       'scripts/build/python.mjs',
       'scripts/bundles/desktop_prepare.py',
-      'hermes_cli/update_channel.py',
-      'hermes_cli/release_channels.py',
-      'hermes_cli/__init__.py',
-      'hermes_constants.py'
+      'mbiling_cli/update_channel.py',
+      'mbiling_cli/release_channels.py',
+      'mbiling_cli/__init__.py',
+      'mbiling_constants.py'
     ]) {
       const destination: string = path.join(root, file)
       fs.mkdirSync(path.dirname(destination), { recursive: true })
@@ -414,7 +414,7 @@ test('actual MSIX manifest writer consumes the channel quad across rollover inst
     fs.mkdirSync(path.join(app, 'build/agent-payload'), { recursive: true })
     fs.writeFileSync(
       path.join(app, 'build/agent-payload/manifest.json'),
-      JSON.stringify({ launchers: ['hermes-no-registry-needed', 'hermes-no-registry-needed-acp'] })
+      JSON.stringify({ launchers: ['mbiling-no-registry-needed', 'mbiling-no-registry-needed-acp'] })
     )
     const facts: ManifestFacts[] = []
 
@@ -448,7 +448,7 @@ test('actual MSIX manifest writer consumes the channel quad across rollover inst
       const output: string = execFileSync(process.execPath, ['-e', script], {
         cwd: root,
         encoding: 'utf8',
-        env: { ...process.env, HERMES_DESKTOP_VARIANT: 'bundled', _HERMES_CHANNEL_REQUEST_JSON: JSON.stringify(build) }
+        env: { ...process.env, MBILING_DESKTOP_VARIANT: 'bundled', _MBILING_CHANNEL_REQUEST_JSON: JSON.stringify(build) }
       })
 
       const row: ManifestFacts = JSON.parse(output.trim().split('\n').at(-1)!)
@@ -456,7 +456,7 @@ test('actual MSIX manifest writer consumes the channel quad across rollover inst
       assert.equal(row.semver, build.version)
       assert.match(row.xml, new RegExp(`Version="${build.windowsVersion.replaceAll('.', '\\.')}"`))
       assert.equal((row.xml.match(/Category="windows.appExecutionAlias"/g) || []).length, 2)
-      assert.match(row.xml, /HermesChannelab12cd34ef56ab78Cli1/)
+      assert.match(row.xml, /MbilingChannelab12cd34ef56ab78Cli1/)
 
       const recordScript: string = `
 import json, pathlib, sys, zipfile, xml.etree.ElementTree as ET
@@ -484,7 +484,7 @@ print(out.read_text(encoding='utf-8'))
 `
 
       const recorded: string = execFileSync(
-        process.env.HERMES_PYTHON || 'python3',
+        process.env.MBILING_PYTHON || 'python3',
         ['-c', recordScript, repo, root, JSON.stringify(build)],
         { encoding: 'utf8' }
       )

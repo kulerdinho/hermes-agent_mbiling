@@ -2,9 +2,9 @@ import { useState } from 'react'
 
 import { ActionsMenu, renderActionItem } from '@/components/ui/actions-menu'
 import { Button } from '@/components/ui/button'
-import type { DelegationModelMap, DelegationModelRoute, ProfileScope } from '@/hermes'
 import { useI18n } from '@/i18n'
 import { Box, MoreHorizontal, Plus } from '@/lib/icons'
+import type { DelegationModelMap, DelegationModelRoute, ProfileScope } from '@/mbiling'
 import { confirm } from '@/store/confirm'
 
 import { Pill, SectionHeading } from '../primitives'

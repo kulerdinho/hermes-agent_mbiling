@@ -4,9 +4,9 @@ import type { GatewayHostTranslations } from './types_gateway_host'
 export const deGatewayHost: GatewayHostTranslations = {
   unavailableTitle: 'Gateway-Einstellungen nicht verfügbar',
   unavailableDesc: 'Die Desktop-IPC-Brücke stellt keine Gateway-Einstellungen bereit.',
-  webappHostTitle: 'Hermes-Host',
+  webappHostTitle: 'Mbiling-Host',
   webappHostDesc:
-    'Die Webapp nutzt immer den Hermes-Host, der sie ausliefert. Um das Gateway zu wechseln, sich bei Mbiling Cloud anzumelden oder gespeicherte Verbindungen zu verwalten, verwenden Sie die Hermes-Desktop-App.',
+    'Die Webapp nutzt immer den Mbiling-Host, der sie ausliefert. Um das Gateway zu wechseln, sich bei Mbiling Cloud anzumelden oder gespeicherte Verbindungen zu verwalten, verwenden Sie die Mbiling-Desktop-App.',
   webAccess: {
     title: 'Webzugriff',
     intro: 'Öffne Mbiling auf diesem Computer vom Handy oder einem anderen Computer aus, angemeldet mit deinem Nous-Konto. Wer sich anmeldet, kann Befehle auf diesem Computer ausführen.',

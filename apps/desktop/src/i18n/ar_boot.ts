@@ -12,7 +12,7 @@ export const arBoot = {
       loadingSessions: 'جار تحميل الجلسات الأخيرة',
       retryingRemoteBackend: 'جارٍ إعادة الاتصال بخادم Mbiling البعيد…',
       startingDesktopConnection: 'جار بدء اتصال سطح المكتب',
-      startingHermesDesktop: 'جار تشغيل Mbiling Desktop...'
+      startingMbilingDesktop: 'جار تشغيل Mbiling Desktop...'
     },
     errors: {
       backgroundExited: 'خرجت عملية Mbiling الخلفية.',
@@ -150,9 +150,9 @@ export const arBoot = {
     versionDetailsDistributionDesktopMsix: 'تطبيق سطح المكتب (MSIX)',
     versionDetailsDistributionDesktopInstaller: 'تطبيق سطح المكتب (المُثبِّت)',
     versionDetailsDistributionSourceInstaller: 'المصدر (سكربت التثبيت)',
-    versionDetailsDistributionSourceInstallerDesktop: 'المصدر (سكربت التثبيت) + hermes desktop',
+    versionDetailsDistributionSourceInstallerDesktop: 'المصدر (سكربت التثبيت) + mbiling desktop',
     versionDetailsDistributionSource: 'المصدر',
-    versionDetailsDistributionSourceDesktop: 'المصدر + hermes desktop',
+    versionDetailsDistributionSourceDesktop: 'المصدر + mbiling desktop',
     versionDetailsDistributionStore: 'Microsoft Store',
     versionDetailsRuntimeEmbedded: 'وقت تشغيل مضمّن',
     versionDetailsRuntimeExternal: 'خارجي (يستخدم وقت تشغيل الجهاز)',

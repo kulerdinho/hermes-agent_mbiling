@@ -2,52 +2,52 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import {
-  HERMES_HUB_FALLBACK_ORIGIN,
-  HERMES_HUB_ORIGIN,
-  isHermesHubClipboardWrite,
-  isHermesHubExternalUrl,
-  isHermesHubOrigin
+  isMbilingHubClipboardWrite,
+  isMbilingHubExternalUrl,
+  isMbilingHubOrigin,
+  MBILING_HUB_FALLBACK_ORIGIN,
+  MBILING_HUB_ORIGIN
 } from './hub-iframe-policy'
 import { createWindowOpenHandler, describeDeniedUrl } from './window-open-policy'
 
 describe('hub-iframe-policy predicates', () => {
   it('admits exactly the two hub origins and nothing else', () => {
-    expect(isHermesHubOrigin(HERMES_HUB_ORIGIN)).toBe(true)
-    expect(isHermesHubOrigin(HERMES_HUB_FALLBACK_ORIGIN)).toBe(true)
+    expect(isMbilingHubOrigin(MBILING_HUB_ORIGIN)).toBe(true)
+    expect(isMbilingHubOrigin(MBILING_HUB_FALLBACK_ORIGIN)).toBe(true)
 
     // Opaque sandboxed frames, data URLs, look-alikes, and absent origins
     // never qualify.
-    expect(isHermesHubOrigin('null')).toBe(false)
-    expect(isHermesHubOrigin('')).toBe(false)
-    expect(isHermesHubOrigin(null)).toBe(false)
-    expect(isHermesHubOrigin(undefined)).toBe(false)
-    expect(isHermesHubOrigin('https://hermes-agent.nousresearch.com.evil.example')).toBe(false)
-    expect(isHermesHubOrigin('https://evil.example')).toBe(false)
-    expect(isHermesHubOrigin('file://')).toBe(false)
+    expect(isMbilingHubOrigin('null')).toBe(false)
+    expect(isMbilingHubOrigin('')).toBe(false)
+    expect(isMbilingHubOrigin(null)).toBe(false)
+    expect(isMbilingHubOrigin(undefined)).toBe(false)
+    expect(isMbilingHubOrigin('https://hermes-agent.nousresearch.com.evil.example')).toBe(false)
+    expect(isMbilingHubOrigin('https://evil.example')).toBe(false)
+    expect(isMbilingHubOrigin('file://')).toBe(false)
   })
 
   it('delegates only http/https/mailto external URLs', () => {
-    expect(isHermesHubExternalUrl('https://github.com/NousResearch/hermes-agent')).toBe(true)
-    expect(isHermesHubExternalUrl('http://example.com/docs')).toBe(true)
-    expect(isHermesHubExternalUrl('mailto:support@example.com')).toBe(true)
+    expect(isMbilingHubExternalUrl('https://github.com/kulerdinho/mbiling')).toBe(true)
+    expect(isMbilingHubExternalUrl('http://example.com/docs')).toBe(true)
+    expect(isMbilingHubExternalUrl('mailto:support@example.com')).toBe(true)
 
-    expect(isHermesHubExternalUrl('file:///etc/passwd')).toBe(false)
-    expect(isHermesHubExternalUrl('javascript:alert(1)')).toBe(false)
-    expect(isHermesHubExternalUrl('hermes://internal')).toBe(false)
-    expect(isHermesHubExternalUrl('not a url')).toBe(false)
+    expect(isMbilingHubExternalUrl('file:///etc/passwd')).toBe(false)
+    expect(isMbilingHubExternalUrl('javascript:alert(1)')).toBe(false)
+    expect(isMbilingHubExternalUrl('mbiling://internal')).toBe(false)
+    expect(isMbilingHubExternalUrl('not a url')).toBe(false)
   })
 
   it('grants clipboard-write to hub origins only', () => {
-    expect(isHermesHubClipboardWrite(HERMES_HUB_ORIGIN)).toBe(true)
-    expect(isHermesHubClipboardWrite(HERMES_HUB_FALLBACK_ORIGIN)).toBe(true)
-    expect(isHermesHubClipboardWrite('null')).toBe(false)
-    expect(isHermesHubClipboardWrite('https://artifact-preview.invalid')).toBe(false)
-    expect(isHermesHubClipboardWrite(null)).toBe(false)
+    expect(isMbilingHubClipboardWrite(MBILING_HUB_ORIGIN)).toBe(true)
+    expect(isMbilingHubClipboardWrite(MBILING_HUB_FALLBACK_ORIGIN)).toBe(true)
+    expect(isMbilingHubClipboardWrite('null')).toBe(false)
+    expect(isMbilingHubClipboardWrite('https://artifact-preview.invalid')).toBe(false)
+    expect(isMbilingHubClipboardWrite(null)).toBe(false)
   })
 })
 
 describe('createWindowOpenHandler trusted-hub delegation', () => {
-  const baseDetails = { url: 'https://github.com/NousResearch/hermes-agent' }
+  const baseDetails = { url: 'https://github.com/kulerdinho/mbiling' }
 
   it('still denies artifact frames (opaque origin) with NO external open', () => {
     const openExternalUrl = vi.fn()
@@ -65,19 +65,19 @@ describe('createWindowOpenHandler trusted-hub delegation', () => {
     const openExternalUrl = vi.fn()
 
     const handler = createWindowOpenHandler(undefined, {
-      getOpenerOrigin: () => HERMES_HUB_ORIGIN,
+      getOpenerOrigin: () => MBILING_HUB_ORIGIN,
       openExternalUrl
     })
 
     expect(handler(baseDetails)).toEqual({ action: 'deny' })
-    expect(openExternalUrl).toHaveBeenCalledExactlyOnceWith('https://github.com/NousResearch/hermes-agent')
+    expect(openExternalUrl).toHaveBeenCalledExactlyOnceWith('https://github.com/kulerdinho/mbiling')
   })
 
   it('delegates from the fallback (GitHub Pages) hub origin too', () => {
     const openExternalUrl = vi.fn()
 
     const handler = createWindowOpenHandler(undefined, {
-      getOpenerOrigin: () => HERMES_HUB_FALLBACK_ORIGIN,
+      getOpenerOrigin: () => MBILING_HUB_FALLBACK_ORIGIN,
       openExternalUrl
     })
 
@@ -89,7 +89,7 @@ describe('createWindowOpenHandler trusted-hub delegation', () => {
     const openExternalUrl = vi.fn()
 
     const handler = createWindowOpenHandler(undefined, {
-      getOpenerOrigin: () => HERMES_HUB_ORIGIN,
+      getOpenerOrigin: () => MBILING_HUB_ORIGIN,
       openExternalUrl
     })
 
@@ -127,7 +127,7 @@ describe('createWindowOpenHandler trusted-hub delegation', () => {
     expect(openExternalUrl).not.toHaveBeenCalled()
 
     const throwingOpen = createWindowOpenHandler(undefined, {
-      getOpenerOrigin: () => HERMES_HUB_ORIGIN,
+      getOpenerOrigin: () => MBILING_HUB_ORIGIN,
       openExternalUrl
     })
 
@@ -141,7 +141,7 @@ describe('createWindowOpenHandler trusted-hub delegation', () => {
       () => {
         throw new Error('log failed')
       },
-      { getOpenerOrigin: () => HERMES_HUB_ORIGIN, openExternalUrl }
+      { getOpenerOrigin: () => MBILING_HUB_ORIGIN, openExternalUrl }
     )
 
     expect(handler(baseDetails)).toEqual({ action: 'deny' })

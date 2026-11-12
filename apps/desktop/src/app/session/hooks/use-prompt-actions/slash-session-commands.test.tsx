@@ -1,4 +1,4 @@
-import { JsonRpcGatewayError } from '@hermes/shared'
+import { JsonRpcGatewayError } from '@mbiling/shared'
 import { cleanup } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -19,7 +19,7 @@ import { truncateRewoundMessages } from './slash-session-commands'
 // /undo, /retry, /steer and /queue run against the session owner's canonical verbs (the Ink TUI's
 // behaviour on the same gateway), never as `slash.exec`, which the shared gateway refuses.
 
-vi.mock('@/hermes', () => ({
+vi.mock('@/mbiling', () => ({
   getLatestSessionMessages: vi.fn(async () => ({ messages: [], session_id: 'session' })),
   getProfiles: vi.fn(async () => ({ profiles: [] })),
   getSession: vi.fn(),
@@ -100,7 +100,7 @@ const COMPRESSING = new JsonRpcGatewayError('session_busy', {
 
 beforeEach(() => {
   clearSingleFlightSessionResumeState()
-  window.localStorage.removeItem('hermes.desktop.composerQueue.v1')
+  window.localStorage.removeItem('mbiling.desktop.composerQueue.v1')
   $queuedPromptsBySession.set({})
   setComposerDraft('')
 })

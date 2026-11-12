@@ -3,9 +3,9 @@ import {
   graftRefreshedTailOntoBackfill,
   olderPageReader
 } from '@/app/chat/transcript-backfill'
-import { getLatestSessionMessages, type ProfileScope } from '@/hermes'
 import { type ChatMessage, toChatMessages } from '@/lib/chat-messages'
-import type { SessionMessage, SessionMessagesResponse, SessionResumeResult } from '@/types/hermes'
+import { getLatestSessionMessages, type ProfileScope } from '@/mbiling'
+import type { SessionMessage, SessionMessagesResponse, SessionResumeResult } from '@/types/mbiling'
 
 import { reconcileDurableHistory } from './utils'
 

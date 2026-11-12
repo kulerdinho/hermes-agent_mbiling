@@ -8,7 +8,7 @@ type BootPalette = Record<'accent' | 'accentForeground' | 'background' | 'foregr
  *  imported, so the renderer entry never needs another chunk before it can show this notice. */
 export function readBootPalette(): BootPalette | null {
   try {
-    const value: unknown = JSON.parse(localStorage.getItem('hermes-boot-palette') ?? 'null')
+    const value: unknown = JSON.parse(localStorage.getItem('mbiling-boot-palette') ?? 'null')
     const fields = ['accent', 'accentForeground', 'background', 'foreground'] as const
 
     const standalone = (field: (typeof fields)[number]) => {
@@ -76,7 +76,7 @@ export function showBootFailure(error: unknown, reload: () => void = () => locat
   })
 
   const wordmark = document.createElement('p')
-  wordmark.textContent = 'HERMES AGENT'
+  wordmark.textContent = 'MBILING AGENT'
   wordmark.setAttribute('aria-hidden', 'true')
   Object.assign(wordmark.style, {
     color: palette?.accent ?? 'currentColor',

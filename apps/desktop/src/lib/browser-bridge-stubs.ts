@@ -103,13 +103,13 @@ export const BROWSER_BRIDGE_STUBS = {
   },
   uninstall: {
     openAppsSettings: async () => undefined,
-    run: async () => ({ error: 'Run `hermes uninstall` on the server host', ok: false }),
+    run: async () => ({ error: 'Run `mbiling uninstall` on the server host', ok: false }),
     summary: async () => ({
       agent_installed: true,
       // Package removal belongs to the server host, never this browser tab.
       code_removal_allowed: false,
       gui_installed: true,
-      hermes_home: '',
+      mbiling_home: '',
       // No OS package owns a browser tab either: About shows no uninstall section.
       native_removal_instructions: null,
       packaged_app_paths: [],
@@ -126,9 +126,9 @@ export const BROWSER_BRIDGE_STUBS = {
     startAnyway: async () => ({ ok: false })
   },
   updates: {
-    apply: async () => ({ command: 'hermes update', manual: true, message: 'Run `hermes update` on the server host', ok: false }),
-    check: async () => ({ message: 'Use `hermes update` on the server host', reason: 'browser-hosted', supported: false }),
+    apply: async () => ({ command: 'mbiling update', manual: true, message: 'Run `mbiling update` on the server host', ok: false }),
+    check: async () => ({ message: 'Use `mbiling update` on the server host', reason: 'browser-hosted', supported: false }),
     onProgress: noopUnsubscribe
   },
   watchPreviewFile: async (url: string) => ({ id: `browser:${url}`, path: url })
-} satisfies Partial<Window['hermesDesktop']>
+} satisfies Partial<Window['mbilingDesktop']>

@@ -13,8 +13,8 @@ import { UserEditComposer } from '@/components/assistant-ui/thread/user-edit-com
 import { UserMessage } from '@/components/assistant-ui/thread/user-message'
 import { Intro, type IntroProps } from '@/components/chat/intro'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
-import type { HermesGateway } from '@/hermes'
 import { useI18n } from '@/i18n'
+import type { MbilingGateway } from '@/mbiling'
 import { $webappSignedOut } from '@/store/boot'
 import { notifyError } from '@/store/notifications'
 
@@ -22,7 +22,7 @@ type ThreadLoadingState = 'response' | 'session'
 
 interface ThreadEditContextValue {
   cwd: string | null
-  gateway: HermesGateway | null
+  gateway: MbilingGateway | null
   sessionId: string | null
 }
 
@@ -39,7 +39,7 @@ const ThreadEditContext = createContext<ThreadEditContextValue>({ cwd: null, gat
 interface ThreadProps {
   clampToComposer?: boolean
   cwd?: string | null
-  gateway?: HermesGateway | null
+  gateway?: MbilingGateway | null
   intro?: IntroProps
   loading?: ThreadLoadingState
   onBranchInNewChat?: (messageId: string) => void

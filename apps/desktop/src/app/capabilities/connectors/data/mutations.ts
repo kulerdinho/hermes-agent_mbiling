@@ -1,9 +1,9 @@
-import type { ConnectionAnswer, ConnectorAccountsResult, ConnectorPolicyGetResult } from '@hermes/shared'
+import type { ConnectionAnswer, ConnectorAccountsResult, ConnectorPolicyGetResult } from '@mbiling/shared'
 import { useCallback, useRef, useState } from 'react'
 
-import type { ProfileScope } from '@/hermes'
 import { translateNow } from '@/i18n'
 import { queryClient } from '@/lib/query-client'
+import type { ProfileScope } from '@/mbiling'
 import { notifyError } from '@/store/notifications'
 
 import type { SaveResult } from '../use-tools-editor'

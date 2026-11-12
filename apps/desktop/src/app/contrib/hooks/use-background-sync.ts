@@ -12,7 +12,6 @@ import {
 } from '@/app/session/hooks/use-prompt-actions/utils'
 import { sessionCreatedThisRun } from '@/app/session/hooks/use-session-actions/created-this-run'
 import { preserveLocalPendingTurnMessages } from '@/app/session/hooks/use-session-actions/utils'
-import { getLatestSessionMessages, type ProfileScope } from '@/hermes'
 import {
   type ChatMessage,
   preserveLocalAssistantErrors,
@@ -23,6 +22,7 @@ import {
 import { createClientSessionState } from '@/lib/chat-runtime'
 import { sessionListFingerprint, sessionMessagesSignature } from '@/lib/session-signatures'
 import { latestSessionTodos, latestSessionTodoSnapshot } from '@/lib/todos'
+import { getLatestSessionMessages, type ProfileScope } from '@/mbiling'
 import { pendingSessionReplay } from '@/store/gateway'
 import { sharedPrimaryRoute } from '@/store/gateway-shared-route'
 import { $sidebarShowArchived } from '@/store/layout'
@@ -992,7 +992,7 @@ interface BackgroundSyncParams {
   refreshActiveTranscript: () => Promise<unknown> | unknown
   refreshCronJobs: () => Promise<unknown> | unknown
   refreshCurrentModel: (force?: boolean) => Promise<unknown> | unknown
-  refreshHermesConfig: () => Promise<unknown> | unknown
+  refreshMbilingConfig: () => Promise<unknown> | unknown
   refreshMessagingSessions: () => Promise<unknown> | unknown
   refreshSessions: () => Promise<unknown> | unknown
   requestGateway: GatewayRequester
@@ -1065,7 +1065,7 @@ export function useBackgroundSync({
   refreshActiveTranscript,
   refreshCronJobs,
   refreshCurrentModel,
-  refreshHermesConfig,
+  refreshMbilingConfig,
   refreshMessagingSessions,
   refreshSessions,
   requestGateway,
@@ -1549,7 +1549,7 @@ export function useBackgroundSync({
     )
   }, [changeEventsAvailable, cronChangeTick, gatewayState, refreshCronJobs])
 
-  // projects.changed (projects.db moved: a CLI `hermes projects create`, another
+  // projects.changed (projects.db moved: a CLI `mbiling projects create`, another
   // window's folder picker, a `set_primary` from the workspace settings) refreshes
   // both the projects list and the sidebar tree — the desktop's own mutations
   // refresh optimistically, so this only needs to cover writers in OTHER
@@ -1614,7 +1614,7 @@ export function useBackgroundSync({
   useEffect(() => {
     if (gatewayState === 'open' && !activeSessionId && freshDraftReady) {
       void refreshCurrentModel()
-      void refreshHermesConfig()
+      void refreshMbilingConfig()
     }
-  }, [activeSessionId, freshDraftReady, gatewayState, refreshCurrentModel, refreshHermesConfig])
+  }, [activeSessionId, freshDraftReady, gatewayState, refreshCurrentModel, refreshMbilingConfig])
 }

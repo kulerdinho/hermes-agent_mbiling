@@ -11,14 +11,14 @@ export const esBoot = {
       loadingSessions: 'Cargando sesiones recientes',
       retryingRemoteBackend: 'Reconectando al backend remoto de Mbiling…',
       startingDesktopConnection: 'Iniciando la conexión de escritorio',
-      startingHermesDesktop: 'Iniciando Mbiling Desktop…'
+      startingMbilingDesktop: 'Iniciando Mbiling Desktop…'
     },
     errors: {
       backgroundExited:
         'El servicio que ejecuta tus chats se cerró de forma inesperada. Reinícialo para continuar; tus chats y ajustes están a salvo.',
       backgroundExitedDuringStartup: 'Mbiling se detuvo justo después de iniciarse.',
       backendStopped: 'Mbiling dejó de funcionar en segundo plano',
-      restartHermes: 'Reiniciar Mbiling',
+      restartMbiling: 'Reiniciar Mbiling',
       openLogs: 'Abrir registros',
       desktopBootFailed: 'Mbiling no pudo iniciarse',
       gatewayConnectionLost: 'Mbiling perdió la conexión',
@@ -89,7 +89,7 @@ export const esBoot = {
       since: time => `Esperando desde ${time}`,
       lastChecked: time => `Última comprobación ${time}`,
       recoveryHint:
-        'Esto suele resolverse en unos minutos. Si no: cierra Mbiling, termina los procesos git o hermes que queden (o reinicia el equipo) y vuelve a abrir Mbiling.',
+        'Esto suele resolverse en unos minutos. Si no: cierra Mbiling, termina los procesos git o mbiling que queden (o reinicia el equipo) y vuelve a abrir Mbiling.',
       checkAgain: 'Comprobar de nuevo',
       quit: 'Salir de Mbiling',
       openLogs: 'Abrir registros',

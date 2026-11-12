@@ -15,7 +15,7 @@ export const arDiagnostics = {
     doneDescription: 'تم رفع الحزمة بشكل خاص. شارك الرابط أدناه في محادثة الدعم لكي يتمكن الفريق من رؤية سجلاتك.',
     failedTitle: 'فشل الرفع',
     failedHint:
-      'يمكنك أيضاً تشغيل `hermes debug share --nous` من الطرفية، أو `hermes debug share --local` لعرض التقرير دون رفعه.',
+      'يمكنك أيضاً تشغيل `mbiling debug share --nous` من الطرفية، أو `mbiling debug share --local` لعرض التقرير دون رفعه.',
     handoffLead: 'تابع النقاش في:',
     links: {
       github: 'GitHub Issues',
@@ -40,7 +40,7 @@ export const arDiagnostics = {
     desktopOutOfDateTitle: 'التطبيق قديم',
     desktopOutOfDateMessage: 'تطبيق Mbiling أقدم من الخلفية المتصل بها وقد لا يعمل كما يجب. حدّث التطبيق ليتوافقا.',
     updateDesktopApp: 'تحديث التطبيق',
-    updateHermes: 'تحديث Mbiling',
+    updateMbiling: 'تحديث Mbiling',
     updateReadyTitle: 'التحديث جاهز',
     updateReadyMessage: count => `${count} تغيير جديد متاح.`,
     updateReadyMessageUnknown: 'يتوفر تحديث جديد.',

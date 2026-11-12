@@ -46,7 +46,7 @@ function installDesktopMock(state: DesktopBootstrapState) {
     }
   }
 
-  Object.defineProperty(window, 'hermesDesktop', {
+  Object.defineProperty(window, 'mbilingDesktop', {
     configurable: true,
     value: desktop
   })
@@ -88,7 +88,7 @@ beforeEach(() => {
 afterEach(() => {
   cleanup()
   vi.useRealTimers()
-  Reflect.deleteProperty(window, 'hermesDesktop')
+  Reflect.deleteProperty(window, 'mbilingDesktop')
 })
 
 describe('DesktopInstallOverlay first-run setup', () => {
@@ -97,7 +97,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
       bootstrapState({
         setupChoice: {
           platform: 'win32',
-          activeRoot: 'C:\\Users\\me\\AppData\\Local\\hermes\\hermes-agent',
+          activeRoot: 'C:\\Users\\me\\AppData\\Local\\mbiling\\mbiling-agent',
           local: 'none',
           bundled: false
         }
@@ -119,7 +119,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
       bootstrapState({
         setupChoice: {
           platform: 'win32',
-          activeRoot: 'C:\\Users\\me\\AppData\\Local\\hermes\\hermes-agent',
+          activeRoot: 'C:\\Users\\me\\AppData\\Local\\mbiling\\mbiling-agent',
           local: 'none',
           bundled: false
         }
@@ -146,7 +146,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
       bootstrapState({
         setupChoice: {
           platform: 'win32',
-          activeRoot: 'C:\\Users\\me\\AppData\\Local\\hermes\\hermes-agent',
+          activeRoot: 'C:\\Users\\me\\AppData\\Local\\mbiling\\mbiling-agent',
           local: 'none',
           bundled: false
         }
@@ -170,7 +170,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
       bootstrapState({
         setupChoice: {
           platform: 'win32',
-          activeRoot: 'C:\\Users\\me\\AppData\\Local\\hermes\\hermes-agent',
+          activeRoot: 'C:\\Users\\me\\AppData\\Local\\mbiling\\mbiling-agent',
           local: 'none',
           bundled: false
         }
@@ -198,7 +198,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
       bootstrapState({
         setupChoice: {
           platform: 'win32',
-          activeRoot: 'C:\\Users\\me\\AppData\\Local\\hermes\\hermes-agent',
+          activeRoot: 'C:\\Users\\me\\AppData\\Local\\mbiling\\mbiling-agent',
           local: 'none',
           bundled: false
         }
@@ -218,7 +218,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
         type: 'setup-choice',
         active: false,
         platform: 'win32',
-        activeRoot: 'C:\\Users\\me\\AppData\\Local\\hermes\\hermes-agent-repaired'
+        activeRoot: 'C:\\Users\\me\\AppData\\Local\\mbiling\\mbiling-agent-repaired'
       })
     })
 
@@ -228,7 +228,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
   it('opens the remote connection form from the first-run choice', async () => {
     installDesktopMock(
       bootstrapState({
-        setupChoice: { platform: 'linux', activeRoot: '/home/me/.hermes/hermes-agent', local: 'none', bundled: false }
+        setupChoice: { platform: 'linux', activeRoot: '/home/me/.mbiling/mbiling-agent', local: 'none', bundled: false }
       })
     )
 
@@ -244,7 +244,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
   it('returns from the remote connection form to the first-run choice', async () => {
     installDesktopMock(
       bootstrapState({
-        setupChoice: { platform: 'linux', activeRoot: '/home/me/.hermes/hermes-agent', local: 'none', bundled: false }
+        setupChoice: { platform: 'linux', activeRoot: '/home/me/.mbiling/mbiling-agent', local: 'none', bundled: false }
       })
     )
 
@@ -262,20 +262,20 @@ describe('DesktopInstallOverlay first-run setup', () => {
   it('requires a successful token connection test before applying remote config', async () => {
     const desktop = installDesktopMock(
       bootstrapState({
-        setupChoice: { platform: 'linux', activeRoot: '/home/me/.hermes/hermes-agent', local: 'none', bundled: false }
+        setupChoice: { platform: 'linux', activeRoot: '/home/me/.mbiling/mbiling-agent', local: 'none', bundled: false }
       })
     )
 
     desktop.probeConnectionConfig.mockResolvedValue({
       authMode: 'token',
-      baseUrl: 'https://gateway.example.com/hermes',
+      baseUrl: 'https://gateway.example.com/mbiling',
       error: null,
       providers: [],
       reachable: true,
       version: '0.17.0'
     })
     desktop.testConnectionConfig.mockResolvedValue({
-      baseUrl: 'https://gateway.example.com/hermes',
+      baseUrl: 'https://gateway.example.com/mbiling',
       ok: true,
       version: '0.17.0'
     })
@@ -288,8 +288,8 @@ describe('DesktopInstallOverlay first-run setup', () => {
     render(<DesktopInstallOverlay />)
 
     fireEvent.click(await screen.findByText('Connect to existing Mbiling'))
-    fireEvent.change(await screen.findByPlaceholderText('https://gateway.example.com/hermes'), {
-      target: { value: 'https://gateway.example.com/hermes' }
+    fireEvent.change(await screen.findByPlaceholderText('https://gateway.example.com/mbiling'), {
+      target: { value: 'https://gateway.example.com/mbiling' }
     })
 
     const apply = screen.getByText('Apply and reconnect').closest('button') as HTMLButtonElement
@@ -309,11 +309,11 @@ describe('DesktopInstallOverlay first-run setup', () => {
         mode: 'remote',
         remoteAuthMode: 'token',
         remoteToken: 'session-secret',
-        remoteUrl: 'https://gateway.example.com/hermes'
+        remoteUrl: 'https://gateway.example.com/mbiling'
       })
     })
 
-    await screen.findByText('Connected to https://gateway.example.com/hermes (0.17.0).')
+    await screen.findByText('Connected to https://gateway.example.com/mbiling (0.17.0).')
     expect(apply.disabled).toBe(false)
 
     fireEvent.click(screen.getByText('Apply and reconnect'))
@@ -323,7 +323,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
         mode: 'remote',
         remoteAuthMode: 'token',
         remoteToken: 'session-secret',
-        remoteUrl: 'https://gateway.example.com/hermes'
+        remoteUrl: 'https://gateway.example.com/mbiling'
       })
     })
     await waitFor(() => expect(screen.queryByText('Gateway URL')).toBeNull())
@@ -332,20 +332,20 @@ describe('DesktopInstallOverlay first-run setup', () => {
   it('restores remote apply controls when applying the tested connection fails', async () => {
     const desktop = installDesktopMock(
       bootstrapState({
-        setupChoice: { platform: 'linux', activeRoot: '/home/me/.hermes/hermes-agent', local: 'none', bundled: false }
+        setupChoice: { platform: 'linux', activeRoot: '/home/me/.mbiling/mbiling-agent', local: 'none', bundled: false }
       })
     )
 
     desktop.probeConnectionConfig.mockResolvedValue({
       authMode: 'token',
-      baseUrl: 'https://gateway.example.com/hermes',
+      baseUrl: 'https://gateway.example.com/mbiling',
       error: null,
       providers: [],
       reachable: true,
       version: '0.17.0'
     })
     desktop.testConnectionConfig.mockResolvedValue({
-      baseUrl: 'https://gateway.example.com/hermes',
+      baseUrl: 'https://gateway.example.com/mbiling',
       ok: true,
       version: '0.17.0'
     })
@@ -354,8 +354,8 @@ describe('DesktopInstallOverlay first-run setup', () => {
     render(<DesktopInstallOverlay />)
 
     fireEvent.click(await screen.findByText('Connect to existing Mbiling'))
-    fireEvent.change(await screen.findByPlaceholderText('https://gateway.example.com/hermes'), {
-      target: { value: 'https://gateway.example.com/hermes' }
+    fireEvent.change(await screen.findByPlaceholderText('https://gateway.example.com/mbiling'), {
+      target: { value: 'https://gateway.example.com/mbiling' }
     })
 
     await act(async () => {
@@ -366,7 +366,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
       target: { value: 'session-secret' }
     })
     fireEvent.click(screen.getByText('Test connection'))
-    await screen.findByText('Connected to https://gateway.example.com/hermes (0.17.0).')
+    await screen.findByText('Connected to https://gateway.example.com/mbiling (0.17.0).')
 
     const apply = screen.getByText('Apply and reconnect').closest('button') as HTMLButtonElement
     fireEvent.click(apply)
@@ -379,25 +379,25 @@ describe('DesktopInstallOverlay first-run setup', () => {
   it('signs in, tests, and applies a password-style remote gateway', async () => {
     const desktop = installDesktopMock(
       bootstrapState({
-        setupChoice: { platform: 'linux', activeRoot: '/home/me/.hermes/hermes-agent', local: 'none', bundled: false }
+        setupChoice: { platform: 'linux', activeRoot: '/home/me/.mbiling/mbiling-agent', local: 'none', bundled: false }
       })
     )
 
     desktop.probeConnectionConfig.mockResolvedValue({
       authMode: 'oauth',
-      baseUrl: 'https://gateway.example.com/hermes',
+      baseUrl: 'https://gateway.example.com/mbiling',
       error: null,
       providers: [{ displayName: 'Username & Password', name: 'password', supportsPassword: true }],
       reachable: true,
       version: '0.17.0'
     })
     desktop.oauthLoginConnectionConfig.mockResolvedValue({
-      baseUrl: 'https://gateway.example.com/hermes',
+      baseUrl: 'https://gateway.example.com/mbiling',
       connected: true,
       ok: true
     })
     desktop.testConnectionConfig.mockResolvedValue({
-      baseUrl: 'https://gateway.example.com/hermes',
+      baseUrl: 'https://gateway.example.com/mbiling',
       ok: true,
       version: null
     })
@@ -406,8 +406,8 @@ describe('DesktopInstallOverlay first-run setup', () => {
     render(<DesktopInstallOverlay />)
 
     fireEvent.click(await screen.findByText('Connect to existing Mbiling'))
-    fireEvent.change(await screen.findByPlaceholderText('https://gateway.example.com/hermes'), {
-      target: { value: 'https://gateway.example.com/hermes' }
+    fireEvent.change(await screen.findByPlaceholderText('https://gateway.example.com/mbiling'), {
+      target: { value: 'https://gateway.example.com/mbiling' }
     })
 
     await act(async () => {
@@ -418,7 +418,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
     fireEvent.click(await screen.findByText('Sign in'))
 
     await waitFor(() => {
-      expect(desktop.oauthLoginConnectionConfig).toHaveBeenCalledWith('https://gateway.example.com/hermes')
+      expect(desktop.oauthLoginConnectionConfig).toHaveBeenCalledWith('https://gateway.example.com/mbiling')
     })
 
     fireEvent.click(screen.getByText('Test connection'))
@@ -428,11 +428,11 @@ describe('DesktopInstallOverlay first-run setup', () => {
         mode: 'remote',
         remoteAuthMode: 'oauth',
         remoteToken: undefined,
-        remoteUrl: 'https://gateway.example.com/hermes'
+        remoteUrl: 'https://gateway.example.com/mbiling'
       })
     })
 
-    await screen.findByText('Connected to https://gateway.example.com/hermes.')
+    await screen.findByText('Connected to https://gateway.example.com/mbiling.')
     const apply = screen.getByText('Apply and reconnect').closest('button') as HTMLButtonElement
     expect(apply.disabled).toBe(false)
     fireEvent.click(apply)
@@ -442,7 +442,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
         mode: 'remote',
         remoteAuthMode: 'oauth',
         remoteToken: undefined,
-        remoteUrl: 'https://gateway.example.com/hermes'
+        remoteUrl: 'https://gateway.example.com/mbiling'
       })
     })
   })
@@ -450,7 +450,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
   it('does not authorize a new URL with an old login result or save before Apply', async () => {
     const desktop = installDesktopMock(
       bootstrapState({
-        setupChoice: { platform: 'linux', activeRoot: '/tmp/hermes', local: 'none', bundled: false }
+        setupChoice: { platform: 'linux', activeRoot: '/tmp/mbiling', local: 'none', bundled: false }
       })
     )
 
@@ -472,7 +472,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
     )
     render(<DesktopInstallOverlay />)
     fireEvent.click(await screen.findByText('Connect to existing Mbiling'))
-    const url = screen.getByPlaceholderText('https://gateway.example.com/hermes')
+    const url = screen.getByPlaceholderText('https://gateway.example.com/mbiling')
     fireEvent.change(url, { target: { value: 'https://a.example' } })
     fireEvent.click(await screen.findByRole('button', { name: /Sign in with/ }))
     await waitFor(() => expect(desktop.oauthLoginConnectionConfig).toHaveBeenCalledWith('https://a.example'))
@@ -494,7 +494,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
       bootstrapState({
         unsupportedPlatform: {
           platform: 'darwin',
-          activeRoot: '/Users/me/.hermes/hermes-agent',
+          activeRoot: '/Users/me/.mbiling/mbiling-agent',
           installCommand: 'curl -fsSL https://example.invalid/install.sh | sh',
           docsUrl: 'https://example.invalid/docs'
         }
@@ -511,14 +511,14 @@ describe('DesktopInstallOverlay first-run setup', () => {
 
     desktop.probeConnectionConfig.mockResolvedValue({
       authMode: 'token',
-      baseUrl: 'https://gateway.example.com/hermes',
+      baseUrl: 'https://gateway.example.com/mbiling',
       error: null,
       providers: [],
       reachable: true,
       version: '0.17.0'
     })
     desktop.testConnectionConfig.mockResolvedValue({
-      baseUrl: 'https://gateway.example.com/hermes',
+      baseUrl: 'https://gateway.example.com/mbiling',
       ok: true,
       version: '0.17.0'
     })
@@ -528,8 +528,8 @@ describe('DesktopInstallOverlay first-run setup', () => {
       return { mode: 'remote' }
     })
 
-    fireEvent.change(screen.getByPlaceholderText('https://gateway.example.com/hermes'), {
-      target: { value: 'https://gateway.example.com/hermes' }
+    fireEvent.change(screen.getByPlaceholderText('https://gateway.example.com/mbiling'), {
+      target: { value: 'https://gateway.example.com/mbiling' }
     })
 
     await act(async () => {
@@ -540,7 +540,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
       target: { value: 'session-secret' }
     })
     fireEvent.click(screen.getByText('Test connection'))
-    await screen.findByText('Connected to https://gateway.example.com/hermes (0.17.0).')
+    await screen.findByText('Connected to https://gateway.example.com/mbiling (0.17.0).')
     fireEvent.click(screen.getByText('Apply and reconnect'))
 
     await waitFor(() => expect(screen.queryByText('Gateway URL')).toBeNull())

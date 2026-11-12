@@ -43,7 +43,7 @@ const entryFor = (item: CatalogSurfaceItem, category: string): CatalogEntry => (
   sha: '',
   subdir: '',
   version: '',
-  requiresHermes: '',
+  requiresMbiling: '',
   tags: [],
   platforms: [],
   requirements: [],

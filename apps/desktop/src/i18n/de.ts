@@ -57,7 +57,7 @@ export const deOverrides = {
       kindCatalog: 'MCP · Katalog',
       kindCustom: 'MCP · Benutzerdefiniert',
       kindPlugin: (plugin: string) => `MCP · Plugin ${plugin}`,
-      inCatalog: 'Im Hermes-Katalog',
+      inCatalog: 'Im Mbiling-Katalog',
       hostedTwin: 'Verwaltete Version verfügbar',
       alsoLocal: 'Läuft auch auf diesem Gerät',
       open: (name: string) => `${name} öffnen`,
@@ -412,13 +412,13 @@ export const deOverrides = {
     copyDetailFailed: 'Notification-Detail konnte nicht kopiert werden',
     backendOutOfDateTitle: 'Backend veraltet',
     backendOutOfDateMessage:
-      'Ihr Hermes-Backend ist älter als dieser Desktop-Build und funktioniert möglicherweise nicht richtig. Aktualisieren Sie, um beide abzugleichen.',
-    desktopOutOfDateTitle: 'Hermes-App veraltet',
+      'Ihr Mbiling-Backend ist älter als dieser Desktop-Build und funktioniert möglicherweise nicht richtig. Aktualisieren Sie, um beide abzugleichen.',
+    desktopOutOfDateTitle: 'Mbiling-App veraltet',
     desktopOutOfDateMessage:
-      'Diese Hermes-App ist älter als das verbundene Backend und funktioniert möglicherweise nicht richtig. Aktualisieren Sie die App, um beide abzugleichen.',
+      'Diese Mbiling-App ist älter als das verbundene Backend und funktioniert möglicherweise nicht richtig. Aktualisieren Sie die App, um beide abzugleichen.',
     updateDesktopApp: 'App aktualisieren',
     installMethodUnsupportedTitle: 'Nicht unterstützte Installationsmethode',
-    updateHermes: 'Mbiling aktualisieren',
+    updateMbiling: 'Mbiling aktualisieren',
     updateReadyTitle: 'Update bereit',
     updateReadyMessage: count => `${count} neue Änderung${count === 1 ? '' : 'en'} verfügbar.`,
     updateReadyMessageUnknown: 'Ein neues Update ist verfügbar.',
@@ -451,10 +451,10 @@ export const deOverrides = {
       codeSkewRestartRequired:
         'Dieses Backend läuft nach einem Update mit altem Code. Starten Sie es neu, um den neuen Code zu laden.',
       rpcOutOfSync: 'App und Backend laufen in unterschiedlichen Versionen. Aktualisieren Sie beide.',
-      restartHermesFailed: 'Mbiling konnte nicht neu gestartet werden'
+      restartMbilingFailed: 'Mbiling konnte nicht neu gestartet werden'
     },
     actions: {
-      restartHermes: 'Mbiling neu starten',
+      restartMbiling: 'Mbiling neu starten',
       openKeys: 'Schlüssel öffnen',
       openGateways: 'Gateways öffnen',
       openMaintenance: 'Wartung öffnen'
@@ -520,7 +520,7 @@ export const deOverrides = {
       'Ihr Paket wurde privat hochgeladen. Teilen Sie den Link unten in Ihrem Support-Thread, damit das Team Ihre Logs sehen kann.',
     failedTitle: 'Hochladen fehlgeschlagen',
     failedHint:
-      'Sie können auch `hermes debug share --nous` im Terminal ausführen oder `hermes debug share --local`, um den Bericht ohne Hochladen auszugeben.',
+      'Sie können auch `mbiling debug share --nous` im Terminal ausführen oder `mbiling debug share --local`, um den Bericht ohne Hochladen auszugeben.',
     handoffLead: 'Diskussion hier fortsetzen:',
     links: {
       github: 'GitHub Issues',
@@ -742,7 +742,7 @@ export const deOverrides = {
     exportConfig: 'Konfiguration exportieren',
     importConfig: 'Konfiguration importieren',
     resetToDefaults: 'Auf Standard zurücksetzen',
-    resetConfirm: 'Alle Einstellungen auf Hermes-Standard zurücksetzen?',
+    resetConfirm: 'Alle Einstellungen auf Mbiling-Standard zurücksetzen?',
     exportFailed: 'Export fehlgeschlagen',
     resetFailed: 'Zurücksetzen fehlgeschlagen',
     pluginPages: {
@@ -1424,7 +1424,7 @@ export const deOverrides = {
     uninstallSection: {
       dangerZone: 'Gefahrenzone',
       checkingInstalled: 'Installierte Komponenten werden geprüft…',
-      uninstallHermes: 'Mbiling deinstallieren',
+      uninstallMbiling: 'Mbiling deinstallieren',
       chooseHowMuch:
         'Wählen Sie, wie viel entfernt werden soll. Die App wird zum Abschluss geschlossen; Sie können das Installationsprogramm jederzeit erneut öffnen, um zurückzukehren.',
       confirmUninstall: 'Deinstallation bestätigen',
@@ -1437,22 +1437,22 @@ export const deOverrides = {
         gui: {
           title: 'Nur die Chat-Oberfläche deinstallieren',
           description:
-            'Entfernt diese Desktop-App. Der Hermes-Agent, Ihre Konfiguration und Ihre Chats bleiben erhalten.',
+            'Entfernt diese Desktop-App. Der Mbiling-Agent, Ihre Konfiguration und Ihre Chats bleiben erhalten.',
           consequence: 'die Desktop-Chat-Oberfläche (diese App und ihre Daten)'
         },
         lite: {
           title: 'Oberfläche + Agent deinstallieren, Daten behalten',
           description:
-            'Entfernt die App und den Hermes-Agent, behält aber Konfiguration, Chats und Geheimnisse für eine spätere Neuinstallation.',
+            'Entfernt die App und den Mbiling-Agent, behält aber Konfiguration, Chats und Geheimnisse für eine spätere Neuinstallation.',
           consequence:
-            'die Chat-Oberfläche und den Hermes-Agent (Konfiguration, Chats und Geheimnisse bleiben erhalten)'
+            'die Chat-Oberfläche und den Mbiling-Agent (Konfiguration, Chats und Geheimnisse bleiben erhalten)'
         },
         full: {
           title: 'Alles deinstallieren',
           description:
             'Entfernt die App, den Agent und alle Benutzerdaten – Konfiguration, Chats, geplante Jobs, Geheimnisse, Logs.',
           consequence:
-            'ALLES – die Chat-Oberfläche, den Hermes-Agent sowie Ihre gesamte Konfiguration, Chats, Geheimnisse und Logs'
+            'ALLES – die Chat-Oberfläche, den Mbiling-Agent sowie Ihre gesamte Konfiguration, Chats, Geheimnisse und Logs'
         }
       }
     },
@@ -1517,7 +1517,7 @@ export const deOverrides = {
       searchPlaceholder: 'Suchen…',
       noResults: 'Keine Ergebnisse gefunden',
       systemDefault: 'Systemstandard',
-      loading: 'Hermes-Konfiguration wird geladen...',
+      loading: 'Mbiling-Konfiguration wird geladen...',
       emptyTitle: 'Nichts zu konfigurieren',
       emptyDesc: 'Dieser Bereich hat keine einstellbaren Optionen.',
       failedLoad: 'Einstellungen konnten nicht geladen werden',
@@ -1551,14 +1551,14 @@ export const deOverrides = {
       unavailable:
         'Das Hilfsprogramm für die HUD-Geste konnte nicht starten oder wurde unerwartet beendet. Versuchen Sie es erneut oder starten Sie Mbiling neu. Das bestehende HUD-Tastenkürzel funktioniert innerhalb von Mbiling weiterhin.',
       missingHelper:
-        'In dieser Hermes-Installation fehlt das Hilfsprogramm für die HUD-Geste. Aktualisieren oder installieren Sie Mbiling neu und versuchen Sie es erneut.',
+        'In dieser Mbiling-Installation fehlt das Hilfsprogramm für die HUD-Geste. Aktualisieren oder installieren Sie Mbiling neu und versuchen Sie es erneut.',
       unsupportedSession:
         'Diese Desktop-Session unterstützt keine globalen Modifikator-Taps. Linux erfordert X11; Wayland wird nicht unterstützt.'
     },
     screenshot: {
       enabledTitle: 'Screenshot-Kurzbefehl',
       enabledDesc:
-        'Drücken Sie in einer beliebigen App beide Befehlstasten gleichzeitig, um deren vorderstes Fenster aufzunehmen und an Ihren aktuellen Hermes-Entwurf anzuhängen. Es wird nie automatisch gesendet. Standardmäßig aus; gilt nur für diesen Mac. Fensterinhalte können vertraulich sein – prüfen Sie den Anhang vor dem Senden.',
+        'Drücken Sie in einer beliebigen App beide Befehlstasten gleichzeitig, um deren vorderstes Fenster aufzunehmen und an Ihren aktuellen Mbiling-Entwurf anzuhängen. Es wird nie automatisch gesendet. Standardmäßig aus; gilt nur für diesen Mac. Fensterinhalte können vertraulich sein – prüfen Sie den Anhang vor dem Senden.',
       statusTitle: 'Status des Screenshot-Kurzbefehls',
       checking: 'Screenshot-Kurzbefehl wird geprüft…',
       disabled: 'Der Screenshot-Kurzbefehl ist aus.',
@@ -1648,10 +1648,10 @@ export const deOverrides = {
       kindRemote: 'Remote-Gateway',
       kindCloud: 'Mbiling Cloud',
       kindSsh: 'SSH',
-      kindLocalDesc: 'Die Hermes-Laufzeitumgebung, die von dieser App verwaltet wird.',
+      kindLocalDesc: 'Die Mbiling-Laufzeitumgebung, die von dieser App verwaltet wird.',
       kindRemoteDesc: 'Ein Mbiling Gateway, das über HTTP(S) erreichbar ist – LAN, Tailscale oder das Internet.',
-      kindCloudDesc: 'Eine gehostete Instanz, die über Ihr Hermes-Cloud-Konto gefunden wurde.',
-      kindSshDesc: 'Eine Hermes-Installation, die über SSH erreicht wird.',
+      kindCloudDesc: 'Eine gehostete Instanz, die über Ihr Mbiling-Cloud-Konto gefunden wurde.',
+      kindSshDesc: 'Eine Mbiling-Installation, die über SSH erreicht wird.',
       labelTitle: 'Name',
       labelDesc:
         'Pflichtfeld. Wird überall angezeigt, wo diese Instanz erscheint; muss eindeutig sein (z. B. „Homelab“, „Arbeitslaptop“).',
@@ -1702,15 +1702,15 @@ export const deOverrides = {
       title: 'Gateway-Verbindung',
       envOverride: 'ENV-Überschreibung',
       intro:
-        'Standardmäßig lokal. Verwenden Sie Remote, wenn diese App ein Hermes-Backend an einem anderen Ort steuern soll. Gateway-Verbindungen gelten pro Gerät; Profile werden von den Gateways ermittelt, mit denen Sie sich verbinden.',
+        'Standardmäßig lokal. Verwenden Sie Remote, wenn diese App ein Mbiling-Backend an einem anderen Ort steuern soll. Gateway-Verbindungen gelten pro Gerät; Profile werden von den Gateways ermittelt, mit denen Sie sich verbinden.',
       envOverrideTitle: 'Umgebungsvariablen steuern diese Desktop-Session.',
       envOverrideDesc:
-        'Entfernen Sie HERMES_DESKTOP_REMOTE_URL und HERMES_DESKTOP_REMOTE_TOKEN, um die unten gespeicherte Einstellung zu verwenden.',
+        'Entfernen Sie MBILING_DESKTOP_REMOTE_URL und MBILING_DESKTOP_REMOTE_TOKEN, um die unten gespeicherte Einstellung zu verwenden.',
       modeTitle: 'Verbindungsmodus',
       localTitle: 'Lokales Gateway',
-      localDesc: 'Startet ein privates Hermes-Backend auf localhost. Das ist der Standard und funktioniert offline.',
+      localDesc: 'Startet ein privates Mbiling-Backend auf localhost. Das ist der Standard und funktioniert offline.',
       remoteTitle: 'Remote-Gateway',
-      remoteDesc: 'Verbindet diese Desktop-Shell mit einem entfernten Hermes-Backend.',
+      remoteDesc: 'Verbindet diese Desktop-Shell mit einem entfernten Mbiling-Backend.',
       remoteAuthHint:
         'Gehostete Gateways verwenden OAuth oder Benutzername und Passwort; selbst gehostete können ein Session-Token verwenden.',
       cloudTitle: 'Mbiling Cloud',
@@ -1741,18 +1741,18 @@ export const deOverrides = {
       cloudUseSaved: 'Gateway verwenden',
       cloudActive: 'In diesem Fenster aktiv',
       cloudConnecting: 'Verbindung wird hergestellt…',
-      cloudDiscoverFailed: 'Ihre Hermes-Cloud-Agents konnten nicht geladen werden',
+      cloudDiscoverFailed: 'Ihre Mbiling-Cloud-Agents konnten nicht geladen werden',
       cloudConnectFailed: 'Keine Verbindung zu diesem Agent möglich',
       cloudSignInFailed: 'Anmeldung bei Mbiling Cloud fehlgeschlagen',
       cloudSignedOutTitle: 'Von Mbiling Cloud abgemeldet',
-      cloudSignedOutMessage: 'Die Hermes-Cloud-Session wurde geleert.',
+      cloudSignedOutMessage: 'Die Mbiling-Cloud-Session wurde geleert.',
       cloudConnectedTitle: 'Verbunden',
       cloudConnectedPill: 'Verbunden',
       cloudConnectedTo: name => `Mit ${name} verbunden.`,
       cloudAgentProvisioning: 'Provisionierung…',
       cloudStatusLabel: status => `Status: ${status}`,
       remoteUrlTitle: 'Remote-URL',
-      remoteUrlDesc: 'Basis-URL für das Remote-Dashboard-Backend. Pfad-Präfixe werden unterstützt, z. B. /hermes.',
+      remoteUrlDesc: 'Basis-URL für das Remote-Dashboard-Backend. Pfad-Präfixe werden unterstützt, z. B. /mbiling.',
       probing: 'Authentifizierungsmethode dieses Gateways wird geprüft…',
       probeError:
         'Dieses Gateway ist noch nicht erreichbar. Prüfen Sie die URL – die Authentifizierungsmethode erscheint, sobald es antwortet.',
@@ -1830,9 +1830,9 @@ export const deOverrides = {
       sshPortDesc: 'Leer = 22 oder der Port aus ~/.ssh/config.',
       sshKeyTitle: 'Identitätsdatei',
       sshKeyDesc: 'Pfad zum privaten Schlüssel. Leer = ssh-agent oder ~/.ssh/config.',
-      sshHermesPathTitle: 'Hermes-Pfad (optional)',
-      sshHermesPathDesc: 'Vollständiger Pfad zum Remote-Hermes-Binary. Leer = automatisch erkennen.',
-      sshHermesPathPlaceholder: 'automatisch erkennen',
+      sshMbilingPathTitle: 'Mbiling-Pfad (optional)',
+      sshMbilingPathDesc: 'Vollständiger Pfad zum Remote-Mbiling-Binary. Leer = automatisch erkennen.',
+      sshMbilingPathPlaceholder: 'automatisch erkennen',
       sshTestConnection: 'SSH testen',
       sshConnect: 'Verbinden',
       sshButtonsHint: 'Speichern wird beim nächsten Start angewendet. Verbinden verbindet sofort neu.',
@@ -1844,7 +1844,7 @@ export const deOverrides = {
       sshErrHostKey:
         'Der Host-Key hat sich seit Ihrer letzten Verbindung GEÄNDERT. Prüfen Sie, ob das erwartet ist, führen Sie dann ssh-keygen -R <host> aus und verbinden Sie sich erneut.',
       sshErrNotInstalled:
-        'Mbiling ist auf dem Remote-Host nicht installiert. Installieren Sie es dort (curl -fsSL https://hermes-agent.nousresearch.com/install.sh | sh) oder legen Sie den Hermes-Pfad fest.',
+        'Mbiling ist auf dem Remote-Host nicht installiert. Installieren Sie es dort (curl -fsSL https://hermes-agent.nousresearch.com/install.sh | sh) oder legen Sie den Mbiling-Pfad fest.',
       sshErrPlatform:
         'Nicht unterstützte Remote-Plattform. Der Desktop-SSH-Modus von Mbiling unterstützt Linux-, macOS- und Windows-Remote-Hosts.',
       sshErrTimeout: 'SSH-Verbindung ist ausgelaufen. Der Host ist möglicherweise nicht erreichbar oder schläft.',
@@ -2157,7 +2157,7 @@ export const deOverrides = {
         cliBillingDisabled: {
           title: 'Remote-Ausgaben sind deaktiviert',
           message:
-            'Remote-Ausgaben sind für dieses Konto deaktiviert – ein Abrechnungsadministrator kann sie auf der Hermes-Agent-Seite des Portals aktivieren.'
+            'Remote-Ausgaben sind für dieses Konto deaktiviert – ein Abrechnungsadministrator kann sie auf der Mbiling-Agent-Seite des Portals aktivieren.'
         },
         roleRequired: {
           title: 'Administratorrolle erforderlich',
@@ -2464,7 +2464,7 @@ export const deOverrides = {
     unlockedHint: 'Sperren, damit der Agent diesen Skill nicht ändert. Du kannst ihn weiterhin selbst bearbeiten.',
     archive: 'Archivieren',
     skillArchivedTitle: 'Skill archiviert',
-    skillArchivedMessage: 'Wiederherstellbar über „hermes curator restore“.',
+    skillArchivedMessage: 'Wiederherstellbar über „mbiling curator restore“.',
     tabPlugins: 'Plugins',
     plugins: {
       agentTitle: 'Agent-Plugins',
@@ -2505,7 +2505,7 @@ export const deOverrides = {
       serverStates: {
         connected: 'verbunden',
         app_not_running: 'App läuft nicht',
-        hermes_not_connected: 'MCP-Verbindung fehlt',
+        mbiling_not_connected: 'MCP-Verbindung fehlt',
         endpoint_unavailable: 'Endpunkt nicht verfügbar',
         no_interactive_session: 'keine interaktive Session',
         version_too_old: 'Version zu alt',
@@ -2514,7 +2514,7 @@ export const deOverrides = {
         unknown: 'Status unbekannt'
       },
       alreadyInstalled: name => `${name} ist in diesem Profil bereits installiert.`,
-      catalogProvenance: sha => `Aus dem Hermes-Katalog installiert${sha ? ` am Pin ${sha}` : ''}.`,
+      catalogProvenance: sha => `Aus dem Mbiling-Katalog installiert${sha ? ` am Pin ${sha}` : ''}.`,
       pinnedProvenance: sha =>
         `An Commit ${sha} gepinnt. Updates werden abgelehnt, bis es mit einem neuen Pin neu installiert wird.`,
       pinnedBadge: sha => `gepinnt @ ${sha}`,
@@ -2534,9 +2534,9 @@ export const deOverrides = {
       deepLinkErrorTitle: 'Plugin-Installationslink abgelehnt',
       deepLinkCatalogInvalidName: 'Der Katalogname im Link fehlt oder ist ungültig.',
       deepLinkCatalogUnknown: (name: string) =>
-        `\u201E${name}\u201C ist nicht im Hermes-Plugin-Katalog. Es wurde nichts installiert.`,
+        `\u201E${name}\u201C ist nicht im Mbiling-Plugin-Katalog. Es wurde nichts installiert.`,
       deepLinkCatalogUnavailable:
-        'Der Hermes-Plugin-Katalog konnte nicht geladen werden. Prüfen Sie Ihre Verbindung und öffnen Sie den Link erneut.',
+        'Der Mbiling-Plugin-Katalog konnte nicht geladen werden. Prüfen Sie Ihre Verbindung und öffnen Sie den Link erneut.',
       settingsToggle: (name: string) => `Einstellungen: ${name}`,
       settingsForm: {
         save: 'Einstellungen speichern',
@@ -2812,7 +2812,7 @@ export const deOverrides = {
     noSessions: 'Noch keine Sessions.',
     gatewayRunning: 'Messaging-Gateway läuft',
     gatewayStopped: 'Messaging-Gateway gestoppt',
-    hermesActiveSessions: (version, count) => `Mbiling ${version} · Aktive Sessions ${count}`,
+    mbilingActiveSessions: (version, count) => `Mbiling ${version} · Aktive Sessions ${count}`,
     restartGateway: 'Gateway neu starten',
     openBrowser: 'Browser umschalten',
     toggleBrowser: 'Browser umschalten',
@@ -2821,7 +2821,7 @@ export const deOverrides = {
     sharedGatewayRestartDescription: bots => `Alle Bots auf diesem Gerät verbinden sich neu: ${bots}`,
     sharedGatewayRestartConfirm: 'Alle neu starten',
     sharedGatewayRestarted: count => `Gemeinsames Gateway neu gestartet (${count} ${count === 1 ? 'Bot' : 'Bots'})`,
-    updateHermes: 'Mbiling aktualisieren',
+    updateMbiling: 'Mbiling aktualisieren',
     reloadWindow: 'Fenster neu laden',
     actionRunning: 'läuft',
     actionDone: 'fertig',
@@ -2987,7 +2987,7 @@ export const deOverrides = {
     relayLink: {
       title: 'Team Gateway',
       badge: 'Kein Bot-Token nötig',
-      intro: (platform: string) => `${platform} erreicht diesen Agenten über den gemeinsamen Hermes-Bot. Verknüpfe dein ${platform}-Konto damit und schreib dem Bot, um mit deinem Agenten zu sprechen.`,
+      intro: (platform: string) => `${platform} erreicht diesen Agenten über den gemeinsamen Mbiling-Bot. Verknüpfe dein ${platform}-Konto damit und schreib dem Bot, um mit deinem Agenten zu sprechen.`,
       link: (platform: string) => `${platform} verknüpfen`,
       linkAnother: (platform: string) => `Weiteres ${platform}-Konto verknüpfen`,
       linkedAccounts: 'Verknüpfte Konten',
@@ -3013,7 +3013,7 @@ export const deOverrides = {
     telegramQr: {
       title: 'Wählen Sie, wie Sie Ihren Telegram-Bot verbinden',
       subtitle:
-        'Beide Optionen verbinden einen Bot, den Sie kontrollieren, und speichern seine Zugangsdaten nur in dieser Hermes-Installation.',
+        'Beide Optionen verbinden einen Bot, den Sie kontrollieren, und speichern seine Zugangsdaten nur in dieser Mbiling-Installation.',
       quickSetup: 'Schnelleinrichtung',
       recommended: 'Empfohlen',
       quickHelp:
@@ -3133,7 +3133,7 @@ export const deOverrides = {
       },
       MATRIX_USER_ID: {
         label: 'Bot-Benutzer-ID',
-        placeholder: '@hermes:example.org'
+        placeholder: '@mbiling:example.org'
       },
       MATRIX_ALLOWED_USERS: {
         label: 'Erlaubte Matrix-Benutzer-IDs',
@@ -3249,7 +3249,7 @@ export const deOverrides = {
     failedImport: 'Profil konnte nicht importiert werden',
     failedExport: 'Profil konnte nicht exportiert werden',
     exportNeedsHost: name =>
-      `Der Browser kann kein Profilarchiv speichern. Führe auf dem Hermes-Host aus: hermes profile export ${name}`,
+      `Der Browser kann kein Profilarchiv speichern. Führe auf dem Mbiling-Host aus: mbiling profile export ${name}`,
     allProfiles: 'Alle Profile',
     showAllProfiles: 'Alle Profile anzeigen',
     notServedHere: 'Hier nicht bereitgestellt',
@@ -3284,9 +3284,9 @@ export const deOverrides = {
       badge: (host: string) => `Läuft auf ${host}`,
       title: (profile: string) => `${profile} mit einem Remote-Host verbinden`,
       description:
-        'Sessions in diesem Profil laufen auf dem von Ihnen festgelegten Remote-Hermes statt auf diesem Computer.',
+        'Sessions in diesem Profil laufen auf dem von Ihnen festgelegten Remote-Mbiling statt auf diesem Computer.',
       urlLabel: 'Remote-Adresse',
-      urlPlaceholder: 'https://hermes.example.com',
+      urlPlaceholder: 'https://mbiling.example.com',
       urlInvalid: 'Geben Sie eine vollständige Adresse ein, die mit http:// oder https:// beginnt',
       tokenLabel: 'Access-Token',
       tokenPlaceholder: 'Remote-Session-Token einfügen',
@@ -3357,7 +3357,7 @@ export const deOverrides = {
     deleteDescMid: ' und entfernt sein ',
     deleteDescSuffix: ' Verzeichnis. Das kann nicht rückgängig gemacht werden.',
     deleting: 'Wird gelöscht...',
-    createDesc: 'Profile sind unabhängige Hermes-Umgebungen: eigene Config, eigene Skills und eigene SOUL.md.',
+    createDesc: 'Profile sind unabhängige Mbiling-Umgebungen: eigene Config, eigene Skills und eigene SOUL.md.',
     nameLabel: 'Name',
     cloneFrom: 'Klonen von',
     cloneFromNone: 'Keine (leer)',
@@ -3791,7 +3791,7 @@ export const deOverrides = {
     transcribingDictation: 'Transkribiert Diktat',
     voiceControls: 'Sprache',
     voiceEngine: 'Sprachchat-Engine',
-    voiceEngineChained: 'Sprache-zu-Text + Hermes-Stimme',
+    voiceEngineChained: 'Sprache-zu-Text + Mbiling-Stimme',
     voiceEngineLive: 'GPT-Live (Vollduplex, delegiert an Mbiling)',
     voiceEngineLiveNeedsKey: 'Benötigt einen OpenAI-API-Schlüssel',
     voiceEngineChangeFailed: 'Sprachchat-Engine konnte nicht geändert werden',
@@ -3817,7 +3817,7 @@ export const deOverrides = {
       '/resume': 'Gespeicherte Session fortsetzen',
       '/details': 'Transkript-Detailgrad steuern',
       '/copy': 'Auswahl oder letzte Assistenten-Nachricht kopieren',
-      '/quit': 'hermes beenden',
+      '/quit': 'mbiling beenden',
       '/start': 'Start-Pings der Plattform ohne Antwort bestätigen',
       '/new': 'Neuen Desktop-Chat starten',
       '/topic': 'Telegram-DM-Themen-Sessions aktivieren oder prüfen',
@@ -3848,7 +3848,7 @@ export const deOverrides = {
       '/refine': 'Diese Unterhaltung jetzt prüfen und Erkenntnisse in Gedächtnis/Skills speichern',
       '/review': 'Einen unabhängigen Subagent starten, der die gerade besprochene Arbeit prüft (PR, Code, Doku)',
       '/loop': 'Einen Prompt in dieser Session in regelmäßigen Abständen erneut ausführen',
-      '/plan': 'Einen Markdown-Umsetzungsplan in .hermes/plans/ schreiben, ohne etwas auszuführen',
+      '/plan': 'Einen Markdown-Umsetzungsplan in .mbiling/plans/ schreiben, ohne etwas auszuführen',
       '/moa': 'Einen Prompt mit der Standard-Mixture-of-Agents-Vorlage ausführen und dann Ihr Modell wiederherstellen',
       '/subgoal': 'Zusätzliche Kriterien zum aktiven Ziel hinzufügen oder verwalten',
       '/status': 'Status der aktuellen Session anzeigen',
@@ -3856,7 +3856,7 @@ export const deOverrides = {
       '/context':
         'Detaillierte Ansicht des Kontextfensters mit Nutzungsanzeige, Aufschlüsselung nach Kategorie, Komprimierungsstatistik und Durchsatz anzeigen',
       '/whoami': 'Ihren Zugriff auf Slash-Befehle anzeigen (Admin / Benutzer)',
-      '/profile': 'Aktives Hermes-Profil wechseln',
+      '/profile': 'Aktives Mbiling-Profil wechseln',
       '/codex-runtime': 'Codex-App-Server-Runtime für OpenAI/Codex-Modelle umschalten',
       '/personality': 'Eine vordefinierte Persönlichkeit festlegen',
       '/battery': 'Farbcodierte Akkuanzeige in der Statusleiste umschalten',
@@ -3884,7 +3884,7 @@ export const deOverrides = {
       '/subscription': 'Ihren Nous-Tarif ansehen und im Browser ändern',
       '/topup': 'Ihr Nous-Guthaben anzeigen und die Abrechnung im Portal verwalten',
       '/platform': 'Eine fehlerhafte Gateway-Plattform pausieren, fortsetzen oder auflisten',
-      '/version': 'Hermes-Agent-Version anzeigen',
+      '/version': 'Mbiling-Agent-Version anzeigen',
       '/debug': 'Debug-Bericht (Systeminfos + Logs) hochladen und teilbare Links erhalten',
       '/model': 'Modell für diese Session wechseln'
     },
@@ -4134,16 +4134,16 @@ export const deOverrides = {
     }
   },
   updates: {
-    discontinuedTitle: 'Dieser Hermes-Build wird nicht mehr unterstützt',
+    discontinuedTitle: 'Dieser Mbiling-Build wird nicht mehr unterstützt',
     discontinuedBody:
-      'Dieser Hermes-Build wird nicht mehr unterstützt und funktioniert möglicherweise nicht mehr — deinstallieren Sie ihn. Ihre Daten bleiben auf dem Datenträger.',
+      'Dieser Mbiling-Build wird nicht mehr unterstützt und funktioniert möglicherweise nicht mehr — deinstallieren Sie ihn. Ihre Daten bleiben auf dem Datenträger.',
     channels: { stable: 'Stabil', canary: 'Canary' },
     appName: 'Mbiling',
     availableBodyRelease: tag => `Version ${tag} ist bereit zur Installation.`,
     releaseAvailable: tag => `Version ${tag} ist verfügbar.`,
     checkingShort: 'Wird geprüft…',
     availableBodyAppInstaller:
-      'Eine neue Hermes-Version ist bereit. Mbiling wird geschlossen, Windows schließt das Update ab und Mbiling startet automatisch neu.',
+      'Eine neue Mbiling-Version ist bereit. Mbiling wird geschlossen, Windows schließt das Update ab und Mbiling startet automatisch neu.',
     applyingBodyAppInstaller:
       'Mbiling wird geschlossen und Windows schließt das Update ab. Danach startet Mbiling automatisch neu.',
     applyingCloseAppInstaller:
@@ -4164,9 +4164,9 @@ export const deOverrides = {
     versionDetailsDistributionDesktopMsix: 'Desktop-App (MSIX)',
     versionDetailsDistributionDesktopInstaller: 'Desktop-App (Installer)',
     versionDetailsDistributionSourceInstaller: 'Quellcode (Installationsskript)',
-    versionDetailsDistributionSourceInstallerDesktop: 'Quellcode (Installationsskript) + hermes desktop',
+    versionDetailsDistributionSourceInstallerDesktop: 'Quellcode (Installationsskript) + mbiling desktop',
     versionDetailsDistributionSource: 'Quellcode',
-    versionDetailsDistributionSourceDesktop: 'Quellcode + hermes desktop',
+    versionDetailsDistributionSourceDesktop: 'Quellcode + mbiling desktop',
     versionDetailsDistributionStore: 'Microsoft Store',
     versionDetailsRuntime: 'Laufzeit',
     versionDetailsRuntimeEmbedded: 'Eingebettete Laufzeit',
@@ -4177,7 +4177,7 @@ export const deOverrides = {
     versionUnavailable: 'Version nicht verfügbar',
     bundleOutOfSync: 'App-Build ist veraltet',
     bundleOutOfSyncDesc:
-      'Die Hermes-Laufzeit wurde aktualisiert, die Desktop-App selbst ist aber noch ein älterer Build – neue Oberflächenfunktionen (wie der Bot-Modus) fehlen, bis sie aktualisiert wird. Führen Sie das Update unten aus, um die App neu zu bauen. Falls das die Warnung nicht behebt, installieren Sie den neuesten Desktop-Installer neu.',
+      'Die Mbiling-Laufzeit wurde aktualisiert, die Desktop-App selbst ist aber noch ein älterer Build – neue Oberflächenfunktionen (wie der Bot-Modus) fehlen, bis sie aktualisiert wird. Führen Sie das Update unten aus, um die App neu zu bauen. Falls das die Warnung nicht behebt, installieren Sie den neuesten Desktop-Installer neu.',
     bundleOutOfSyncAction: 'Installer herunterladen',
     bundleSwapPending: 'Neustart zum Abschließen des Updates',
     bundleSwapPendingDesc:
@@ -4217,7 +4217,7 @@ export const deOverrides = {
     checkFailedTitle: 'Update-Check fehlgeschlagen',
     tryAgain: 'Erneut versuchen',
     notAvailableTitle: 'Kein Update verfügbar',
-    unsupportedMessage: 'Diese Hermes-Version kann sich nicht aus der App heraus aktualisieren.',
+    unsupportedMessage: 'Diese Mbiling-Version kann sich nicht aus der App heraus aktualisieren.',
     connectionRetry: 'Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.',
     gitUnusable: 'Mbiling konnte Git auf diesem Computer nicht ausführen und daher nicht nach Updates suchen.',
     connectionSettings: 'Verbindungseinstellungen',
@@ -4226,9 +4226,9 @@ export const deOverrides = {
     latestBodyBackend: 'Das Backend läuft mit der neuesten Version.',
     allSetTitle: 'Alles bereit',
     availableTitle: 'Neues Update verfügbar',
-    availableBody: 'Eine neue Hermes-Version ist bereit zur Installation.',
+    availableBody: 'Eine neue Mbiling-Version ist bereit zur Installation.',
     availableTitleBackend: 'Backend-Update verfügbar',
-    availableBodyBackend: 'Eine neuere Version des verbundenen Hermes-Backends ist bereit zur Installation.',
+    availableBodyBackend: 'Eine neuere Version des verbundenen Mbiling-Backends ist bereit zur Installation.',
     availableBodyNoChangelog:
       'Eine neuere Version ist bereit. Release-Notizen sind für diesen Installationstyp nicht verfügbar.',
     updateNow: 'Jetzt aktualisieren',
@@ -4241,16 +4241,16 @@ export const deOverrides = {
       'Sie haben Mbiling über die Befehlszeile installiert, daher laufen Updates auch dort. Fügen Sie dies in Ihr Terminal ein:',
     manualPickedUp: 'Mbiling übernimmt die neue Version beim nächsten Start.',
     manualBodyBackend:
-      'Das Hermes-Backend wird außerhalb dieser App verwaltet. Führen Sie dies auf dem Server aus, der es hostet:',
+      'Das Mbiling-Backend wird außerhalb dieser App verwaltet. Führen Sie dies auf dem Server aus, der es hostet:',
     manualPickedUpBackend: 'Das Backend lädt die neue Version, sobald das Update abgeschlossen ist.',
     guiSkewTitle: 'Desktop-App aktualisieren',
     guiSkewBody:
-      'Das Backend wurde aktualisiert, aber dieses Desktop-App-Paket nicht. Aktualisieren oder installieren Sie die Hermes-Desktop-App neu (Ihr AppImage / .deb / .rpm), um beide abzugleichen.',
+      'Das Backend wurde aktualisiert, aber dieses Desktop-App-Paket nicht. Aktualisieren oder installieren Sie die Mbiling-Desktop-App neu (Ihr AppImage / .deb / .rpm), um beide abzugleichen.',
     copy: 'Kopieren',
     copied: 'Kopiert',
     done: 'Fertig',
     applyingBody:
-      'Der Hermes-Updater übernimmt in einem eigenen Fenster und öffnet Mbiling automatisch wieder, wenn er fertig ist. Bitte öffnen Sie Mbiling während des Updates nicht selbst erneut.',
+      'Der Mbiling-Updater übernimmt in einem eigenen Fenster und öffnet Mbiling automatisch wieder, wenn er fertig ist. Bitte öffnen Sie Mbiling während des Updates nicht selbst erneut.',
     applyingBodyBackend:
       'Das Remote-Backend wendet das Update an und startet neu. Mbiling verbindet sich automatisch wieder, wenn es zurück ist.',
     applyingClose: 'Dieses Fenster schließt sich während des Updates, dann öffnet sich Mbiling von selbst wieder.',
@@ -4329,7 +4329,7 @@ export const deOverrides = {
       'Geben Sie die URL Ihres Gateways ein. Mbiling Desktop erkennt, ob ein Token oder eine Browser-Anmeldung nötig ist.',
     remoteUrlTitle: 'Gateway-URL',
     remoteUrlDesc: 'Verwenden Sie die Basis-URL des Mbiling Gateways, bei Remote-Gateways einschließlich https://.',
-    remoteUrlPlaceholder: 'https://gateway.example.com/hermes',
+    remoteUrlPlaceholder: 'https://gateway.example.com/mbiling',
     probing: 'Gateway-Authentifizierung wird erkannt...',
     probeError: 'Dieses Mbiling Gateway konnte nicht erreicht werden.',
     probeErrorDetails: 'Details',
@@ -4355,9 +4355,9 @@ export const deOverrides = {
     settingUpTitle: 'Mbiling wird eingerichtet',
     finishingTitle: 'Wird abgeschlossen',
     failedDesc:
-      'Einer der Installationsschritte ist fehlgeschlagen. Unter Windows kann das passieren, wenn eine andere Hermes-CLI- oder Desktop-Instanz läuft. Beenden Sie alle laufenden Hermes-Instanzen und versuchen Sie es dann erneut. Das vollständige Protokoll finden Sie in den Details unten oder im Desktop-Log.',
+      'Einer der Installationsschritte ist fehlgeschlagen. Unter Windows kann das passieren, wenn eine andere Mbiling-CLI- oder Desktop-Instanz läuft. Beenden Sie alle laufenden Mbiling-Instanzen und versuchen Sie es dann erneut. Das vollständige Protokoll finden Sie in den Details unten oder im Desktop-Log.',
     activeDesc:
-      'Das ist eine einmalige Einrichtung. Der Hermes-Installer lädt Abhängigkeiten herunter und konfiguriert Ihren Computer. Bei späteren Starts wird dieser Schritt übersprungen.',
+      'Das ist eine einmalige Einrichtung. Der Mbiling-Installer lädt Abhängigkeiten herunter und konfiguriert Ihren Computer. Bei späteren Starts wird dieser Schritt übersprungen.',
     progress: (completed, total) => `${completed} von ${total} Schritten fertig`,
     currentStage: stage => ` – gerade: ${stage}`,
     fetchingManifest: 'Installer-Manifest wird geholt...',
@@ -4427,7 +4427,7 @@ export const deOverrides = {
     },
     setupFailed: {
       gateClosed:
-        'Diese Hermes-Version kann ohne Nous-Konto nicht starten. Melden Sie sich an oder legen Sie eines an – kostenlos und in einer Minute erledigt.',
+        'Diese Mbiling-Version kann ohne Nous-Konto nicht starten. Melden Sie sich an oder legen Sie eines an – kostenlos und in einer Minute erledigt.',
       paused:
         'Chatten ohne Anmeldung ist vorübergehend pausiert. Mbiling prüft weiter. Die Anmeldung ist kostenlos, und Sie können sofort weitermachen.',
       rateLimited: wait =>
@@ -5002,7 +5002,7 @@ export const deOverrides = {
         },
         SESSION_NOT_OWNED: {
           title: 'Chat ist woanders geöffnet',
-          body: 'Dieser Chat ist in einem anderen Hermes-Fenster oder Terminal geöffnet. Starten Sie hier einen neuen Chat oder schließen Sie ihn zuerst dort.'
+          body: 'Dieser Chat ist in einem anderen Mbiling-Fenster oder Terminal geöffnet. Starten Sie hier einen neuen Chat oder schließen Sie ihn zuerst dort.'
         },
         disk_full: {
           title: 'Ihre Festplatte ist voll',
@@ -5081,8 +5081,8 @@ export const deOverrides = {
       errorChooseModel: 'Modell wählen',
       errorCompressConversation: 'Gespräch komprimieren',
       errorCompressFailed: 'Das Gespräch konnte nicht komprimiert werden',
-      errorOpenHermesFolder: 'Hermes-Ordner öffnen',
-      errorOpenHermesFolderFailed: 'Der Hermes-Ordner konnte nicht geöffnet werden',
+      errorOpenMbilingFolder: 'Mbiling-Ordner öffnen',
+      errorOpenMbilingFolderFailed: 'Der Mbiling-Ordner konnte nicht geöffnet werden',
       errorUpdateApiKey: 'API-Key aktualisieren',
       errorSignInAgain: provider => `Erneut bei ${provider} anmelden`,
       errorSignInFreeTier: 'Mit einem Nous-Konto anmelden',
@@ -5116,7 +5116,7 @@ export const deOverrides = {
       attachingFile: 'Hängt an…'
     },
     approval: {
-      gatewayDisconnected: 'Hermes-Gateway ist nicht verbunden',
+      gatewayDisconnected: 'Mbiling-Gateway ist nicht verbunden',
       sendFailed: 'Genehmigungsantwort konnte nicht gesendet werden',
       reconnect: 'Neu verbinden',
       timedOutSystemLine:
@@ -5131,7 +5131,7 @@ export const deOverrides = {
       reject: 'Ablehnen',
       alwaysTitle: 'Diesen Befehl immer erlauben?',
       alwaysDescription: pattern =>
-        `Dies fügt das Muster „${pattern}“ Ihrer dauerhaften Zulassungsliste hinzu (~/.hermes/config.yaml). Mbiling fragt bei solchen Befehlen nicht mehr nach – weder in dieser noch in zukünftigen Sessions.`,
+        `Dies fügt das Muster „${pattern}“ Ihrer dauerhaften Zulassungsliste hinzu (~/.mbiling/config.yaml). Mbiling fragt bei solchen Befehlen nicht mehr nach – weder in dieser noch in zukünftigen Sessions.`,
       alwaysAllow: 'Immer erlauben'
     },
     clarify: deClarify,
@@ -5182,7 +5182,7 @@ export const deOverrides = {
       sendFailed: 'MCP-Einrichtungsantwort konnte nicht gesendet werden',
       reloadFailed:
         'Server gespeichert, aber das Neuladen der MCP-Tools schlug fehl — sie laden in der nächsten Session',
-      gatewayDisconnected: 'Hermes-Gateway ist nicht verbunden'
+      gatewayDisconnected: 'Mbiling-Gateway ist nicht verbunden'
     },
     tool: {
       copyCode: 'Code kopieren',
@@ -5367,7 +5367,7 @@ export const deOverrides = {
     }
   },
   prompts: {
-    gatewayDisconnected: 'Das Hermes-Gateway ist nicht verbunden',
+    gatewayDisconnected: 'Das Mbiling-Gateway ist nicht verbunden',
     reconnect: 'Neu verbinden',
     sudoSendFailed: 'Sudo-Passwort konnte nicht gesendet werden',
     secretSendFailed: 'Geheimnis konnte nicht gesendet werden',
@@ -5500,7 +5500,7 @@ export const deOverrides = {
       success: platform => `Übergeben an ${platform}. Jederzeit hier fortsetzen.`,
       systemNote: platform => `↻ Übergeben an ${platform} — jederzeit hier fortsetzen.`,
       failed: error => `Übergabe fehlgeschlagen: ${error}`,
-      timedOut: 'Zeitüberschreitung beim Warten auf das Gateway. Läuft `hermes gateway`?',
+      timedOut: 'Zeitüberschreitung beim Warten auf das Gateway. Läuft `mbiling gateway`?',
       startMessaging: 'Messaging starten'
     }
   },

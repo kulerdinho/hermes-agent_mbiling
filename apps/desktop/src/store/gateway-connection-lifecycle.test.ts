@@ -1,4 +1,4 @@
-import { JsonRpcGatewayError } from '@hermes/shared'
+import { JsonRpcGatewayError } from '@mbiling/shared'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { LIVENESS_REPROBE_DELAY_MS } from '@/lib/gateway-liveness-policy'
@@ -35,9 +35,9 @@ const reconnectStateMocks = vi.hoisted(() => ({
   resetTileRuntimeBindings: vi.fn()
 }))
 
-vi.mock('@/hermes', () => ({
+vi.mock('@/mbiling', () => ({
   setApiRequestConnection: vi.fn(),
-  HermesGateway: class {
+  MbilingGateway: class {
     connectionState = 'closed'
     close = vi.fn(() => {
       this.connectionState = 'closed'
@@ -87,7 +87,7 @@ const {
 } = await import('./gateway')
 
 function installDesktop(stub: Record<string, unknown>): void {
-  ;(window as unknown as { hermesDesktop: unknown }).hermesDesktop = stub
+  ;(window as unknown as { mbilingDesktop: unknown }).mbilingDesktop = stub
 }
 
 function descriptorFor(connectionId: string, profile: string) {
@@ -112,7 +112,7 @@ afterEach(() => {
   gatewayMocks.eventHandlers.length = 0
   vi.clearAllMocks()
   vi.useRealTimers()
-  delete (window as unknown as { hermesDesktop?: unknown }).hermesDesktop
+  delete (window as unknown as { mbilingDesktop?: unknown }).mbilingDesktop
 })
 
 describe('a redial of the active route', () => {
@@ -692,7 +692,7 @@ describe('reconnect fail-stop on a removed connection', () => {
     // path (wake sweep, agent activation) used to make ensureActiveGatewayOpen
     // return null immediately: reconnectSecondary early-returns on
     // `reconnecting`, the socket is still closed, and the caller surfaced
-    // "Hermes gateway is not connected" on the Sessions + action. The drive
+    // "Mbiling gateway is not connected" on the Sessions + action. The drive
     // must ride out the in-flight activation and hand back the opened socket.
     let releaseDial: (() => void) | undefined
 
@@ -779,10 +779,10 @@ describe('secondary stalled-dial budget', () => {
     vi.useFakeTimers()
 
     // What main's ensureLocalGateway / parseGatewayEnsureOutput / assertLocalGatewayEndpoint throw,
-    // as they cross the IPC boundary. Each re-dial spawns another `hermes gateway ensure`.
+    // as they cross the IPC boundary. Each re-dial spawns another `mbiling gateway ensure`.
     for (const permanent of [
-      "Error invoking remote method 'hermes:connection:get-for': Error: Gateway incompatible (runtime_protocol). Use hermes gateway status for recovery.",
-      'hermes gateway ensure produced no result (exit 2): invalid choice. Update Mbiling or check the profile, then retry.',
+      "Error invoking remote method 'mbiling:connection:get-for': Error: Gateway incompatible (runtime_protocol). Use mbiling gateway status for recovery.",
+      'mbiling gateway ensure produced no result (exit 2): invalid choice. Update Mbiling or check the profile, then retry.',
       'Invalid local gateway endpoint'
     ]) {
       closeSecondaryGateways()

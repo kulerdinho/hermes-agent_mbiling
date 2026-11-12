@@ -7,17 +7,17 @@ export const deBoot = {
     desktopBootFailedWithMessage: message => `Desktop-Start fehlgeschlagen: ${message}`,
     steps: {
       connectingGateway: 'Live-Desktop-Gateway wird verbunden',
-      loadingSettings: 'Hermes-Einstellungen werden geladen',
+      loadingSettings: 'Mbiling-Einstellungen werden geladen',
       loadingSessions: 'Letzte Sessions werden geladen',
-      retryingRemoteBackend: 'Wird mit dem Remote-Hermes-Backend neu verbunden…',
+      retryingRemoteBackend: 'Wird mit dem Remote-Mbiling-Backend neu verbunden…',
       startingDesktopConnection: 'Desktop-Verbindung wird gestartet',
-      startingHermesDesktop: 'Mbiling Desktop wird gestartet…'
+      startingMbilingDesktop: 'Mbiling Desktop wird gestartet…'
     },
     errors: {
-      backgroundExited: 'Der Hermes-Hintergrundprozess wurde beendet.',
-      backgroundExitedDuringStartup: 'Der Hermes-Hintergrundprozess wurde während des Starts beendet.',
+      backgroundExited: 'Der Mbiling-Hintergrundprozess wurde beendet.',
+      backgroundExitedDuringStartup: 'Der Mbiling-Hintergrundprozess wurde während des Starts beendet.',
       backendStopped: 'Backend gestoppt',
-      restartHermes: 'Mbiling neu starten',
+      restartMbiling: 'Mbiling neu starten',
       openLogs: 'Logs öffnen',
       desktopBootFailed: 'Desktop-Start fehlgeschlagen',
       gatewayConnectionLost: 'Verbindung zum Gateway verloren',
@@ -38,7 +38,7 @@ export const deBoot = {
       diskFull: 'Die Festplatte ist voll, deshalb konnte Mbiling nicht starten.',
       portInUse: 'Ein anderes Programm verwendet den Netzwerkport, den Mbiling braucht.',
       installMissing:
-        'Ein Teil der Hermes-Installation fehlt. Wählen Sie „Installation reparieren“, um sie wiederherzustellen.'
+        'Ein Teil der Mbiling-Installation fehlt. Wählen Sie „Installation reparieren“, um sie wiederherzustellen.'
     },
     failure: {
       title: 'Mbiling konnte nicht gestartet werden',
@@ -85,15 +85,15 @@ export const deBoot = {
       description:
         'Mbiling startet noch nicht, damit es keine Dateien lädt, die ein Update womöglich noch ändert. Sobald die Sperre endet, startet Mbiling von selbst.',
       heldByProcess: pid =>
-        `Das Update (Prozess ${pid}) wurde beendet, aber ein von ihm gestarteter Prozess hält die Hermes-Installation noch fest.`,
+        `Das Update (Prozess ${pid}) wurde beendet, aber ein von ihm gestarteter Prozess hält die Mbiling-Installation noch fest.`,
       heldUnknown:
-        'Ein Update wurde beendet, aber ein von ihm gestarteter Prozess hält die Hermes-Installation noch fest.',
+        'Ein Update wurde beendet, aber ein von ihm gestarteter Prozess hält die Mbiling-Installation noch fest.',
       unverified:
-        'Der Update-Helfer konnte gerade nicht prüfen, wem die Hermes-Installation gehört. Mbiling prüft weiter.',
+        'Der Update-Helfer konnte gerade nicht prüfen, wem die Mbiling-Installation gehört. Mbiling prüft weiter.',
       since: time => `Wartet seit ${time}`,
       lastChecked: time => `Zuletzt geprüft ${time}`,
       recoveryHint:
-        'Das löst sich meist in wenigen Minuten. Falls nicht: Mbiling beenden, übrig gebliebene git- oder hermes-Prozesse beenden (oder den Computer neu starten) und Mbiling erneut öffnen.',
+        'Das löst sich meist in wenigen Minuten. Falls nicht: Mbiling beenden, übrig gebliebene git- oder mbiling-Prozesse beenden (oder den Computer neu starten) und Mbiling erneut öffnen.',
       checkAgain: 'Erneut prüfen',
       quit: 'Mbiling beenden',
       openLogs: 'Logs öffnen',

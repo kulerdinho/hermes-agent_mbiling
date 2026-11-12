@@ -25,10 +25,10 @@ def export_commands(path: Path) -> None:
         alias.symlink_to(prepared.python)
         directories.insert(0, str(commands))
     file_commands("GITHUB_ENV", {
-        "HERMES_PYTHON": prepared.python,
-        "HERMES_NODE": prepared.node,
-        "HERMES_HOME": prepared.request.work / "hermes-home",
-        "HERMES_RUNTIME_DIR": prepared.request.cache / "tools",
+        "MBILING_PYTHON": prepared.python,
+        "MBILING_NODE": prepared.node,
+        "MBILING_HOME": prepared.request.work / "mbiling-home",
+        "MBILING_RUNTIME_DIR": prepared.request.cache / "tools",
         "PYTHONUTF8": "1",
         "PYTHONDONTWRITEBYTECODE": "1",
     })

@@ -114,7 +114,7 @@ export const ruOverrides = {
       'Это приложение Mbiling старше подключённого бэкенда и может работать некорректно. Обновите приложение, чтобы они совпали.',
     updateDesktopApp: 'Обновить приложение',
     installMethodUnsupportedTitle: 'Неподдерживаемый способ установки',
-    updateHermes: 'Обновить Mbiling',
+    updateMbiling: 'Обновить Mbiling',
     updateReadyTitle: 'Обновление готово',
     updateReadyMessage: count =>
       `Доступно ${count} ${count % 10 === 1 && count % 100 !== 11 ? 'новое изменение' : count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 12 || count % 100 > 14) ? 'новых изменения' : 'новых изменений'}.`,
@@ -1073,7 +1073,7 @@ export const ruOverrides = {
         'По умолчанию — локальный. Используйте удалённый, когда приложение должно управлять бэкендом Mbiling в другом месте. Соединения шлюзов — на уровне машины; профили обнаруживаются из подключённых шлюзов.',
       envOverrideTitle: 'Переменные окружения управляют этой сессией приложения.',
       envOverrideDesc:
-        'Сбросьте HERMES_DESKTOP_REMOTE_URL и HERMES_DESKTOP_REMOTE_TOKEN, чтобы использовать сохранённую настройку ниже.',
+        'Сбросьте MBILING_DESKTOP_REMOTE_URL и MBILING_DESKTOP_REMOTE_TOKEN, чтобы использовать сохранённую настройку ниже.',
       modeTitle: 'Режим подключения',
       localTitle: 'Локальный шлюз',
       localDesc: 'Запускает приватный бэкенд Mbiling на localhost. Это значение по умолчанию, работает офлайн.',
@@ -1118,7 +1118,7 @@ export const ruOverrides = {
       cloudAgentProvisioning: 'Развёртывание…',
       cloudStatusLabel: status => `Статус: ${status}`,
       remoteUrlTitle: 'Удалённый URL',
-      remoteUrlDesc: 'Базовый URL удалённого бэкенда дашборда. Поддерживаются префиксы пути, например /hermes.',
+      remoteUrlDesc: 'Базовый URL удалённого бэкенда дашборда. Поддерживаются префиксы пути, например /mbiling.',
       probing: 'Проверяем, как аутентифицируется этот шлюз…',
       probeError:
         'Пока не удалось связаться с этим шлюзом. Проверьте URL — способ аутентификации появится, когда он ответит.',
@@ -1189,9 +1189,9 @@ export const ruOverrides = {
       sshPortDesc: 'Пусто = 22 или порт из ~/.ssh/config.',
       sshKeyTitle: 'Файл ключа',
       sshKeyDesc: 'Путь к закрытому ключу. Пусто = ssh-agent или ~/.ssh/config.',
-      sshHermesPathTitle: 'Путь к Mbiling (необязательно)',
-      sshHermesPathDesc: 'Полный путь к бинарнику hermes на удалённой машине. Пусто = автоопределение.',
-      sshHermesPathPlaceholder: 'автоопределение',
+      sshMbilingPathTitle: 'Путь к Mbiling (необязательно)',
+      sshMbilingPathDesc: 'Полный путь к бинарнику mbiling на удалённой машине. Пусто = автоопределение.',
+      sshMbilingPathPlaceholder: 'автоопределение',
       sshTestConnection: 'Проверить SSH',
       sshConnect: 'Подключиться',
       sshButtonsHint: '«Сохранить» применится при следующем запуске. «Подключиться» переподключится сейчас.',
@@ -1481,7 +1481,7 @@ export const ruOverrides = {
     unlockedHint: 'Заблокируйте навык, чтобы агент не мог его менять. Вы по-прежнему можете редактировать его сами.',
     archive: 'В архив',
     skillArchivedTitle: 'Навык в архиве',
-    skillArchivedMessage: 'Восстановить через hermes curator restore.',
+    skillArchivedMessage: 'Восстановить через mbiling curator restore.',
     hub: {
       searchPlaceholder: 'Поиск в хабе навыков',
       search: 'Поиск',
@@ -1712,7 +1712,7 @@ export const ruOverrides = {
     noSessions: 'Сеансов пока нет.',
     gatewayRunning: 'Шлюз сообщений работает',
     gatewayStopped: 'Шлюз сообщений остановлен',
-    hermesActiveSessions: (version, count) => `Mbiling ${version} · Активные сеансы: ${count}`,
+    mbilingActiveSessions: (version, count) => `Mbiling ${version} · Активные сеансы: ${count}`,
     restartGateway: 'Перезапустить шлюз',
     openBrowser: 'Переключить браузер',
     toggleBrowser: 'Переключить браузер',
@@ -1721,7 +1721,7 @@ export const ruOverrides = {
     sharedGatewayRestartDescription: bots => `Все боты на этом устройстве переподключатся: ${bots}`,
     sharedGatewayRestartConfirm: 'Перезапустить все',
     sharedGatewayRestarted: count => `Общий шлюз перезапущен (ботов: ${count})`,
-    updateHermes: 'Обновить Mbiling',
+    updateMbiling: 'Обновить Mbiling',
     reloadWindow: 'Перезагрузить окно',
     actionRunning: 'выполняется',
     actionDone: 'готово',
@@ -1996,7 +1996,7 @@ export const ruOverrides = {
       },
       MATRIX_HOMESERVER: { label: 'URL homeserver', placeholder: 'https://matrix.org' },
       MATRIX_ACCESS_TOKEN: { label: 'Токен доступа' },
-      MATRIX_USER_ID: { label: 'ID пользователя бота', placeholder: '@hermes:example.org' },
+      MATRIX_USER_ID: { label: 'ID пользователя бота', placeholder: '@mbiling:example.org' },
       MATRIX_ALLOWED_USERS: {
         label: 'Разрешённые ID пользователей Matrix',
         help: 'Рекомендуется. ID пользователей (по одному в поле) в формате @user:server.'
@@ -2103,7 +2103,7 @@ export const ruOverrides = {
     failedImport: 'Не удалось импортировать профиль',
     failedExport: 'Не удалось экспортировать профиль',
     exportNeedsHost: name =>
-      `Браузер не может сохранить архив профиля. На хосте Mbiling выполните: hermes profile export ${name}`,
+      `Браузер не может сохранить архив профиля. На хосте Mbiling выполните: mbiling profile export ${name}`,
     allProfiles: 'Все профили',
     showAllProfiles: 'Показать все профили',
     notServedHere: 'Здесь не обслуживается',
@@ -2602,7 +2602,7 @@ export const ruOverrides = {
       '/resume': 'Возобновить сохранённый сеанс',
       '/details': 'уровень детализации транскрипта',
       '/copy': 'скопировать выделенное или последнее сообщение ассистента',
-      '/quit': 'выйти из hermes',
+      '/quit': 'выйти из mbiling',
       '/start': 'Подтвердить запуск платформы без ответа',
       '/new': 'Начать новый чат в приложении',
       '/topic': 'Включить или просмотреть темы личных сообщений Telegram',
@@ -2631,7 +2631,7 @@ export const ruOverrides = {
       '/refine': 'Проанализировать беседу и сохранить выводы в памяти или навыках',
       '/review': 'Запустить независимого субагента для проверки обсуждаемой работы',
       '/loop': 'Повторять запрос с заданным интервалом в этом сеансе',
-      '/plan': 'Записать план реализации в Markdown в .hermes/plans/ без выполнения',
+      '/plan': 'Записать план реализации в Markdown в .mbiling/plans/ без выполнения',
       '/moa': 'Выполнить запрос через Mixture of Agents, затем вернуть исходную модель',
       '/subgoal': 'Добавить или изменить критерии активной цели',
       '/status': 'Показать состояние текущего сеанса',
@@ -3071,7 +3071,7 @@ export const ruOverrides = {
     remoteSetupDesc: 'Введите URL вашего шлюза. Mbiling Desktop определит, нужен токен или вход через браузер.',
     remoteUrlTitle: 'URL шлюза',
     remoteUrlDesc: 'Используйте базовый URL шлюза Mbiling, включая https:// для удалённых.',
-    remoteUrlPlaceholder: 'https://gateway.example.com/hermes',
+    remoteUrlPlaceholder: 'https://gateway.example.com/mbiling',
     probing: 'Определяем аутентификацию шлюза...',
     probeError: 'Не удалось подключиться к этому шлюзу Mbiling.',
     identityProvider: 'ваш провайдер аутентификации',
@@ -3598,7 +3598,7 @@ export const ruOverrides = {
       reject: 'Отклонить',
       alwaysTitle: 'Всегда разрешать эту команду?',
       alwaysDescription: pattern =>
-        `Это добавит паттерн «${pattern}» в ваш постоянный список разрешений (~/.hermes/config.yaml). Mbiling больше не будет спрашивать о подобных командах — ни в этом сеансе, ни в будущем.`,
+        `Это добавит паттерн «${pattern}» в ваш постоянный список разрешений (~/.mbiling/config.yaml). Mbiling больше не будет спрашивать о подобных командах — ни в этом сеансе, ни в будущем.`,
       alwaysAllow: 'Всегда разрешать'
     },
     clarify: ruClarify,
@@ -3856,7 +3856,7 @@ export const ruOverrides = {
       success: platform => `Передаём в ${platform}. Возобновите здесь в любой момент.`,
       systemNote: platform => `↻ Передано в ${platform} — возобновите здесь в любой момент.`,
       failed: error => `Передача не удалась: ${error}`,
-      timedOut: 'Превышено время ожидания шлюза. Выполняется ли `hermes gateway`?'
+      timedOut: 'Превышено время ожидания шлюза. Выполняется ли `mbiling gateway`?'
     }
   },
   errors: {

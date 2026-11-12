@@ -11,7 +11,7 @@
  * way chat does.
  */
 
-import { resolveGatewayWsUrl } from '@hermes/shared'
+import { resolveGatewayWsUrl } from '@mbiling/shared'
 
 const RESOLVE_TIMEOUT_MS = 15_000
 
@@ -52,7 +52,7 @@ export async function resolveSiblingWsUrl(
   path: string,
   options: { stripGatewayCredential?: boolean } = {}
 ): Promise<string> {
-  const desktop = window.hermesDesktop
+  const desktop = window.mbilingDesktop
 
   if (!desktop?.getConnection) {
     throw new Error('Mbiling Desktop connection bridge unavailable')

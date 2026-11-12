@@ -2,28 +2,28 @@ import { useStore } from '@nanostores/react'
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useMemo, useRef, useState } from 'react'
 
-import {
-  getMcpCatalog,
-  type HermesGateway,
-  type McpCatalogEntry,
-  type McpCatalogResponse,
-  type McpTestResult,
-  type ProfileScope,
-  profileScopeKey,
-  saveMcpServers
-} from '@/hermes'
 import { useI18n } from '@/i18n'
 import { completeMcpDesktopOAuth } from '@/lib/mcp-dashboard-oauth'
 import { probeCache, probeKey } from '@/lib/mcp-probe-cache'
 import { announceMcpReload, reloadMcp } from '@/lib/mcp-reload'
 import { getServers, type McpServerEntry, type McpServers } from '@/lib/mcp-servers'
 import { setDisabledTools, toggleToolInServer } from '@/lib/mcp-tool-filter'
+import {
+  getMcpCatalog,
+  type MbilingGateway,
+  type McpCatalogEntry,
+  type McpCatalogResponse,
+  type McpTestResult,
+  type ProfileScope,
+  profileScopeKey,
+  saveMcpServers
+} from '@/mbiling'
 import { notify, notifyError } from '@/store/notifications'
 import { $activeGatewayProfile, normalizeProfileKey } from '@/store/profile'
 import { $activeSessionId } from '@/store/session'
-import type { HermesConfigRecord } from '@/types/hermes'
+import type { MbilingConfigRecord } from '@/types/mbiling'
 
-import { hermesConfigCacheWriter, useHermesConfigRecord } from '../../hooks/use-config-record'
+import { mbilingConfigCacheWriter, useMbilingConfigRecord } from '../../hooks/use-config-record'
 import { useOnProfileSwitch } from '../../hooks/use-on-profile-switch'
 import { useProfileSwitchLatch } from '../../hooks/use-profile-switch-latch'
 import { seedOptions } from '../connectors/data/persist'
@@ -42,7 +42,7 @@ export interface McpServersController extends McpDraft, PublishedProbes {
   availableCatalog: McpCatalogEntry[]
   catalog: McpCatalogEntry[]
   catalogLoading: boolean
-  config: HermesConfigRecord | null
+  config: MbilingConfigRecord | null
   configError: unknown
   configFailed: boolean
   configLoading: boolean
@@ -62,7 +62,7 @@ export interface McpServersController extends McpDraft, PublishedProbes {
 }
 
 export interface UseMcpServersOptions {
-  gateway: HermesGateway | null
+  gateway: MbilingGateway | null
   profile?: ProfileScope
 }
 
@@ -82,9 +82,9 @@ export function useMcpServers({ gateway, profile }: UseMcpServersOptions): McpSe
     refetch: refetchConfigQuery,
     dataUpdatedAt: configUpdatedAt,
     errorUpdatedAt: configErroredAt
-  } = useHermesConfigRecord(profile)
+  } = useMbilingConfigRecord(profile)
 
-  const setConfig = hermesConfigCacheWriter(profile)
+  const setConfig = mbilingConfigCacheWriter(profile)
 
   const { arm: armProfileLatch, pending: profilePending } = useProfileSwitchLatch({
     dataUpdatedAt: configUpdatedAt,

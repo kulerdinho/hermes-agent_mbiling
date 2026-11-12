@@ -358,14 +358,14 @@ test('update-all deduplicates the same recovery scope and keeps primary preceden
 test.runIf(process.platform !== 'win32').each([0, 23])(
   'POSIX managed launcher executes the updater command and atomically publishes status %i',
   async (exitCode: number): Promise<void> => {
-    const home: string = await mkdtemp(path.join(os.tmpdir(), 'hermes managed launch '))
+    const home: string = await mkdtemp(path.join(os.tmpdir(), 'mbiling managed launch '))
     const shell: string = (await exec('command -v bash', { shell: 'bash' })).stdout.trim()
-    const launcher: string = path.join(home, 'hermes launcher')
+    const launcher: string = path.join(home, 'mbiling launcher')
 
     try {
       await writeFile(
         launcher,
-        `#!${shell}\nprintf '%s\\n' "$@" "$HERMES_HOME" "$HERMES_UPDATE_CORRELATION_ID" "$HERMES_UPDATE_ORIGIN_PROFILE" "$HERMES_UPDATE_ORIGIN_HOME" "$HERMES_UPDATE_OUTPUT_PATH"\nexit ${exitCode}\n`,
+        `#!${shell}\nprintf '%s\\n' "$@" "$MBILING_HOME" "$MBILING_UPDATE_CORRELATION_ID" "$MBILING_UPDATE_ORIGIN_PROFILE" "$MBILING_UPDATE_ORIGIN_HOME" "$MBILING_UPDATE_OUTPUT_PATH"\nexit ${exitCode}\n`,
         { encoding: 'utf8', mode: 0o700 }
       )
 
@@ -373,13 +373,13 @@ test.runIf(process.platform !== 'win32').each([0, 23])(
         {
           ssh: { exec: async (): Promise<string> => '' },
           platform: 'Linux',
-          hermesPath: launcher,
-          hermesHome: home
+          mbilingPath: launcher,
+          mbilingHome: home
         },
         CORRELATION
       )
 
-      const { stdout, stderr } = await exec(command, { shell, env: { ...process.env, HOME: home, HERMES_HOME: home } })
+      const { stdout, stderr } = await exec(command, { shell, env: { ...process.env, HOME: home, MBILING_HOME: home } })
       const statusPath: string = path.join(home, `.update_exit_code.${CORRELATION}`)
       const logPath: string = path.join(home, 'logs', `desktop-update-${CORRELATION}.log`)
       let status: string | undefined
@@ -422,8 +422,8 @@ test('Windows managed launcher starts a hidden child and leaves exit 75 to the e
     {
       ssh: { exec: async () => '' },
       platform: 'Windows',
-      hermesPath: 'C:\\Mbiling\\hermes.exe',
-      hermesHome: 'C:\\Users\\alice\\.hermes',
+      mbilingPath: 'C:\\Mbiling\\mbiling.exe',
+      mbilingHome: 'C:\\Users\\alice\\.mbiling',
       pythonPath: 'C:\\Mbiling\\python.exe'
     },
     CORRELATION
@@ -439,9 +439,9 @@ test('Windows managed launcher starts a hidden child and leaves exit 75 to the e
 
   assert.match(wrapper, /update --yes/)
   assert.doesNotMatch(wrapper, /update --yes --gateway/)
-  assert.match(wrapper, /HERMES_UPDATE_WINDOWS_DETACHED/)
-  assert.match(wrapper, /HERMES_UPDATE_TAURI_READY_PATH/)
-  assert.match(wrapper, /HERMES_UPDATE_TAURI_OUTCOME_PATH/)
+  assert.match(wrapper, /MBILING_UPDATE_WINDOWS_DETACHED/)
+  assert.match(wrapper, /MBILING_UPDATE_TAURI_READY_PATH/)
+  assert.match(wrapper, /MBILING_UPDATE_TAURI_OUTCOME_PATH/)
   assert.match(wrapper, /\$rc -ne 75/)
   assert.match(wrapper, /\$handoffAccepted=/)
   assert.match(wrapper, new RegExp(`update_launch_intent\\.${CORRELATION}`))
@@ -466,7 +466,7 @@ test('remote observation rejects a receipt for another correlation', () => {
 test.runIf(process.platform !== 'win32')(
   'POSIX observer reads the exact correlation receipt and terminal marker from disk',
   async () => {
-    const home = await mkdtemp(path.join(os.tmpdir(), 'hermes-managed-update-'))
+    const home = await mkdtemp(path.join(os.tmpdir(), 'mbiling-managed-update-'))
 
     try {
       const receipts = path.join(home, 'logs', 'update_receipts')
@@ -488,8 +488,8 @@ test.runIf(process.platform !== 'win32')(
         {
           ssh: { exec: async () => '' },
           platform: 'Linux',
-          hermesPath: '/opt/hermes/hermes',
-          hermesHome: home
+          mbilingPath: '/opt/mbiling/mbiling',
+          mbilingHome: home
         },
         CORRELATION
       )
@@ -511,7 +511,7 @@ test.runIf(process.platform !== 'win32')(
 test.runIf(process.platform !== 'win32')(
   'a committed update that still owes a step stays a success but names the owed step',
   async () => {
-    const home = await mkdtemp(path.join(os.tmpdir(), 'hermes-managed-owed-'))
+    const home = await mkdtemp(path.join(os.tmpdir(), 'mbiling-managed-owed-'))
 
     const run = async (
       followups: unknown[],
@@ -533,7 +533,7 @@ test.runIf(process.platform !== 'win32')(
       )
 
       const command = buildRemoteUpdateObservationCommand(
-        { ssh: { exec: async () => '' }, platform: 'Linux', hermesPath: '/opt/hermes/hermes', hermesHome: home },
+        { ssh: { exec: async () => '' }, platform: 'Linux', mbilingPath: '/opt/mbiling/mbiling', mbilingHome: home },
         CORRELATION
       )
 
@@ -565,7 +565,7 @@ test.runIf(process.platform !== 'win32')(
       assert.equal(owed.restoreOk, true)
       assert.deepEqual(owed.owed, [{ step: 'dependencies', reason: 'sync failed' }])
       assert.match(owed.message || '', /still owed: dependencies \(sync failed\)/)
-      assert.match(owed.message || '', /hermes update/)
+      assert.match(owed.message || '', /mbiling update/)
       assert.match(managedSshUpdateAllRow({ id: 'home' }, owed).detail || '', /dependencies/)
 
       const clean = await run([])
@@ -587,7 +587,7 @@ test.runIf(process.platform !== 'win32')(
 
       // record_user_action turns a success into partial/exit 1: its exact manual instruction is shown,
       // and the rerun advice is never offered for a parked stash.
-      const instruction = 'Run `git stash apply stash@{0}` in /opt/hermes to restore your local changes.'
+      const instruction = 'Run `git stash apply stash@{0}` in /opt/mbiling to restore your local changes.'
 
       const partial = await run([], {
         exitCode: 1,
@@ -601,7 +601,7 @@ test.runIf(process.platform !== 'win32')(
       const detail = managedSshUpdateAllRow({ id: 'home' }, partial).detail || ''
       assert.ok(detail.includes(instruction), detail)
       assert.match(detail, /local_changes/)
-      assert.doesNotMatch(detail, /Re-run `hermes update`/)
+      assert.doesNotMatch(detail, /Re-run `mbiling update`/)
     } finally {
       await rm(home, { force: true, recursive: true })
     }
@@ -611,7 +611,7 @@ test.runIf(process.platform !== 'win32')(
 test.runIf(process.platform !== 'win32')(
   'managed observer unwraps a named profile home for the install-wide marker',
   async () => {
-    const root = await mkdtemp(path.join(os.tmpdir(), 'hermes-managed-profile-marker-'))
+    const root = await mkdtemp(path.join(os.tmpdir(), 'mbiling-managed-profile-marker-'))
     const profileHome = path.join(root, 'profiles', 'research')
 
     // A v2 claim whose owner is gone and whose delegate is alive at its creation time.
@@ -627,7 +627,7 @@ test.runIf(process.platform !== 'win32')(
       const now = Math.floor(Date.now() / 1000)
       await mkdir(profileHome, { recursive: true })
       await writeFile(
-        path.join(root, '.hermes-update-in-progress'),
+        path.join(root, '.mbiling-update-in-progress'),
         `0\n${now}\nct:${ct}\ndelegate:${delegate.pid} ct:${ct}\nrun:desk-1\n`
       )
 
@@ -635,8 +635,8 @@ test.runIf(process.platform !== 'win32')(
         {
           ssh: { exec: async () => '' },
           platform: 'Linux',
-          hermesPath: '/opt/hermes/hermes',
-          hermesHome: profileHome
+          mbilingPath: '/opt/mbiling/mbiling',
+          mbilingHome: profileHome
         },
         CORRELATION
       )
@@ -656,7 +656,7 @@ test.runIf(process.platform !== 'win32')(
 test.runIf(process.platform !== 'win32')(
   'managed observer reads a named profile update receipt from the root home the CLI writes',
   async () => {
-    const root = await mkdtemp(path.join(os.tmpdir(), 'hermes-managed-profile-receipt-'))
+    const root = await mkdtemp(path.join(os.tmpdir(), 'mbiling-managed-profile-receipt-'))
     const profileHome = path.join(root, 'profiles', 'research')
 
     const receipt = (outcome: string) =>
@@ -682,8 +682,8 @@ test.runIf(process.platform !== 'win32')(
         {
           ssh: { exec: async () => '' },
           platform: 'Linux',
-          hermesPath: '/opt/hermes/hermes',
-          hermesHome: profileHome
+          mbilingPath: '/opt/mbiling/mbiling',
+          mbilingHome: profileHome
         },
         CORRELATION
       )
@@ -724,8 +724,8 @@ test('Windows coordinator handoff is pending until its marker clears and correla
 
   const target = {
     platform: 'Windows' as const,
-    hermesPath: 'C:\\Mbiling\\hermes.exe',
-    hermesHome: 'C:\\Users\\alice\\.hermes',
+    mbilingPath: 'C:\\Mbiling\\mbiling.exe',
+    mbilingHome: 'C:\\Users\\alice\\.mbiling',
     pythonPath: 'C:\\Mbiling\\python.exe',
     ssh: {
       exec: async () => {
@@ -752,8 +752,8 @@ test('terminal status without its durable receipt fails instead of claiming succ
 
   const target = {
     platform: 'Linux' as const,
-    hermesPath: '~/.local/bin/hermes',
-    hermesHome: '~/.hermes',
+    mbilingPath: '~/.local/bin/mbiling',
+    mbilingHome: '~/.mbiling',
     ssh: { exec: async () => observation({ marker: 'absent', exitCode: 0 }) }
   }
 
@@ -775,8 +775,8 @@ test('live or malformed remote markers fail actionably at bounded update and rec
 
     const target = {
       platform: 'Linux' as const,
-      hermesPath: '~/.local/bin/hermes',
-      hermesHome: '~/.hermes',
+      mbilingPath: '~/.local/bin/mbiling',
+      mbilingHome: '~/.mbiling',
       ssh: { exec: async () => observation({ marker, ...(marker === 'live' ? { markerPid: 44 } : {}) }) }
     }
 
@@ -800,8 +800,8 @@ test('a journaled launch requires correlated terminal proof or an observed live-
 
   const target = {
     platform: 'Linux' as const,
-    hermesPath: '~/.local/bin/hermes',
-    hermesHome: '~/.hermes',
+    mbilingPath: '~/.local/bin/mbiling',
+    mbilingHome: '~/.mbiling',
     ssh: { exec: async () => observation({ marker: 'absent' }) }
   }
 
@@ -834,8 +834,8 @@ test('remote launch intent fences crash recovery even before the local journal r
 
   const target = {
     platform: 'Linux' as const,
-    hermesPath: '~/.local/bin/hermes',
-    hermesHome: '~/.hermes',
+    mbilingPath: '~/.local/bin/mbiling',
+    mbilingHome: '~/.mbiling',
     ssh: { exec: async () => observation({ marker: 'absent', launchIntent: 'present' }) }
   }
 

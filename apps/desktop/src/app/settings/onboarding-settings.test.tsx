@@ -48,7 +48,7 @@ beforeAll(() => {
 })
 
 beforeEach(() => {
-  Object.defineProperty(window, 'hermesDesktop', {
+  Object.defineProperty(window, 'mbilingDesktop', {
     configurable: true,
     value: { chatOnboarding: { size }, guestOnboardingEnabled: true }
   })

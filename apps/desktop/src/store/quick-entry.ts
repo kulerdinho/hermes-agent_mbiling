@@ -57,12 +57,12 @@ function applyStatus(status: QuickEntryStatus | undefined): void {
   })
 }
 
-type QuickEntryBridge = NonNullable<Window['hermesDesktop']['quickEntry']>
+type QuickEntryBridge = NonNullable<Window['mbilingDesktop']['quickEntry']>
 
 /** The shell's Quick Entry settings call, or undefined where there is none
  *  (outside Electron, the Webapp's bridge). */
 function quickEntrySettingsCall<K extends 'getSettings' | 'setSettings'>(name: K): QuickEntryBridge[K] | undefined {
-  const call = typeof window === 'undefined' ? undefined : window.hermesDesktop?.quickEntry?.[name]
+  const call = typeof window === 'undefined' ? undefined : window.mbilingDesktop?.quickEntry?.[name]
 
   return typeof call === 'function' ? call : undefined
 }
@@ -527,7 +527,7 @@ function normalizeSubmitPayload(raw: unknown): null | QuickEntrySubmitPayload {
  * disposer. Idempotent — a second call while wired is a no-op.
  */
 export function initQuickEntryBridge(): () => void {
-  const api = typeof window === 'undefined' ? undefined : window.hermesDesktop?.quickEntry
+  const api = typeof window === 'undefined' ? undefined : window.mbilingDesktop?.quickEntry
 
   if (!api?.onSubmit || unsubscribeSubmit) {
     return () => {}

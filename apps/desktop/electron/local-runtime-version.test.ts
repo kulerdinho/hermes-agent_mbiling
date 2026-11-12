@@ -16,16 +16,16 @@ describe('local client version source', (): void => {
   it('probes the installation launcher with a bounded command and ignores remote values', async (): Promise<void> => {
     const run: VersionProbeRunner = vi.fn(async (_command, args, options) => {
       expect(args).toEqual(['--version'])
-      expect(options.cwd).toBe('/isolated/hermes')
+      expect(options.cwd).toBe('/isolated/mbiling')
       expect(options.timeout).toBe(PROBE_TIMEOUT_MS)
       expect(options.maxBuffer).toBe(64 * 1024)
-      expect(options.env.HERMES_HOME).toBe('/isolated/home')
+      expect(options.env.MBILING_HOME).toBe('/isolated/home')
 
       return 'Mbiling v0.21.5+6644.gb412ee9 (local)\n'
     })
 
-    await expect(resolveLocalRuntimeVersion('/isolated/hermes', '/isolated/home', {
-      launcher: '/isolated/hermes/.hermes/bin/hermes',
+    await expect(resolveLocalRuntimeVersion('/isolated/mbiling', '/isolated/home', {
+      launcher: '/isolated/mbiling/.mbiling/bin/mbiling',
       run
     })).resolves.toBe('0.21.5+6644.gb412ee9')
     expect(run).toHaveBeenCalledTimes(1)
@@ -36,8 +36,8 @@ describe('local client version source', (): void => {
       throw new Error('timeout')
     })
 
-    await expect(resolveLocalRuntimeVersion('/isolated/hermes', '/isolated/home', {
-      launcher: '/isolated/hermes/.hermes/bin/hermes',
+    await expect(resolveLocalRuntimeVersion('/isolated/mbiling', '/isolated/home', {
+      launcher: '/isolated/mbiling/.mbiling/bin/mbiling',
       run
     })).resolves.toBe('')
   })
@@ -45,7 +45,7 @@ describe('local client version source', (): void => {
   it('does not invoke a missing installation launcher', async (): Promise<void> => {
     const run: VersionProbeRunner = vi.fn()
 
-    await expect(resolveLocalRuntimeVersion('/isolated/hermes', '/isolated/home', { launcher: null, run })).resolves.toBe('')
+    await expect(resolveLocalRuntimeVersion('/isolated/mbiling', '/isolated/home', { launcher: null, run })).resolves.toBe('')
     expect(run).not.toHaveBeenCalled()
   })
 
@@ -60,12 +60,12 @@ describe('local client version source', (): void => {
       try {
         const root: string = path.join(base, 'checkout')
         const home: string = path.join(base, 'home')
-        fs.mkdirSync(path.join(root, 'hermes_cli'), { recursive: true })
+        fs.mkdirSync(path.join(root, 'mbiling_cli'), { recursive: true })
         fs.mkdirSync(path.join(root, 'pm'))
-        fs.writeFileSync(path.join(root, 'hermes_cli', '_launchers.py'), '')
+        fs.writeFileSync(path.join(root, 'mbiling_cli', '_launchers.py'), '')
         fs.mkdirSync(path.join(home, 'bin'), { recursive: true })
         fs.writeFileSync(
-          path.join(home, 'bin', 'hermes'),
+          path.join(home, 'bin', 'mbiling'),
           `#!/bin/sh\nsleep 1\nprintf '%s\\n' 'Mbiling v1.2.3 (2026.10.1)' 'Install directory: ${root}'\n`,
           { mode: 0o755 }
         )

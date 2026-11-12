@@ -6,12 +6,12 @@ checkpointing for ``--resume``, trajectories in from/value format, and tool-usag
 statistics aggregated across all batches. See ``main`` (fire CLI) for usage.
 """
 
-# hermes_bootstrap must be the very first import — UTF-8 stdio on Windows, no-op on POSIX.
+# mbiling_bootstrap must be the very first import — UTF-8 stdio on Windows, no-op on POSIX.
 try:
-    import hermes_bootstrap
+    import mbiling_bootstrap
 except ModuleNotFoundError as exc:
-    # Partial ``hermes update`` (git reset landed, ``uv pip install -e .`` did not).
-    if exc.name != "hermes_bootstrap":
+    # Partial ``mbiling update`` (git reset landed, ``uv pip install -e .`` did not).
+    if exc.name != "mbiling_bootstrap":
         raise  # the bootstrap exists but cannot load: skipping it would skip PM activation
 
 import json

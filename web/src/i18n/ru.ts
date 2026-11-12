@@ -103,7 +103,7 @@ export const ru: Translations = {
   status: {
     actionFailed: "Ошибка действия",
     actionFinished: "Завершено",
-    actionFinishedOwed: "Обновлено, но работа ещё не завершена (запустите `hermes update` снова, чтобы закончить)",
+    actionFinishedOwed: "Обновлено, но работа ещё не завершена (запустите `mbiling update` снова, чтобы закончить)",
     actions: "Действия",
     agent: "Агент",
     activeSessions: "Активные сессии",
@@ -129,8 +129,8 @@ export const ru: Translations = {
     starting: "Запуск",
     startedInBackground: "Запущено в фоне — следите за журналами",
     stopped: "Остановлено",
-    updateHermes: "Обновить Mbiling",
-    updatingHermes: "Обновление Mbiling…",
+    updateMbiling: "Обновить Mbiling",
+    updatingMbiling: "Обновление Mbiling…",
     waitingForOutput: "Ожидание вывода…",
   },
 
@@ -342,7 +342,7 @@ export const ru: Translations = {
       "Сохранено — перезапустите шлюз, чтобы применить изменение.",
     forceReinstall: "Принудительная переустановка (сначала удалить существующую папку)",
     headline:
-      "Поиск, установка, включение и обновление плагинов Mbiling (аналог `hermes plugins`).",
+      "Поиск, установка, включение и обновление плагинов Mbiling (аналог `mbiling plugins`).",
     identifierLabel: "Git URL или owner/repo",
     inactive: "неактивно",
     installBtn: "Установить",
@@ -359,8 +359,8 @@ export const ru: Translations = {
     providersHint:
       "Записывает memory.provider (пусто = встроенный) и context.engine в config.yaml. Применяется со следующей сессии.",
     refreshDashboard: "Пересканировать расширения панели",
-    removeConfirm: "Удалить этот плагин из ~/.hermes/plugins/?",
-    removeHint: "Удалять можно только плагины, установленные пользователем в ~/.hermes/plugins.",
+    removeConfirm: "Удалить этот плагин из ~/.mbiling/plugins/?",
+    removeHint: "Удалять можно только плагины, установленные пользователем в ~/.mbiling/plugins.",
     rescanHeading: "Реестр SPA-плагинов",
     rescanHint: "Пересканируйте после добавления файлов на диск, чтобы боковая панель подхватила новые манифесты.",
     runtimeHeading: "Рантайм шлюза (YAML-плагины)",
@@ -382,7 +382,7 @@ export const ru: Translations = {
     all: "Все",
     categories: "Категории",
     filters: "Фильтры",
-    noSkills: "Навыки не найдены. Навыки загружаются из ~/.hermes/skills/",
+    noSkills: "Навыки не найдены. Навыки загружаются из ~/.mbiling/skills/",
     noSkillsMatch: "Нет навыков, соответствующих запросу или фильтру.",
     skillCount: "{count} навык{s}",
     resultCount: "{count} результат{s}",
@@ -396,7 +396,7 @@ export const ru: Translations = {
   },
 
   config: {
-    configPath: "~/.hermes/config.yaml",
+    configPath: "~/.mbiling/config.yaml",
     filters: "Фильтры",
     sections: "Разделы",
     exportConfig: "Экспортировать конфигурацию в JSON",
@@ -621,7 +621,7 @@ export const ru: Translations = {
         "«Поделиться в X» открывает пост с заранее заполненным текстом в новой вкладке. Сначала нажмите «Скопировать изображение», если хотите прикрепить значок 1200×630 — X позволяет вставить его прямо в редактор твита. «Скачать PNG» сохраняет файл для использования где угодно.",
       clipboard_unsupported:
         "Копирование изображений в буфер обмена не поддерживается в этом браузере — используйте «Скачать».",
-      tweet_text: "Just unlocked {tier_part}\"{name}\" in Mbiling ☤",
+      tweet_text: "Just unlocked {tier_part}\"{name}\" in Mbiling ◉",
     },
   },
   kanban: {

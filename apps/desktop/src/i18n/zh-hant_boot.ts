@@ -12,7 +12,7 @@ export const zhHantBoot = {
       loadingSessions: '正在載入最近工作階段',
       retryingRemoteBackend: '正在重新連線遠端 Mbiling 後端…',
       startingDesktopConnection: '正在啟動桌面連線',
-      startingHermesDesktop: '正在啟動 Mbiling Desktop…'
+      startingMbilingDesktop: '正在啟動 Mbiling Desktop…'
     },
     errors: {
       backgroundExited: 'Mbiling 背景程序已結束。',
@@ -240,7 +240,7 @@ export const zhHantBoot = {
     remoteSetupDesc: '輸入閘道 URL。Mbiling Desktop 會偵測需要權杖還是瀏覽器登入。',
     remoteUrlTitle: '閘道 URL',
     remoteUrlDesc: '使用 Mbiling 閘道的基礎 URL；遠端位址請包含 https://。',
-    remoteUrlPlaceholder: 'https://gateway.example.com/hermes',
+    remoteUrlPlaceholder: 'https://gateway.example.com/mbiling',
     probing: '正在偵測閘道驗證方式...',
     probeError: '無法連線到該 Mbiling 閘道。',
     identityProvider: '您的身分提供者',

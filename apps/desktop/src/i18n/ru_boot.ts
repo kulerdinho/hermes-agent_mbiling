@@ -11,7 +11,7 @@ export const ruBoot = {
       loadingSessions: 'Загрузка последних сеансов',
       retryingRemoteBackend: 'Переподключение к удалённому бэкенду Mbiling…',
       startingDesktopConnection: 'Запуск подключения приложения',
-      startingHermesDesktop: 'Запуск Mbiling Desktop…'
+      startingMbilingDesktop: 'Запуск Mbiling Desktop…'
     },
     errors: {
       backgroundExited: 'Фоновый процесс Mbiling завершён.',

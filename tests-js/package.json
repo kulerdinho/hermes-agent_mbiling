@@ -1,5 +1,5 @@
 {
-  "name": "@hermes/root-tests",
+  "name": "@mbiling/root-tests",
   "private": true,
   "type": "module",
   "scripts": {

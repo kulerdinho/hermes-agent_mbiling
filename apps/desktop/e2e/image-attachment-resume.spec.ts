@@ -60,10 +60,10 @@ function writeImage(sandbox: Sandbox): string {
 async function setupSeededDesktop(): Promise<SeededFixture> {
   const mock = await startMockServer()
   const sandbox = createSandbox('image-attachment')
-  writeMockProviderConfig(sandbox.hermesHome, mock.url, undefined, NATIVE_IMAGE_CONFIG)
-  writeEnvFile(sandbox.hermesHome)
+  writeMockProviderConfig(sandbox.mbilingHome, mock.url, undefined, NATIVE_IMAGE_CONFIG)
+  writeEnvFile(sandbox.mbilingHome)
 
-  const builder = await RealSessionBuilder.start(sandbox.hermesHome)
+  const builder = await RealSessionBuilder.start(sandbox.mbilingHome)
 
   try {
     await builder.createSession({
@@ -164,6 +164,7 @@ test.describe('attached image resume', () => {
     fixture = null
   })
 
+  // eslint-disable-next-line no-empty-pattern -- pre-existing upstream pattern
   test('renders a persisted attachment as a thumbnail on first open and after a cold reload', async ({}, testInfo) => {
     // Seeding through the real gateway plus two full app boots does not fit the
     // default per-test budget on a cold runner.

@@ -419,7 +419,7 @@ export const frOverrides = {
       "Cette application Mbiling est plus ancienne que le backend auquel elle est connectée et peut ne pas fonctionner correctement. Effectuez la mise à jour de l'application pour les aligner.",
     updateDesktopApp: "Mettre à jour l'application",
     installMethodUnsupportedTitle: "Méthode d'installation non prise en charge",
-    updateHermes: 'Mettre à jour Mbiling',
+    updateMbiling: 'Mettre à jour Mbiling',
     updateReadyTitle: 'Mise à jour prête',
     updateReadyMessage: count =>
       `${count} ${count === 1 ? 'nouvelle modification disponible' : 'nouvelles modifications disponibles'}.`,
@@ -451,10 +451,10 @@ export const frOverrides = {
       codeSkewRestartRequired:
         "Ce backend exécute encore l'ancien code après une mise à jour. Redémarrez-le pour charger le nouveau code.",
       rpcOutOfSync: "L'application et le backend ne sont pas sur la même version. Mettez-les tous les deux à jour.",
-      restartHermesFailed: 'Impossible de redémarrer Mbiling'
+      restartMbilingFailed: 'Impossible de redémarrer Mbiling'
     },
     actions: {
-      restartHermes: 'Redémarrer Mbiling',
+      restartMbiling: 'Redémarrer Mbiling',
       openKeys: 'Ouvrir les clés',
       openGateways: 'Ouvrir les gateways',
       openMaintenance: 'Ouvrir Maintenance'
@@ -520,7 +520,7 @@ export const frOverrides = {
       "Votre paquet a été téléversé de manière privée. Partagez le lien ci-dessous dans votre fil d'assistance afin que l'équipe puisse consulter vos journaux.",
     failedTitle: "Échec de l'envoi",
     failedHint:
-      'Vous pouvez également exécuter `hermes debug share --nous` dans un terminal, ou `hermes debug share --local` pour afficher le rapport sans le téléverser.',
+      'Vous pouvez également exécuter `mbiling debug share --nous` dans un terminal, ou `mbiling debug share --local` pour afficher le rapport sans le téléverser.',
     handoffLead: 'Poursuivez la discussion sur :',
     links: {
       github: 'Issues GitHub',
@@ -1431,7 +1431,7 @@ export const frOverrides = {
     uninstallSection: {
       dangerZone: 'Zone dangereuse',
       checkingInstalled: 'Vérification des éléments installés…',
-      uninstallHermes: 'Désinstaller Mbiling',
+      uninstallMbiling: 'Désinstaller Mbiling',
       chooseHowMuch:
         'Choisissez ce que vous souhaitez supprimer. L’application se ferme pour terminer ; rouvrez le programme d’installation à tout moment pour revenir.',
       confirmUninstall: 'Confirmer la désinstallation',
@@ -1709,7 +1709,7 @@ export const frOverrides = {
         'Local par défaut. Utilisez distant quand cette application doit piloter un backend Mbiling ailleurs. Remplacements par profil ci-dessous.',
       envOverrideTitle: "Des variables d'environnement contrôlent cette session desktop.",
       envOverrideDesc:
-        'Supprimez les variables HERMES_DESKTOP_REMOTE_URL et HERMES_DESKTOP_REMOTE_TOKEN pour utiliser le paramètre enregistré ci-dessous.',
+        'Supprimez les variables MBILING_DESKTOP_REMOTE_URL et MBILING_DESKTOP_REMOTE_TOKEN pour utiliser le paramètre enregistré ci-dessous.',
       modeTitle: 'Mode de connexion',
       localTitle: 'Gateway local',
       localDesc:
@@ -1758,7 +1758,7 @@ export const frOverrides = {
       cloudStatusLabel: status => `État : ${status}`,
       remoteUrlTitle: 'URL distante',
       remoteUrlDesc:
-        'URL de base du backend de tableau de bord distant. Les préfixes de chemin sont pris en charge, par exemple /hermes.',
+        'URL de base du backend de tableau de bord distant. Les préfixes de chemin sont pris en charge, par exemple /mbiling.',
       probing: "Vérification de la méthode d'authentification de ce gateway…",
       probeError:
         "Impossible d'atteindre ce gateway pour le moment. Vérifiez l'URL — la méthode d'authentification apparaîtra une fois qu'il répondra.",
@@ -1836,9 +1836,9 @@ export const frOverrides = {
       sshPortDesc: 'Vide = 22 ou le port de ~/.ssh/config.',
       sshKeyTitle: "Fichier d'identité",
       sshKeyDesc: 'Chemin de la clé privée. Vide = ssh-agent ou ~/.ssh/config.',
-      sshHermesPathTitle: 'Chemin Mbiling (facultatif)',
-      sshHermesPathDesc: 'Chemin complet vers le binaire hermes distant. Vide = détection automatique.',
-      sshHermesPathPlaceholder: 'détection automatique',
+      sshMbilingPathTitle: 'Chemin Mbiling (facultatif)',
+      sshMbilingPathDesc: 'Chemin complet vers le binaire mbiling distant. Vide = détection automatique.',
+      sshMbilingPathPlaceholder: 'détection automatique',
       sshTestConnection: 'Tester SSH',
       sshConnect: 'Se connecter',
       sshButtonsHint: "Enregistrer s'applique au prochain lancement. Connecter se reconnecte immédiatement.",
@@ -2471,7 +2471,7 @@ export const frOverrides = {
       'Verrouillez-le pour que l’agent ne puisse pas modifier ce skill. Vous pouvez toujours le modifier vous-même.',
     archive: 'Archiver',
     skillArchivedTitle: 'Skill archivé',
-    skillArchivedMessage: 'Restaurable via hermes curator restore.',
+    skillArchivedMessage: 'Restaurable via mbiling curator restore.',
     tabPlugins: 'Plugins',
     plugins: {
       agentTitle: "Plugins de l'agent",
@@ -2512,7 +2512,7 @@ export const frOverrides = {
       serverStates: {
         connected: 'connecté',
         app_not_running: 'application non lancée',
-        hermes_not_connected: 'connexion MCP manquante',
+        mbiling_not_connected: 'connexion MCP manquante',
         endpoint_unavailable: 'point de terminaison indisponible',
         no_interactive_session: 'aucune session interactive',
         version_too_old: 'version trop ancienne',
@@ -2821,7 +2821,7 @@ export const frOverrides = {
     noSessions: 'Aucune session pour le moment.',
     gatewayRunning: 'Gateway de messagerie en cours',
     gatewayStopped: 'Gateway de messagerie arrêté',
-    hermesActiveSessions: (version, count) => `Mbiling ${version} · Sessions actives ${count}`,
+    mbilingActiveSessions: (version, count) => `Mbiling ${version} · Sessions actives ${count}`,
     restartGateway: 'Redémarrer le gateway',
     openBrowser: 'Basculer le navigateur',
     toggleBrowser: 'Basculer le navigateur',
@@ -2830,7 +2830,7 @@ export const frOverrides = {
     sharedGatewayRestartDescription: bots => `Tous les bots de cet appareil se reconnecteront : ${bots}`,
     sharedGatewayRestartConfirm: 'Tout redémarrer',
     sharedGatewayRestarted: count => `Gateway partagé redémarré (${count} ${count === 1 ? 'bot' : 'bots'})`,
-    updateHermes: 'Mettre à jour Mbiling',
+    updateMbiling: 'Mettre à jour Mbiling',
     reloadWindow: 'Recharger la fenêtre',
     actionRunning: 'en cours',
     actionDone: 'terminé',
@@ -3141,7 +3141,7 @@ export const frOverrides = {
       },
       MATRIX_USER_ID: {
         label: "ID d'utilisateur du bot",
-        placeholder: '@hermes:example.org'
+        placeholder: '@mbiling:example.org'
       },
       MATRIX_ALLOWED_USERS: {
         label: "IDs d'utilisateurs Matrix autorisés",
@@ -3255,7 +3255,7 @@ export const frOverrides = {
     failedImport: "Échec de l'importation du profil",
     failedExport: "Échec de l'exportation du profil",
     exportNeedsHost: name =>
-      `Le navigateur ne peut pas enregistrer une archive de profil. Sur l'hôte Mbiling, exécutez : hermes profile export ${name}`,
+      `Le navigateur ne peut pas enregistrer une archive de profil. Sur l'hôte Mbiling, exécutez : mbiling profile export ${name}`,
     allProfiles: 'Tous les profils',
     showAllProfiles: 'Afficher tous les profils',
     notServedHere: 'Non proposé ici',
@@ -3856,7 +3856,7 @@ export const frOverrides = {
       '/refine': 'Passer en revue cette conversation maintenant et enregistrer les leçons en mémoire/skills',
       '/review': 'Lancer un sous-agent indépendant pour relire le travail qui vient d’être discuté (PR, code, docs)',
       '/loop': 'Relancer un prompt à intervalle régulier dans cette session',
-      '/plan': 'Écrire un plan d’implémentation markdown dans .hermes/plans/ sans rien exécuter',
+      '/plan': 'Écrire un plan d’implémentation markdown dans .mbiling/plans/ sans rien exécuter',
       '/moa': 'Exécuter un prompt avec le préréglage Mixture of Agents par défaut, puis restaurer votre modèle',
       '/subgoal': 'Ajouter ou gérer des critères supplémentaires sur l’objectif actif',
       '/status': 'Afficher l’état de la session actuelle',
@@ -4174,9 +4174,9 @@ export const frOverrides = {
     versionDetailsDistributionDesktopMsix: 'Application Desktop (MSIX)',
     versionDetailsDistributionDesktopInstaller: 'Application Desktop (installateur)',
     versionDetailsDistributionSourceInstaller: "Code source (script d'installation)",
-    versionDetailsDistributionSourceInstallerDesktop: "Code source (script d'installation) + hermes desktop",
+    versionDetailsDistributionSourceInstallerDesktop: "Code source (script d'installation) + mbiling desktop",
     versionDetailsDistributionSource: 'Code source',
-    versionDetailsDistributionSourceDesktop: 'Code source + hermes desktop',
+    versionDetailsDistributionSourceDesktop: 'Code source + mbiling desktop',
     versionDetailsDistributionStore: 'Microsoft Store',
     versionDetailsRuntime: "Environnement d'exécution",
     versionDetailsRuntimeEmbedded: "Environnement d'exécution intégré",
@@ -4338,7 +4338,7 @@ export const frOverrides = {
       "Entrez l'URL du gateway. Mbiling Desktop détectera s'il a besoin d'un jeton ou d'une connexion par navigateur.",
     remoteUrlTitle: 'URL du gateway',
     remoteUrlDesc: "Utilisez l'URL de base du gateway Mbiling, y compris https:// pour les connexions distantes.",
-    remoteUrlPlaceholder: 'https://gateway.example.com/hermes',
+    remoteUrlPlaceholder: 'https://gateway.example.com/mbiling',
     probing: "Détection de l'authentification du gateway...",
     probeError: "Impossible d'atteindre ce gateway Mbiling.",
     probeErrorDetails: 'Détails',
@@ -5089,8 +5089,8 @@ export const frOverrides = {
       errorChooseModel: 'Choisir un modèle',
       errorCompressConversation: 'Compresser la conversation',
       errorCompressFailed: 'Impossible de compresser la conversation',
-      errorOpenHermesFolder: 'Ouvrir le dossier Mbiling',
-      errorOpenHermesFolderFailed: "Impossible d'ouvrir le dossier Mbiling",
+      errorOpenMbilingFolder: 'Ouvrir le dossier Mbiling',
+      errorOpenMbilingFolderFailed: "Impossible d'ouvrir le dossier Mbiling",
       errorUpdateApiKey: 'Mettre à jour la clé API',
       errorSignInAgain: provider => `Se reconnecter à ${provider}`,
       errorSignInFreeTier: 'Se connecter avec un compte Nous',
@@ -5140,7 +5140,7 @@ export const frOverrides = {
       reject: 'Rejeter',
       alwaysTitle: 'Toujours autoriser cette commande ?',
       alwaysDescription: pattern =>
-        `Cela ajoute le motif « ${pattern} » à votre liste d'autorisation permanente (~/.hermes/config.yaml). Mbiling ne redemandera plus pour ce type de commande — que ce soit dans cette session ou dans une session future.`,
+        `Cela ajoute le motif « ${pattern} » à votre liste d'autorisation permanente (~/.mbiling/config.yaml). Mbiling ne redemandera plus pour ce type de commande — que ce soit dans cette session ou dans une session future.`,
       alwaysAllow: 'Toujours autoriser'
     },
     clarify: frClarify,
@@ -5509,7 +5509,7 @@ export const frOverrides = {
       success: platform => `Transféré vers ${platform}. Reprenez ici à tout moment.`,
       systemNote: platform => `↻ Transféré vers ${platform} — reprenez ici à tout moment.`,
       failed: error => `Échec du transfert : ${error}`,
-      timedOut: "Délai d'expiration en attendant la Gateway. `hermes gateway` est-il en cours d'exécution ?",
+      timedOut: "Délai d'expiration en attendant la Gateway. `mbiling gateway` est-il en cours d'exécution ?",
       startMessaging: 'Démarrer la messagerie'
     }
   },

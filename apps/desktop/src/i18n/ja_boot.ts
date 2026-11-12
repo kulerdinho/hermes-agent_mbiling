@@ -11,7 +11,7 @@ export const jaBoot = {
       loadingSessions: '最近のセッションを読み込み中',
       retryingRemoteBackend: 'リモート Mbiling バックエンドに再接続中…',
       startingDesktopConnection: 'デスクトップ接続を開始中',
-      startingHermesDesktop: 'Mbiling Desktop を起動中…'
+      startingMbilingDesktop: 'Mbiling Desktop を起動中…'
     },
     errors: {
       backgroundExited: 'Mbiling バックグラウンドプロセスが終了しました。',

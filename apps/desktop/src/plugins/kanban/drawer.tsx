@@ -35,7 +35,7 @@ import {
   useQueryClient,
   useValue,
   writeClipboardText
-} from '@hermes/plugin-sdk'
+} from '@mbiling/plugin-sdk'
 import { type ReactNode, useEffect, useRef, useState } from 'react'
 
 import {

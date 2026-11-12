@@ -137,7 +137,7 @@ describe('composer context-menu contribution area', () => {
     )
 
     plugin('alpha', items)
-    window.document.documentElement.dataset.hermesDesktopHost = 'browser'
+    window.document.documentElement.dataset.mbilingDesktopHost = 'browser'
 
     try {
       const editor = composer('teh quick fox')
@@ -160,7 +160,7 @@ describe('composer context-menu contribution area', () => {
       expect(withoutRows.defaultPrevented).toBe(false)
       expect($contextMenu.get()).toBeNull()
     } finally {
-      delete window.document.documentElement.dataset.hermesDesktopHost
+      delete window.document.documentElement.dataset.mbilingDesktopHost
     }
   })
 

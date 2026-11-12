@@ -51,7 +51,7 @@ import { matchingConnectionId } from './connection-route-identity'
 // excludes apps/shared sources, but vitest resolves the workspace package fine
 // at runtime. Loaded once here, not in the test body, where a cold import under
 // CI load can outlast the 5s test timeout.
-const shared = (await import(String('@hermes/shared'))) as {
+const shared = (await import(String('@mbiling/shared'))) as {
   backendScopeKey: typeof backendScopeKey
   backendScopePrefix: typeof backendScopePrefix
   LOCAL_CONNECTION_ID: string
@@ -251,7 +251,7 @@ test('primary SSH reuse rejects a descriptor with different effective dialing co
 test('primary SSH reuse rejects a descriptor with a different remote Mbiling path', async () => {
   const registry = migrateV1ToRegistry({
     mode: 'ssh',
-    remote: { mode: 'ssh', host: 'build-host', remoteHermesPath: '/srv/hermes', user: 'alice' },
+    remote: { mode: 'ssh', host: 'build-host', remoteMbilingPath: '/srv/mbiling', user: 'alice' },
     profiles: {}
   })
 
@@ -267,7 +267,7 @@ test('primary SSH reuse rejects a descriptor with a different remote Mbiling pat
         ssh: {
           effectiveConfigFingerprint: 'same-effective-config',
           host: 'build-host',
-          remoteHermesPath: '/opt/hermes',
+          remoteMbilingPath: '/opt/mbiling',
           remoteProfile: '',
           user: 'alice'
         }
@@ -283,23 +283,23 @@ test('primary SSH reuse rejects a descriptor with a different remote Mbiling pat
 test('registry primary reuses a matching primary backend descriptor', () => {
   const registry = normalizeRegistry({
     version: REGISTRY_VERSION,
-    primary: 'hermes-vps',
+    primary: 'mbiling-vps',
     launchMode: 'primary',
-    lastUsed: 'hermes-vps',
+    lastUsed: 'mbiling-vps',
     connections: [
       { id: LOCAL_CONNECTION_ID, kind: 'local', label: 'This device' },
-      { id: 'hermes-vps', kind: 'ssh', label: 'Mbiling VPS', host: 'hermes-vps' }
+      { id: 'mbiling-vps', kind: 'ssh', label: 'Mbiling VPS', host: 'mbiling-vps' }
     ]
   })
 
   const descriptor = {
-    connectionId: 'hermes-vps',
+    connectionId: 'mbiling-vps',
     mode: 'remote' as const,
     remoteKind: 'ssh' as const,
-    ssh: { host: 'hermes-vps' }
+    ssh: { host: 'mbiling-vps' }
   }
 
-  assert.equal(registrySourceOwnsPrimaryBackend(registry, 'hermes-vps', descriptor), true)
+  assert.equal(registrySourceOwnsPrimaryBackend(registry, 'mbiling-vps', descriptor), true)
   assert.equal(registrySourceOwnsPrimaryBackend(registry, LOCAL_CONNECTION_ID, descriptor), false)
 })
 
@@ -570,7 +570,7 @@ test('resolvedConnectionId keeps same-host SSH routes distinct by port, key, pat
     host: 'work-host',
     keyPath: '/keys/a',
     kind: 'ssh' as const,
-    remoteHermesPath: '/srv/hermes',
+    remoteMbilingPath: '/srv/mbiling',
     remoteProfile: 'alpha',
     user: 'root'
   }
@@ -585,7 +585,7 @@ test('resolvedConnectionId keeps same-host SSH routes distinct by port, key, pat
       { ...base, id: 'ssh-base', label: 'SSH base' },
       { ...base, id: 'ssh-port', label: 'SSH port', port: 2222 },
       { ...base, id: 'ssh-key', keyPath: '/keys/b', label: 'SSH key' },
-      { ...base, id: 'ssh-path', label: 'SSH path', remoteHermesPath: '/opt/hermes' },
+      { ...base, id: 'ssh-path', label: 'SSH path', remoteMbilingPath: '/opt/mbiling' },
       { ...base, id: 'ssh-profile', label: 'SSH profile', remoteProfile: 'beta' }
     ]
   }
@@ -596,7 +596,7 @@ test('resolvedConnectionId keeps same-host SSH routes distinct by port, key, pat
   assert.equal(resolve(base), 'ssh-base')
   assert.equal(resolve({ ...base, port: 2222 }), 'ssh-port')
   assert.equal(resolve({ ...base, keyPath: '/keys/b' }), 'ssh-key')
-  assert.equal(resolve({ ...base, remoteHermesPath: '/opt/hermes' }), 'ssh-path')
+  assert.equal(resolve({ ...base, remoteMbilingPath: '/opt/mbiling' }), 'ssh-path')
   assert.equal(resolve({ ...base, remoteProfile: 'beta' }), 'ssh-profile')
   assert.equal(
     resolvedConnectionId(registry, {
@@ -719,7 +719,7 @@ test('uniqueLabel counts up (never "X 2 2") and clamps long candidates', () => {
 
 // --- backendScopeKey (composite pool keys) ---
 
-// The electron and @hermes/shared implementations MUST stay byte-identical —
+// The electron and @mbiling/shared implementations MUST stay byte-identical —
 // the renderer keys its socket registry with the shared copy while the main
 // process keys the backend pool with this one. This contract test is the
 // enforcement (see the NOTE on backendScopeKey).
@@ -813,7 +813,7 @@ test('registry local route: a concrete remote-only profile is refused on the for
   assert.match(String(named.refuse ?? ''), /Profile "inbox" no longer exists/)
   assert.equal(named.delegate, false)
 
-  // default is $HERMES_HOME, not profiles/default: a profiles/default probe
+  // default is $MBILING_HOME, not profiles/default: a profiles/default probe
   // reports absent, but This device -> default must still open locally.
   assert.deepEqual(resolveRegistryLocalRoute('default', { globalRemote: true, localProfileExists: false }), {
     delegate: false,
@@ -900,7 +900,7 @@ test('roster: source profile metadata follows the connection-qualified row', () 
 
   const vpsMeta = {
     display_name: 'Emma',
-    ui_meta: { 'hermes-bots': { title: 'Emma', shape: 'blobatar::sun', color: '#8b5cf6' } },
+    ui_meta: { 'mbiling-bots': { title: 'Emma', shape: 'blobatar::sun', color: '#8b5cf6' } },
     has_avatar: true
   }
 
@@ -1285,14 +1285,14 @@ test('merge preserves fields the editor does not carry (org, ssh extras)', () =>
     kind: 'ssh' as const,
     label: 'Box',
     port: 2222,
-    remoteHermesPath: '/opt/hermes',
+    remoteMbilingPath: '/opt/mbiling',
     remoteProfile: 'research',
     user: 'k'
   }
 
   const labelOnly = mergeConnectionInput({ id: 's', kind: 'ssh', label: 'Renamed box' }, ssh)
 
-  assert.equal(labelOnly.remoteHermesPath, '/opt/hermes')
+  assert.equal(labelOnly.remoteMbilingPath, '/opt/mbiling')
   assert.equal(labelOnly.remoteProfile, 'research')
   assert.equal(labelOnly.host, 'homelab.lan')
   assert.equal(labelOnly.user, 'k')
@@ -1730,7 +1730,7 @@ test('Apply remote preserves an existing URL identity and label without duplicat
   let registry = emptyRegistry()
 
   registry = upsertConnection(registry, {
-    id: 'hermes-alex',
+    id: 'mbiling-alex',
     kind: 'remote',
     label: 'Existing gateway',
     url: 'https://gateway.example.com',
@@ -1746,11 +1746,11 @@ test('Apply remote preserves an existing URL identity and label without duplicat
   const matches = applied.connections.filter(connection => connection.url === 'https://gateway.example.com')
 
   assert.equal(matches.length, 1)
-  assert.equal(matches[0].id, 'hermes-alex')
+  assert.equal(matches[0].id, 'mbiling-alex')
   assert.equal(matches[0].label, 'Existing gateway')
   assert.equal(matches[0].authMode, 'oauth')
-  assert.equal(applied.primary, 'hermes-alex')
-  assert.equal(applied.lastUsed, 'hermes-alex')
+  assert.equal(applied.primary, 'mbiling-alex')
+  assert.equal(applied.lastUsed, 'mbiling-alex')
 })
 
 test('Apply local moves primary/current to This device without deleting registered remotes', () => {
@@ -2079,7 +2079,7 @@ test('normalizeConnectionInput keeps filtered headers on remote/cloud, drops the
     {
       kind: 'remote',
       label: 'CF box',
-      url: 'https://hermes.example.com',
+      url: 'https://mbiling.example.com',
       authMode: 'token',
       token: { enc: 'x' },
       headers: {
@@ -2112,7 +2112,7 @@ test('mergeConnectionInput inherits stored headers when the editor payload omits
     id: 'cf',
     kind: 'remote' as const,
     label: 'CF box',
-    url: 'https://hermes.example.com',
+    url: 'https://mbiling.example.com',
     authMode: 'token' as const,
     headers: { 'CF-Access-Client-Id': { encoding: 'safeStorage', value: 'id' } }
   }
@@ -2132,7 +2132,7 @@ test('connectionDialFieldsChanged: a header change recycles live backends', () =
     id: 'cf',
     kind: 'remote',
     label: 'CF box',
-    url: 'https://hermes.example.com',
+    url: 'https://mbiling.example.com',
     authMode: 'token',
     token: { enc: 'x' },
     headers: { 'CF-Access-Client-Id': { encoding: 'safeStorage', value: 'id' } }
@@ -2159,7 +2159,7 @@ test('normalizeRegistry preserves stored headers on remote entries (v2 additive 
         id: 'cf',
         kind: 'remote',
         label: 'CF box',
-        url: 'https://hermes.example.com',
+        url: 'https://mbiling.example.com',
         authMode: 'token',
         token: { enc: 'x' },
         headers: {
@@ -2182,7 +2182,7 @@ test('migrateV1ToRegistry carries v1 remote headers into the registry entry', ()
   const registry = migrateV1ToRegistry({
     mode: 'remote',
     remote: {
-      url: 'https://hermes.example.com',
+      url: 'https://mbiling.example.com',
       authMode: 'token',
       token: { enc: 'x' },
       headers: { 'CF-Access-Client-Id': { encoding: 'safeStorage', value: 'id' } }

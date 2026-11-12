@@ -13,7 +13,7 @@ export const deSharedMetrics = {
   collectedReliability: 'App-Zustand: Abstürze, Start- und Antwortgeschwindigkeit, Updates, Messaging-Verbindungen',
   collectedUsage:
     'Agentenqualität: verfehlte Bearbeitungen, fehlerhafte Tool-Aufrufe, festgefahrene Schleifen, Kosten pro Aufgabe',
-  collectedMachine: 'Gerät: Betriebssystem, RAM-Bereich, GPU-Typ, Hermes-Version, Nutzung lokaler Modelle',
+  collectedMachine: 'Gerät: Betriebssystem, RAM-Bereich, GPU-Typ, Mbiling-Version, Nutzung lokaler Modelle',
   sending:
     'Wenn Sie teilen, sendet Mbiling Statistiken einmal täglich mit einer zufälligen ID für dieses Profil an Nous. Abgesehen von einem einmaligen Hinweis, dass Mbiling installiert wurde, werden Statistiken von vor Ihrer Zustimmung nie gesendet. Sie können das jederzeit in den Einstellungen ändern.',
   readDocs: 'Alle Details lesen',
@@ -23,7 +23,7 @@ export const deSharedMetrics = {
   sendLabel: 'Nutzungsstatistiken mit Nous teilen',
   sendDesc:
     'Nur Zählwerte, einmal täglich mit einer zufälligen ID für dieses Profil gesendet. Niemals Ihre Nachrichten, Dateien, Pfade oder Fehlertexte.',
-  unavailable: 'Aktualisieren Sie das Hermes-Backend, um diese Einstellung zu ändern.',
+  unavailable: 'Aktualisieren Sie das Mbiling-Backend, um diese Einstellung zu ändern.',
   stripBody: 'Nur Zählwerte. Niemals Ihre Nachrichten oder Dateien.',
   stripReaskBody:
     'Wir fragen noch einmal: Eine frühere Version konnte „Nein danke“ speichern, bevor Sie diese Frage gesehen haben.',

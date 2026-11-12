@@ -1,7 +1,7 @@
 import { useStore } from '@nanostores/react'
 
-import type { ProfileScope } from '@/hermes'
 import { useI18n } from '@/i18n'
+import type { ProfileScope } from '@/mbiling'
 import { notifyError } from '@/store/notifications'
 
 import type { AccountRow, ConnectorCardModel } from '../types'
@@ -69,7 +69,7 @@ export function useHostedActions(
       const url = outcome.operation.targets.find(target => target.connectUrl)?.connectUrl
 
       if (url) {
-        void window.hermesDesktop?.openExternal?.(url)
+        void window.mbilingDesktop?.openExternal?.(url)
       }
     }
 

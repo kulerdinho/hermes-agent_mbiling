@@ -125,7 +125,7 @@ export const jaOverrides = {
       'この Mbiling アプリは接続先のバックエンドより古く、正常に動作しない場合があります。アプリを更新して揃えてください。',
     updateDesktopApp: 'アプリを更新',
     installMethodUnsupportedTitle: 'サポート対象外のインストール方法',
-    updateHermes: 'Mbiling を更新',
+    updateMbiling: 'Mbiling を更新',
     updateReadyTitle: '更新の準備ができました',
     updateReadyMessage: count => `${count} 件の新しい変更が利用可能です。`,
     updateReadyMessageUnknown: '新しい更新が利用可能です。',
@@ -210,7 +210,7 @@ export const jaOverrides = {
       'バンドルは非公開でアップロードされました。サポートスレッドで以下のリンクを共有すると、チームがログを確認できます。',
     failedTitle: 'アップロードに失敗しました',
     failedHint:
-      'ターミナルから `hermes debug share --nous` を実行するか、`hermes debug share --local` でアップロードせずにレポートを表示することもできます。',
+      'ターミナルから `mbiling debug share --nous` を実行するか、`mbiling debug share --local` でアップロードせずにレポートを表示することもできます。',
     handoffLead: '続きは次の場所で:',
     links: {
       github: 'GitHub Issues',
@@ -280,7 +280,7 @@ export const jaOverrides = {
     uninstallSection: {
       dangerZone: '危険ゾーン',
       checkingInstalled: 'インストール内容を確認中…',
-      uninstallHermes: 'Mbiling をアンインストール',
+      uninstallMbiling: 'Mbiling をアンインストール',
       chooseHowMuch:
         '削除する範囲を選択してください。完了するためにアプリが閉じます。インストーラーを開き直せばいつでも戻れます。',
       confirmUninstall: 'アンインストールの確認',
@@ -571,7 +571,7 @@ export const jaOverrides = {
       modelPricingDesc: 'モデル選択で、100万トークンあたりの入力・出力・キャッシュ読み取り料金を表示します。',
       reactionsTitle: 'メッセージリアクション',
       reactionsDesc:
-        'iMessage風の絵文字タップバック — メッセージにリアクションでき、Hermesもあなたのメッセージにリアクションします。',
+        'iMessage風の絵文字タップバック — メッセージにリアクションでき、Mbilingもあなたのメッセージにリアクションします。',
       tipsTitle: 'アプリ内ヒント',
       tipsDesc:
         'アプリや Mbiling からのヒントをときどき表示します。各ヒントは一度だけ表示されます。利用開始から30日後に自動でオフになりますが、再びオンにできます。',
@@ -998,7 +998,7 @@ export const jaOverrides = {
         'Mbiling Desktop はデフォルトで独自のローカルゲートウェイを起動します。別のマシンや信頼できるプロキシの背後で既に動作している Mbiling バックエンドをこのアプリで制御する場合は、リモートゲートウェイを使用してください。ゲートウェイ接続はマシン単位の設定で、プロファイルは接続したゲートウェイから検出されます。',
       envOverrideTitle: '環境変数がこのデスクトップセッションを制御しています。',
       envOverrideDesc:
-        '保存された設定を使用するには HERMES_DESKTOP_REMOTE_URL と HERMES_DESKTOP_REMOTE_TOKEN の設定を解除してください。',
+        '保存された設定を使用するには MBILING_DESKTOP_REMOTE_URL と MBILING_DESKTOP_REMOTE_TOKEN の設定を解除してください。',
       localTitle: 'ローカルゲートウェイ',
       localDesc:
         'ローカルホストでプライベートな Mbiling バックエンドを起動します。これがデフォルトで、オフラインでも動作します。',
@@ -1007,7 +1007,7 @@ export const jaOverrides = {
         'このデスクトップシェルをリモートの Mbiling バックエンドに接続します。ホスト型ゲートウェイは OAuth またはユーザー名とパスワードを使用します。自己ホスト型はセッショントークンを使用する場合があります。',
       remoteUrlTitle: 'リモート URL',
       remoteUrlDesc:
-        'リモートダッシュボードバックエンドのベース URL。/hermes などのパスプレフィックスもサポートしています。',
+        'リモートダッシュボードバックエンドのベース URL。/mbiling などのパスプレフィックスもサポートしています。',
       probing: 'このゲートウェイの認証方法を確認中…',
       probeError: 'このゲートウェイにまだ到達できません。URL を確認してください。応答後に認証方法が表示されます。',
       signedIn: 'サインイン済み',
@@ -1083,9 +1083,9 @@ export const jaOverrides = {
       sshPortDesc: '空欄 = 22 または ~/.ssh/config のポート。',
       sshKeyTitle: '鍵ファイル',
       sshKeyDesc: '秘密鍵のパス。空欄 = ssh-agent または ~/.ssh/config。',
-      sshHermesPathTitle: 'Mbiling パス（任意）',
-      sshHermesPathDesc: 'リモートの hermes バイナリへのフルパス。空欄 = 自動検出。',
-      sshHermesPathPlaceholder: '自動検出',
+      sshMbilingPathTitle: 'Mbiling パス（任意）',
+      sshMbilingPathDesc: 'リモートの mbiling バイナリへのフルパス。空欄 = 自動検出。',
+      sshMbilingPathPlaceholder: '自動検出',
       sshTestConnection: 'SSH をテスト',
       sshConnect: '接続',
       sshButtonsHint: '「保存」は次回起動時に適用され、「接続」は今すぐ再接続します。',
@@ -1387,7 +1387,7 @@ export const jaOverrides = {
     unlockedHint: 'ロックすると、エージェントはこのスキルを変更できなくなります。自分では引き続き編集できます。',
     archive: 'アーカイブ',
     skillArchivedTitle: 'スキルをアーカイブしました',
-    skillArchivedMessage: 'hermes curator restore で復元できます。',
+    skillArchivedMessage: 'mbiling curator restore で復元できます。',
     officialCatalog: 'インストール可能',
     officialPill: '公式'
   },
@@ -1548,7 +1548,7 @@ export const jaOverrides = {
     noSessions: 'セッションはまだありません。',
     gatewayRunning: 'メッセージングゲートウェイが実行中',
     gatewayStopped: 'メッセージングゲートウェイが停止中',
-    hermesActiveSessions: (version, count) => `Mbiling ${version} · アクティブセッション ${count}`,
+    mbilingActiveSessions: (version, count) => `Mbiling ${version} · アクティブセッション ${count}`,
     restartGateway: 'ゲートウェイを再起動',
     openBrowser: 'ブラウザを開く',
     gatewayRestartFailed: 'ゲートウェイの再起動に失敗しました。',
@@ -1556,7 +1556,7 @@ export const jaOverrides = {
     sharedGatewayRestartDescription: bots => `このデバイス上のすべてのボットが再接続します: ${bots}`,
     sharedGatewayRestartConfirm: 'すべて再起動',
     sharedGatewayRestarted: count => `共有ゲートウェイを再起動しました（${count} ボット）`,
-    updateHermes: 'Mbiling を更新',
+    updateMbiling: 'Mbiling を更新',
     reloadWindow: 'ウィンドウを再読み込み',
     actionRunning: '実行中',
     actionDone: '完了',
@@ -1771,7 +1771,7 @@ export const jaOverrides = {
       },
       MATRIX_HOMESERVER: { label: 'ホームサーバー URL', placeholder: 'https://matrix.org' },
       MATRIX_ACCESS_TOKEN: { label: 'アクセストークン' },
-      MATRIX_USER_ID: { label: 'ボットユーザー ID', placeholder: '@hermes:example.org' },
+      MATRIX_USER_ID: { label: 'ボットユーザー ID', placeholder: '@mbiling:example.org' },
       MATRIX_ALLOWED_USERS: {
         label: '許可する Matrix ユーザー ID',
         help: '推奨。@user:server 形式のユーザー ID（1 欄に 1 件）。'
@@ -1814,7 +1814,7 @@ export const jaOverrides = {
     failedImport: 'プロファイルのインポートに失敗しました',
     failedExport: 'プロファイルのエクスポートに失敗しました',
     exportNeedsHost: name =>
-      `ブラウザーではプロファイルのアーカイブを保存できません。Mbiling ホストで次を実行してください: hermes profile export ${name}`,
+      `ブラウザーではプロファイルのアーカイブを保存できません。Mbiling ホストで次を実行してください: mbiling profile export ${name}`,
     allProfiles: 'すべてのプロファイル',
     showAllProfiles: 'すべてのプロファイルを表示',
     notServedHere: 'ここでは提供されていません',
@@ -1837,7 +1837,7 @@ export const jaOverrides = {
       title: (profile: string) => `${profile} をリモートホストに接続`,
       description: 'このプロファイルのセッションは、このパソコンではなく指定したリモートの Mbiling で実行されます。',
       urlLabel: 'リモートアドレス',
-      urlPlaceholder: 'https://hermes.example.com',
+      urlPlaceholder: 'https://mbiling.example.com',
       urlInvalid: 'http:// または https:// で始まる完全なアドレスを入力してください',
       tokenLabel: 'アクセストークン',
       tokenPlaceholder: 'リモートのセッショントークンを貼り付け',
@@ -2346,7 +2346,7 @@ export const jaOverrides = {
       '/resume': '以前のセッションを再開',
       '/details': 'トランスクリプトの詳細レベルを制御',
       '/copy': '選択または最後のアシスタントメッセージをコピー',
-      '/quit': 'hermes を終了',
+      '/quit': 'mbiling を終了',
       '/start': '返信せずにプラットフォームの開始要求を確認',
       '/new': '新しいデスクトップチャットを開始',
       '/topic': 'Telegram の個人チャットのトピックを有効化または確認',
@@ -2375,7 +2375,7 @@ export const jaOverrides = {
       '/refine': 'この会話を見直し、学びをメモリやスキルに保存',
       '/review': '独立したサブエージェントに作業のレビューを依頼',
       '/loop': 'このセッションで一定間隔でプロンプトを繰り返す',
-      '/plan': '実行せずに .hermes/plans/ に Markdown の実装計画を作成',
+      '/plan': '実行せずに .mbiling/plans/ に Markdown の実装計画を作成',
       '/moa': 'Mixture of Agents のプリセットで実行し、元のモデルに戻す',
       '/subgoal': '進行中の目標の追加条件を管理',
       '/status': '現在のセッション状態を表示',
@@ -2664,9 +2664,9 @@ export const jaOverrides = {
   },
 
   updates: {
-    discontinuedTitle: 'このHermesビルドはサポートされていません',
+    discontinuedTitle: 'このMbilingビルドはサポートされていません',
     discontinuedBody:
-      'このHermesビルドはサポートが終了し、動作しなくなる可能性があります。アンインストールしてください。データはディスクに残ります。',
+      'このMbilingビルドはサポートが終了し、動作しなくなる可能性があります。アンインストールしてください。データはディスクに残ります。',
     channels: { stable: '安定版', canary: '先行版' },
     bundleSwapPending: '再起動して更新を完了',
     bundleSwapPendingDesc:
@@ -2826,7 +2826,7 @@ export const jaOverrides = {
       'ゲートウェイ URL を入力してください。Mbiling Desktop がトークンとブラウザーサインインのどちらが必要かを検出します。',
     remoteUrlTitle: 'ゲートウェイ URL',
     remoteUrlDesc: 'Mbiling ゲートウェイのベース URL を使用します。リモートの場合は https:// を含めてください。',
-    remoteUrlPlaceholder: 'https://gateway.example.com/hermes',
+    remoteUrlPlaceholder: 'https://gateway.example.com/mbiling',
     probing: 'ゲートウェイ認証方式を検出中...',
     probeError: 'その Mbiling ゲートウェイに到達できませんでした。',
     identityProvider: 'ID プロバイダー',
@@ -3451,7 +3451,7 @@ export const jaOverrides = {
       reject: '拒否',
       alwaysTitle: 'このコマンドを常に許可しますか？',
       alwaysDescription: pattern =>
-        `これにより "${pattern}" パターンが永続的な許可リスト (~/.hermes/config.yaml) に追加されます。Mbiling はこのセッションや将来のセッションで、このようなコマンドについて再度尋ねません。`,
+        `これにより "${pattern}" パターンが永続的な許可リスト (~/.mbiling/config.yaml) に追加されます。Mbiling はこのセッションや将来のセッションで、このようなコマンドについて再度尋ねません。`,
       alwaysAllow: '常に許可'
     },
     clarify: jaClarify,
@@ -3718,7 +3718,7 @@ export const jaOverrides = {
       success: platform => `${platform} に引き継ぎました。いつでもここで再開できます。`,
       systemNote: platform => `↻ ${platform} に引き継ぎました — いつでもここで再開できます。`,
       failed: error => `引き継ぎに失敗しました: ${error}`,
-      timedOut: 'ゲートウェイの待機がタイムアウトしました。`hermes gateway` は起動していますか？'
+      timedOut: 'ゲートウェイの待機がタイムアウトしました。`mbiling gateway` は起動していますか？'
     }
   },
 

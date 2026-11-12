@@ -1,7 +1,7 @@
-import { randomUuid } from '@hermes/shared'
+import { randomUuid } from '@mbiling/shared'
 
 type StreamWorkBridge = Required<
-  Pick<NonNullable<Window['hermesDesktop']>, 'scheduleStreamWorkWake' | 'onStreamWorkWake'>
+  Pick<NonNullable<Window['mbilingDesktop']>, 'scheduleStreamWorkWake' | 'onStreamWorkWake'>
 >
 
 interface StreamWork {
@@ -54,7 +54,7 @@ function onNativeWake(token: string): void {
 }
 
 function connectBridge(): void {
-  const candidate = typeof window === 'undefined' ? undefined : window.hermesDesktop
+  const candidate = typeof window === 'undefined' ? undefined : window.mbilingDesktop
 
   if (candidate?.scheduleStreamWorkWake && candidate.onStreamWorkWake) {
     bridge = {

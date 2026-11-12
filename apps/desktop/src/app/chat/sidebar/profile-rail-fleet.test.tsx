@@ -126,7 +126,7 @@ vi.mock('@/components/remote-setup/first-run', () => ({
   FirstRunRemoteSetup: () => 'Connect to existing Mbiling'
 }))
 
-vi.mock('@/hermes', () => ({
+vi.mock('@/mbiling', () => ({
   getProfileSoul: vi.fn().mockResolvedValue({ content: '' }),
   updateProfileSoul: vi.fn()
 }))
@@ -169,7 +169,7 @@ const roster: DesktopAgentRoster = {
       connectionKind: 'remote',
       connectionLabel: 'Gateway A',
       profile: 'default',
-      handle: 'hermes-gateway-a'
+      handle: 'mbiling-gateway-a'
     },
     {
       connectionId: 'gateway-a',
@@ -183,7 +183,7 @@ const roster: DesktopAgentRoster = {
       connectionKind: 'local',
       connectionLabel: 'This device',
       profile: 'default',
-      handle: 'hermes'
+      handle: 'mbiling'
     },
     {
       connectionId: 'local',
@@ -229,7 +229,7 @@ beforeEach(() => {
   probeLocalBackend.mockResolvedValue({ bootstrapNeeded: false })
   selectConnection.mockResolvedValue(undefined)
   openWindow.mockResolvedValue({ ok: true })
-  ;(window as { hermesDesktop?: unknown }).hermesDesktop = { getAgentRoster, openWindow, probeLocalBackend }
+  ;(window as { mbilingDesktop?: unknown }).mbilingDesktop = { getAgentRoster, openWindow, probeLocalBackend }
 })
 
 afterEach(() => {
@@ -244,7 +244,7 @@ afterEach(() => {
   activeGatewayProfile.set('default')
   profileScope.set('default')
   profiles.set([{ is_default: true, name: 'default' }])
-  delete (window as { hermesDesktop?: unknown }).hermesDesktop
+  delete (window as { mbilingDesktop?: unknown }).mbilingDesktop
 })
 
 describe('ProfileRail overflow', () => {

@@ -1,10 +1,9 @@
 import type { AppendMessage, ThreadMessage } from '@assistant-ui/react'
-import { isUndeliveredCorrectionRefusal, JsonRpcGatewayError } from '@hermes/shared'
-import { stripAnsi } from '@hermes/shared/ansi'
+import { isUndeliveredCorrectionRefusal, JsonRpcGatewayError } from '@mbiling/shared'
+import { stripAnsi } from '@mbiling/shared/ansi'
 import { useStore } from '@nanostores/react'
 import { type MutableRefObject, useCallback, useEffect, useRef } from 'react'
 
-import { type ResolvedOwner, transcribeAudio } from '@/hermes'
 import { useI18n } from '@/i18n'
 import { attachmentPathNeedsUpload } from '@/lib/attachment-upload-policy'
 import { type ChatMessage, textPart } from '@/lib/chat-messages'
@@ -14,6 +13,7 @@ import { triggerHaptic } from '@/lib/haptics'
 import { setMutableRef } from '@/lib/mutable-ref'
 import { normalize } from '@/lib/text'
 import { transcribeAudioClientDirect } from '@/lib/voice-client-direct'
+import { type ResolvedOwner, transcribeAudio } from '@/mbiling'
 import { clearClarifyRequest } from '@/store/clarify'
 import { setSessionCompacting } from '@/store/compaction'
 import {
@@ -138,7 +138,7 @@ export async function uploadComposerAttachment(
   // source descriptor here. Absence means an older browser backend/native file
   // and retains the existing byte-upload rules.
   const stagedUpload = attachment.kind === 'file'
-    ? attachment.stagedUpload ?? window.hermesDesktop?.getStagedFileForAttach?.(path)
+    ? attachment.stagedUpload ?? window.mbilingDesktop?.getStagedFileForAttach?.(path)
     : undefined
 
   if (stagedUpload && stagedUpload.path !== path) {
@@ -585,7 +585,7 @@ export function usePromptActions({
 
   // Queue a handoff of this session to a messaging platform and watch it to
   // a terminal state. We only write the request through the gateway; the
-  // separate `hermes gateway` process performs the actual transfer, so we
+  // separate `mbiling gateway` process performs the actual transfer, so we
   // poll `handoff.state` (mirror of the CLI's block-poll) for the result.
   const handoffSession = useCallback(
     async (

@@ -20,7 +20,7 @@
  *   - the listener only ever RECEIVES `code`/`state` query params and
  *     forwards them to the renderer; no tokens are exchanged here — the
  *     gateway verifies `state` (constant-time) before redeeming anything;
- *   - the browser sees only a minimal "return to Hermes" page.
+ *   - the browser sees only a minimal "return to Mbiling" page.
  */
 
 import http from 'node:http'
@@ -95,7 +95,7 @@ function dispose(id: string) {
 
 export function registerMcpOauthCallbackIpc() {
   // Bind a one-shot loopback listener; resolves { id, redirectUri }.
-  ipcMain.handle('hermes:mcp-oauth:listen', async () => {
+  ipcMain.handle('mbiling:mcp-oauth:listen', async () => {
     if (pending.size >= MAX_PENDING_LISTENERS) {
       throw new Error('Too many MCP OAuth listeners are already pending')
     }
@@ -145,7 +145,7 @@ export function registerMcpOauthCallbackIpc() {
   })
 
   // Resolve when the redirect arrives (or timeout). Safe to call once per id.
-  ipcMain.handle('hermes:mcp-oauth:wait', async (_event, id, timeoutMs) => {
+  ipcMain.handle('mbiling:mcp-oauth:wait', async (_event, id, timeoutMs) => {
     const entry = pending.get(String(id || ''))
 
     if (!entry) {
@@ -179,7 +179,7 @@ export function registerMcpOauthCallbackIpc() {
   })
 
   // Tear a listener down without waiting (user cancelled, flow errored).
-  ipcMain.handle('hermes:mcp-oauth:cancel', (_event, id) => {
+  ipcMain.handle('mbiling:mcp-oauth:cancel', (_event, id) => {
     dispose(String(id || ''))
 
     return true

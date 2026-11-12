@@ -1,7 +1,7 @@
 import type { Session, WebContents } from 'electron'
 
 /** Partition the preview pane's `<webview>` always carries. */
-export const PREVIEW_GUEST_PARTITION = 'persist:hermes-preview'
+export const PREVIEW_GUEST_PARTITION = 'persist:mbiling-preview'
 
 export interface PreviewGuestAttachPrefs {
   backgroundThrottling?: boolean

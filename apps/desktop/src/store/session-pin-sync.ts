@@ -24,8 +24,8 @@
 import { atom } from 'nanostores'
 
 import { ambientOwnerConnectionId } from '@/api/client'
-import { setSessionPinnedRemote } from '@/hermes'
 import { onConnectionScopeChange } from '@/lib/connection-scoped'
+import { setSessionPinnedRemote } from '@/mbiling'
 import { $primaryGatewayRoute } from '@/store/gateway-primary-route'
 import { $pinnedSessionIds, pinSession, unpinSession } from '@/store/layout'
 import { $activeGatewayProfile, normalizeProfileKey } from '@/store/profile'
@@ -41,7 +41,7 @@ import {
   setSessions
 } from '@/store/session'
 import { isSessionRemovalPending } from '@/store/session-removal'
-import type { SessionInfo } from '@/types/hermes'
+import type { SessionInfo } from '@/types/mbiling'
 
 // pin ids we've successfully PATCHed pinned=true this session.
 const mirrored = new Set<string>()
@@ -348,7 +348,7 @@ function reconcile(): void {
 
 function reconcileInner(): void {
   // Config/session REST is only reachable through the Electron bridge.
-  if (!window.hermesDesktop) {
+  if (!window.mbilingDesktop) {
     return
   }
 

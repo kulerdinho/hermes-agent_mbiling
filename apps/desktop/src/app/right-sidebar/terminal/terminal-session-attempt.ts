@@ -1,14 +1,14 @@
 import type { Terminal } from '@xterm/xterm'
 import type { RefObject } from 'react'
 
-import type { HermesTerminalSession } from '@/global'
+import type { MbilingTerminalSession } from '@/global'
 import { translateNow } from '@/i18n'
 import { hostHas } from '@/lib/host-capabilities'
 
 import { defaultTerminalGateway, runsOverSsh, terminalGatewayOf } from './terminal-gateway'
 import { $terminals, adoptTerminalGateway, markTerminalPersistent, removeExitedTerminal } from './terminals'
 
-type TerminalApi = Window['hermesDesktop']['terminal']
+type TerminalApi = Window['mbilingDesktop']['terminal']
 
 export type TerminalStatus = 'closed' | 'open' | 'starting' | 'reconnecting'
 
@@ -52,7 +52,7 @@ interface SessionAttemptOptions {
   /** True while restored local history is parsing; its query replies must not reach the shell. */
   isReplayingHistory: () => boolean
   /** The attempt adopted a live session: seed size, shell name and selection. */
-  onStarted: (session: HermesTerminalSession) => void
+  onStarted: (session: MbilingTerminalSession) => void
   /** Cwd for the next shell; read at each start so a retry follows a `cd`. */
   resolveCwd: () => string
   /** Runs once start metadata says whether the server replays history itself. */

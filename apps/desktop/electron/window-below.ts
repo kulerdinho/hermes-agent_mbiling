@@ -1,4 +1,4 @@
-// window-below.ts — which OS window sits directly underneath a Hermes window.
+// window-below.ts — which OS window sits directly underneath a Mbiling window.
 //
 // Backs the desktop-gated `read_window_below` tool: the renderer receives
 // `window.read.request` from the gateway, asks main over IPC, and answers
@@ -104,7 +104,7 @@ const overlaps = (a: EnumeratedWindow['bounds'], b: EnumeratedWindow['bounds']):
 /**
  * Pick the window directly underneath ours from a front-to-back window list.
  *
- * Walks past every window owned by our own process (all Hermes windows share
+ * Walks past every window owned by our own process (all Mbiling windows share
  * the main process pid), then takes the first other-process window whose
  * bounds overlap ours — "underneath" means visually behind, not merely next
  * in z-order on some other display. `frontmost` is the first other-process

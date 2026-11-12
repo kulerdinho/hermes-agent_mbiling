@@ -47,10 +47,10 @@ interface PaintState {
 async function setupSeededDesktop(mockServer?: MockServerOptions): Promise<SeededFixture> {
   const mock = await startMockServer(mockServer)
   const sandbox = createSandbox('large-session')
-  writeMockProviderConfig(sandbox.hermesHome, mock.url)
-  writeEnvFile(sandbox.hermesHome)
+  writeMockProviderConfig(sandbox.mbilingHome, mock.url)
+  writeEnvFile(sandbox.mbilingHome)
 
-  const builder = await RealSessionBuilder.start(sandbox.hermesHome)
+  const builder = await RealSessionBuilder.start(sandbox.mbilingHome)
   try {
     await builder.createSession({ title: SESSION_TITLE, turns: HISTORY_TURNS })
   } finally {
@@ -117,7 +117,7 @@ async function startPaintObserver(page: Page): Promise<void> {
     const viewport = document.querySelector('[data-slot="aui_thread-viewport"]')
     const state = { bursts: 0, timeline: [] as Array<{ mutations: number; time: number }> }
     ;(window as Window & { __largeSessionPaints?: typeof state }).__largeSessionPaints = state
-    if (!viewport) return
+    if (!viewport) {return}
 
     let additions = 0
     let flushTimer: ReturnType<typeof setTimeout> | undefined
@@ -126,8 +126,8 @@ async function startPaintObserver(page: Page): Promise<void> {
         (count, record) => count + (record.type === 'childList' && record.addedNodes.length > 0 ? 1 : 0),
         0,
       )
-      if (additions === 0) return
-      if (flushTimer) clearTimeout(flushTimer)
+      if (additions === 0) {return}
+      if (flushTimer) {clearTimeout(flushTimer)}
       flushTimer = setTimeout(() => {
         state.bursts += 1
         state.timeline.push({ mutations: additions, time: Date.now() })
@@ -146,7 +146,7 @@ async function paintState(page: Page): Promise<PaintState> {
 async function textNodeOccurrences(page: Page, expected: string): Promise<number> {
   return page.evaluate(text => {
     const viewport = document.querySelector('[data-slot="aui_thread-viewport"]')
-    if (!viewport) return 0
+    if (!viewport) {return 0}
 
     const walker = document.createTreeWalker(viewport, NodeFilter.SHOW_TEXT)
     let count = 0
@@ -186,6 +186,7 @@ test.describe('large session resume', () => {
     fixture = null
   })
 
+  // eslint-disable-next-line no-empty-pattern -- pre-existing upstream pattern
   test('cold resume of an unchanged session has one user row and bounded transcript paints', async ({}, testInfo) => {
     fixture = await setupSeededDesktop()
     await waitForAppReady(fixture, 120_000)
@@ -195,6 +196,7 @@ test.describe('large session resume', () => {
   })
 
   for (const resumeKind of ['fast', 'cold'] as const) {
+    // eslint-disable-next-line no-empty-pattern -- pre-existing upstream pattern
     test(`${resumeKind} resume keeps background inference attached without duplicate messages`, async ({}, testInfo) => {
       fixture = await setupSeededDesktop({ holdFirstStreamForPrompt: BACKGROUND_PROMPT })
       await waitForAppReady(fixture, 120_000)

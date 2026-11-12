@@ -27,11 +27,11 @@ interface VoiceLiveConversationOptions {
   busy: boolean
   enabled: boolean
   onFatalError?: () => void
-  /** Interrupt the in-flight Hermes turn (Stop-button seam). Fired when a new
+  /** Interrupt the in-flight Mbiling turn (Stop-button seam). Fired when a new
    *  delegation supersedes one still running. */
   onInterrupt?: () => Promise<void> | void
   onStopWord?: () => void
-  /** Submit a Hermes turn: `text` is the user's last words (the bubble and the
+  /** Submit a Mbiling turn: `text` is the user's last words (the bubble and the
    *  persisted row), `voiceContext` the recent spoken exchange for the model. */
   onSubmit: (text: string, voiceContext: string) => Promise<void> | void
   pendingResponse: () => PendingVoiceResponse | null
@@ -43,7 +43,7 @@ interface VoiceLiveConversationOptions {
   beforeMicOpen?: () => Promise<void> | void
 }
 
-/** Turn transcript fragments into the Hermes turn: `prompt` is what the user
+/** Turn transcript fragments into the Mbiling turn: `prompt` is what the user
  *  last said (the persisted user row), `context` the recent spoken exchange
  *  that rides the model input only (see tools/voice_live.py). */
 export function delegationPrompt(context: LiveTranscriptFragment[]): { context: string; prompt: string } {
@@ -99,7 +99,7 @@ export function liveEndedMessage(
  *
  * Status mapping: `listening` = session up, voice idle; `speaking` = the
  * remote track is producing audio; `thinking` = a delegation is in flight in
- * Hermes. There is no `transcribing` phase: the voice model owns speech.
+ * Mbiling. There is no `transcribing` phase: the voice model owns speech.
  */
 export function useVoiceLiveConversation({
   busy,
@@ -374,7 +374,7 @@ export function useVoiceLiveConversation({
     }
   }, [end, refreshStatus, setDelegation, voiceCopy])
 
-  // Drive the reply back into the voice: stream commentary as Hermes writes
+  // Drive the reply back into the voice: stream commentary as Mbiling writes
   // it (sentence-chunked), quiet tool progress as thinking appends, and clear
   // the delegation when the turn settles.
   // eslint-disable-next-line no-restricted-syntax -- turn-coordination refs (delegation id / spoken cursor), not atom mirrors

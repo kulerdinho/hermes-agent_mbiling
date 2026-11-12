@@ -111,7 +111,7 @@ export const en: Translations = {
     diskElevatedBanner:
       "Your agent's disk is filling up. Consider clearing old sessions or expanding its storage.",
     multiplexStandaloneBanner:
-      "Your gateway serves only one profile. Not served: {profiles}. Why: {reason}. Fix: hermes gateway migrate --multiplex",
+      "Your gateway serves only one profile. Not served: {profiles}. Why: {reason}. Fix: mbiling gateway migrate --multiplex",
     dismiss: "Dismiss",
     sharedMetricsTitle: "Help improve Mbiling?",
     sharedMetricsBody:
@@ -135,7 +135,7 @@ export const en: Translations = {
   status: {
     actionFailed: "Action failed",
     actionFinished: "Finished",
-    actionFinishedOwed: "Updated, but still owed (re-run `hermes update` to finish)",
+    actionFinishedOwed: "Updated, but still owed (re-run `mbiling update` to finish)",
     actions: "Actions",
     agent: "Agent",
     activeSessions: "Active Sessions",
@@ -165,12 +165,12 @@ export const en: Translations = {
     starting: "Starting",
     startedInBackground: "Started in background — check logs for progress",
     stopped: "Stopped",
-    updateHermes: "Update Mbiling",
-    updateHermesConfirmMessage:
-      "This runs hermes update and restarts the gateway when it finishes. Active sessions keep their prompt cache until then.",
-    updateHermesConfirmNow: "Update now",
-    updateHermesConfirmTitle: "Update Mbiling?",
-    updatingHermes: "Updating Mbiling…",
+    updateMbiling: "Update Mbiling",
+    updateMbilingConfirmMessage:
+      "This runs mbiling update and restarts the gateway when it finishes. Active sessions keep their prompt cache until then.",
+    updateMbilingConfirmNow: "Update now",
+    updateMbilingConfirmTitle: "Update Mbiling?",
+    updatingMbiling: "Updating Mbiling…",
     waitingForOutput: "Waiting for output…",
   },
 
@@ -428,7 +428,7 @@ export const en: Translations = {
       "Saved — restart the gateway to apply the change.",
     forceReinstall: "Force reinstall (delete existing folder first)",
     headline:
-      "Discover, install, enable, and update Mbiling plugins (`hermes plugins` parity).",
+      "Discover, install, enable, and update Mbiling plugins (`mbiling plugins` parity).",
     identifierLabel: "Git URL or owner/repo",
     inactive: "inactive",
     installBtn: "Install",
@@ -445,8 +445,8 @@ export const en: Translations = {
     providersHint:
       "Writes memory.provider (empty = built-in) and context.engine to config.yaml. Takes effect next session.",
     refreshDashboard: "Rescan dashboard extensions",
-    removeConfirm: "Remove this plugin from ~/.hermes/plugins/?",
-    removeHint: "Only user-installed plugins under ~/.hermes/plugins can be removed.",
+    removeConfirm: "Remove this plugin from ~/.mbiling/plugins/?",
+    removeHint: "Only user-installed plugins under ~/.mbiling/plugins can be removed.",
     rescanHeading: "SPA plugin registry",
     rescanHint: "Rescan after adding files on disk so the dashboard sidebar picks up new manifests.",
     runtimeHeading: "Gateway runtime (YAML plugins)",
@@ -492,7 +492,7 @@ export const en: Translations = {
     all: "All",
     categories: "Categories",
     filters: "Filters",
-    noSkills: "No skills installed yet. Browse the skills hub or create one here; from a terminal you can also run `hermes skills search <topic>`.",
+    noSkills: "No skills installed yet. Browse the skills hub or create one here; from a terminal you can also run `mbiling skills search <topic>`.",
     noSkillsMatch: "No skills match your search or filter.",
     skillCount: "{count} skill{s}",
     resultCount: "{count} result{s}",
@@ -510,7 +510,7 @@ export const en: Translations = {
   },
 
   config: {
-    configPath: "~/.hermes/config.yaml",
+    configPath: "~/.mbiling/config.yaml",
     filters: "Filters",
     sections: "Sections",
     exportConfig: "Export config as JSON",
@@ -741,7 +741,7 @@ export const en: Translations = {
         "Share on X opens a pre-filled post in a new tab. Click Copy image first if you want the 1200×630 badge attached — X lets you paste it right into the tweet composer. Download PNG saves the file for use anywhere.",
       clipboard_unsupported:
         "Clipboard image copy not supported in this browser — use Download instead.",
-      tweet_text: "Just unlocked {tier_part}\"{name}\" in Mbiling ☤",
+      tweet_text: "Just unlocked {tier_part}\"{name}\" in Mbiling ◉",
     },
   },
 
