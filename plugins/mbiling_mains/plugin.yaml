@@ -1,0 +1,5 @@
+name: mbiling-mains
+version: 0.1.0
+description: "Mains Mbiling : le terminal et les fichiers de l'agent s'exécutent sur l'ordinateur du client, à travers le Relais."
+author: Mbiling
+kind: backend
