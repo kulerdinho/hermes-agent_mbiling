@@ -1,0 +1,20 @@
+# Configuration du Relais des Mains (phase 0).
+# Copier ce fichier, l'adapter, puis lancer le Relais avec :
+#   MBILING_RELAIS_CONFIG=/chemin/config.yaml uvicorn mbiling_cloud.relais.app:creer_app --factory
+#
+# Les jetons ne sont JAMAIS écrits ici : on indique seulement le NOM de la variable
+# d'environnement qui les contient (au moins 24 caractères aléatoires chacun).
+
+# Jeton que la cellule (plugin mbiling_mains) présente au Relais.
+jeton_interne_env: MBILING_RELAIS_JETON_INTERNE
+
+# Appareils autorisés à se connecter. En phase 1, cette liste viendra de Mbiling Comptes.
+appareils:
+  - identifiant: pc-test-1
+    organisation: org-test
+    jeton_env: MBILING_JETON_APPAREIL_PC_TEST_1
+
+limites:
+  delai_bonjour_s: 10        # temps laissé au PC pour se présenter
+  taille_script_max: 2000000 # octets ; les écritures de fichiers passent dans le script
+  file_sortie_max: 2000      # messages de sortie en attente par commande
