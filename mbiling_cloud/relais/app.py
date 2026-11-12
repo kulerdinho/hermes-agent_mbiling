@@ -26,7 +26,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, AsyncIterator
 
-import yaml
 from fastapi import FastAPI, Header, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -36,7 +35,13 @@ def charger_config() -> dict[str, Any]:
     chemin = os.environ.get("MBILING_RELAIS_CONFIG")
     if not chemin:
         raise RuntimeError("MBILING_RELAIS_CONFIG doit désigner le fichier de configuration du Relais")
-    return yaml.safe_load(Path(chemin).read_text(encoding="utf-8"))
+    texte = Path(chemin).read_text(encoding="utf-8")
+    try:
+        import yaml
+        return yaml.safe_load(texte)
+    except ModuleNotFoundError:  # dans l'environnement du moteur, c'est ruamel.yaml qui est installé
+        from ruamel.yaml import YAML
+        return YAML(typ="safe").load(texte)
 
 
 def secret(nom_variable: str) -> str:

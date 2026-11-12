@@ -29,11 +29,17 @@ class EnvironnementMains(BaseEnvironment):
             raise EnvironmentConnectionError(str(exc)) from exc
         info = self._appareil.get("info") or {}
         self._temp = (info.get("tmp") or "/tmp").rstrip("/") or "/tmp"
-        depart = info.get("dossier_depart")
-        if depart and (not cwd or cwd in ("~", "/root")):
-            cwd = depart
-        super().__init__(cwd=cwd or "~", timeout=timeout)
+        # « ~ » désigne le premier dossier autorisé par le PC, pas le dossier personnel de Windows.
+        self._depart = info.get("dossier_depart") or "~"
+        if not cwd or cwd in ("~", "/root"):
+            cwd = self._depart
+        super().__init__(cwd=cwd, timeout=timeout)
         self.init_session()
+
+    def execute(self, command: str, cwd: str = "", **kwargs):
+        if cwd == "~":
+            cwd = self._depart
+        return super().execute(command, cwd, **kwargs)
 
     def get_temp_dir(self) -> str:
         return self._temp

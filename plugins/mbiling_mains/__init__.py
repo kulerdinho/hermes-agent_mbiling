@@ -37,6 +37,10 @@ class FournisseurMains(TerminalEnvironmentProvider):
         return False  # toutes les approbations restent actives
 
     @property
+    def default_cwd(self) -> Optional[str]:
+        return "~"  # résolu par l'environnement : premier dossier autorisé sur le PC
+
+    @property
     def env_description(self) -> str:
         return ("the user's own computer, reached through the Mbiling app (bash; on Windows this is Git Bash, "
                 "so use /c/Users/... style paths)")
