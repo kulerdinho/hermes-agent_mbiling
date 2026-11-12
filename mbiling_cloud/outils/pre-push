@@ -1,0 +1,12 @@
+#!/bin/sh
+# Garde-fou local Mbiling : refuse toute poussée directe vers dev, staging ou main.
+# Ces branches ne changent que par une demande de fusion sur GitHub (voir BRANCHES.md).
+# Installation : cp mbiling_cloud/outils/pre-push .git/hooks/pre-push
+while read local_ref local_sha remote_ref remote_sha; do
+  case "$remote_ref" in
+    refs/heads/dev|refs/heads/staging|refs/heads/main|refs/heads/upstream)
+      echo "Poussée refusée : ${remote_ref#refs/heads/} ne reçoit que des demandes de fusion (voir BRANCHES.md)." >&2
+      exit 1 ;;
+  esac
+done
+exit 0
