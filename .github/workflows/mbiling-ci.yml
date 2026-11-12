@@ -1,0 +1,112 @@
+# Contrôles Mbiling : ils gardent les trois étapes dev -> staging -> main.
+#
+#   dev      reçoit le travail des développeurs (branches feature/, fix/, chore/, docs/, hotfix/)
+#   staging  reçoit uniquement dev : c'est ici qu'on teste et valide
+#   main     reçoit uniquement staging : c'est la production
+#
+# Le contrôle « valide » est le seul à exiger dans les protections de branches :
+# il échoue dès qu'un des contrôles ci-dessous échoue.
+name: Mbiling CI
+
+on:
+  pull_request:
+    branches: [dev, staging, main]
+  push:
+    branches: [dev, staging, main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mbiling-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  flux:
+    name: Sens des fusions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Vérifier la branche d'origine
+        if: github.event_name == 'pull_request'
+        env:
+          BASE: ${{ github.base_ref }}
+          HEAD: ${{ github.head_ref }}
+        run: |
+          case "$BASE" in
+            main)
+              [ "$HEAD" = "staging" ] || { echo "::error::main ne reçoit que staging (reçu : $HEAD)"; exit 1; } ;;
+            staging)
+              [ "$HEAD" = "dev" ] || { echo "::error::staging ne reçoit que dev (reçu : $HEAD)"; exit 1; } ;;
+            dev)
+              case "$HEAD" in
+                feature/*|fix/*|chore/*|docs/*|hotfix/*) ;;
+                *) echo "::error::dev reçoit des branches feature/, fix/, chore/, docs/ ou hotfix/ (reçu : $HEAD)"; exit 1 ;;
+              esac ;;
+          esac
+          echo "Fusion autorisée : $HEAD -> $BASE"
+
+  secrets:
+    name: Recherche de secrets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Analyser les commits ajoutés
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          if [ -z "$BASE_SHA" ] || ! git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null; then
+            echo "Pas de point de comparaison : analyse du dernier commit seulement."
+            PLAGE="-1"
+          else
+            PLAGE="$BASE_SHA..$HEAD_SHA"
+          fi
+          docker run --rm -e GIT_CONFIG_COUNT=1 -e GIT_CONFIG_KEY_0=safe.directory -e "GIT_CONFIG_VALUE_0=*" -v "$PWD:/depot" -w /depot ghcr.io/gitleaks/gitleaks:v8.21.2 \
+            git --log-opts="$PLAGE" --redact --no-banner .
+
+  renommage:
+    name: Aucune mention visible de l'ancien nom
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install --quiet pyyaml
+      - name: Vérifier le renommage (si le script est présent)
+        run: |
+          if [ -f rebrand/appliquer.py ]; then python rebrand/appliquer.py --verifier | tail -20; else echo "Script de renommage absent sur cette branche."; fi
+
+  mains:
+    name: Mains (Relais, plugin, client PC)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Essai de bout en bout (si les Mains sont présentes)
+        run: |
+          if [ ! -f mbiling_cloud/essais/essai_mains.py ]; then echo "Mains absentes sur cette branche."; exit 0; fi
+          pip install --quiet -r mbiling_cloud/relais/requirements.txt websockets
+          python -m compileall -q plugins/mbiling_mains mbiling_cloud
+          node --check mbiling_mains_client/mains.cjs
+          python mbiling_cloud/essais/essai_mains.py
+
+  valide:
+    name: valide
+    if: always()
+    needs: [flux, secrets, renommage, mains]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Tous les contrôles doivent réussir
+        env:
+          RESULTATS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "Résultats : $RESULTATS"
+          for r in $RESULTATS; do [ "$r" = "success" ] || { echo "::error::au moins un contrôle a échoué"; exit 1; }; done
