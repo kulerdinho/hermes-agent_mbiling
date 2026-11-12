@@ -120,12 +120,12 @@ export function quitPromptFor(
       lines.length > 0 ? '' : null,
       backendOwned
         ? 'Quitting stops the agent mid-turn. Any work it has not finished writing is lost.'
-        : 'The agent keeps running on the gateway. Quitting only closes Hermes on this computer; reconnect later to see the results.'
+        : 'The agent keeps running on the gateway. Quitting only closes Mbiling on this computer; reconnect later to see the results.'
     ]
       .filter(line => line !== null)
       .join('\n')
       .trim(),
-    message: work.count === 1 ? 'Hermes is still working on 1 chat.' : `Hermes is still working on ${work.count} chats.`
+    message: work.count === 1 ? 'Mbiling is still working on 1 chat.' : `Mbiling is still working on ${work.count} chats.`
   }
 }
 

@@ -263,9 +263,9 @@ async function locateHermes(ssh, remoteHermesPath) {
   }
 
   const err: any = new Error(
-    'Hermes is not installed on the remote host (could not find a `hermes` executable). ' +
+    'Mbiling is not installed on the remote host (could not find a `hermes` executable). ' +
       'Install it on the remote with:  curl -fsSL https://hermes-agent.nousresearch.com/install.sh | sh  ' +
-      '— or set the Hermes path explicitly in the SSH connection settings.'
+      '— or set the Mbiling path explicitly in the SSH connection settings.'
   )
 
   err.kind = 'hermes-not-found'
@@ -313,7 +313,7 @@ async function probeRemoteHermesHome(ssh) {
 
     return out || '~/.hermes'
   } catch (cause) {
-    const error: any = new Error('Could not resolve the remote Hermes home.')
+    const error: any = new Error('Could not resolve the remote Mbiling home.')
     error.kind = 'transient-transport-error'
     error.cause = cause
     throw error
@@ -355,7 +355,7 @@ async function assertRemoteInstallUpdateClear(ssh, hermesHome, hermesPath = '') 
         .split(/\r?\n/)
         .pop() || ''
   } catch (cause) {
-    const error: any = new Error('Could not prove that the remote Hermes install is clear for SSH startup.')
+    const error: any = new Error('Could not prove that the remote Mbiling install is clear for SSH startup.')
     error.kind = 'update-in-progress'
     error.cause = cause
     throw error
@@ -371,8 +371,8 @@ async function assertRemoteInstallUpdateClear(ssh, hermesHome, hermesPath = '') 
     live
       ? `Remote Hermes update process ${live[1]} is still running; SSH startup is paused.`
       : observation === 'HELD'
-        ? 'A process the remote Hermes update started still holds the install; SSH startup is paused.'
-        : 'The remote Hermes update marker is unreadable, malformed, or locked; refusing SSH startup.'
+        ? 'A process the remote Mbiling update started still holds the install; SSH startup is paused.'
+        : 'The remote Mbiling update marker is unreadable, malformed, or locked; refusing SSH startup.'
   )
 
   error.kind = 'update-in-progress'
@@ -393,7 +393,7 @@ async function listRemoteHermesProfiles(ssh, platform: any = null) {
   try {
     listing = await ssh.exec(`if [ -d ${dir} ]; then ls -1 ${dir}; fi`)
   } catch (cause) {
-    const error: any = new Error('Could not list remote Hermes profiles.')
+    const error: any = new Error('Could not list remote Mbiling profiles.')
     error.kind = 'transient-transport-error'
     error.cause = cause
     throw error
@@ -421,7 +421,7 @@ async function readRemoteInstallId(ssh, platform: any = null) {
   try {
     out = await ssh.exec(`if [ -f ${file} ]; then cat ${file}; fi`)
   } catch (cause) {
-    const error: any = new Error('Could not read the remote Hermes install id.')
+    const error: any = new Error('Could not read the remote Mbiling install id.')
     error.kind = 'transient-transport-error'
     error.cause = cause
     throw error
@@ -443,7 +443,7 @@ function assertSafeRemoteHome(home) {
   const value = String(home || '').trim()
 
   if (!/^(\/|~\/)[A-Za-z0-9._/+-]+$/.test(value) || value.includes('..')) {
-    const error: any = new Error('Unsafe remote Hermes home.')
+    const error: any = new Error('Unsafe remote Mbiling home.')
     error.kind = 'unsafe-path'
     throw error
   }
@@ -1161,7 +1161,7 @@ function buildSpawnCommand(hermesPath, profile, opts: any = {}) {
     `exec env HERMES_DESKTOP=1${devServerEnv} ${hermes} ${profileArgs}${subCmd}`
 
   const detachedShell: string = `eval "exec $1>&-"; ${dashCmd} </dev/null >> ${logPath} 2>&1 & echo $!`
-  // The inner shell backgrounds Hermes and reports its PID; backgrounding the
+  // The inner shell backgrounds Mbiling and reports its PID; backgrounding the
   // launcher too adds its unrelated PID to the value published in the lock.
   const detachedSpawn: string = `child=$("$(command -v setsid || echo nohup)" sh -c ${shq(detachedShell)} hermes-update-child "$1")`
 
@@ -1312,8 +1312,8 @@ async function spawnRemoteDashboard(
 ) {
   if (!(await remoteSupportsSshOwnership(ssh, hermesPath))) {
     const err: any = new Error(
-      'The remote Hermes install does not support --ssh-session-token-file and --ssh-owner-nonce. ' +
-        'Update Hermes on the remote host to continue using Desktop SSH mode.'
+      'The remote Mbiling install does not support --ssh-session-token-file and --ssh-owner-nonce. ' +
+        'Update Mbiling on the remote host to continue using Desktop SSH mode.'
     )
 
     err.kind = 'update-required'

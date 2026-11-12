@@ -373,7 +373,7 @@ export class HermesGateway extends JsonRpcGatewayClient {
     } catch (error) {
       this.readiness.failDial(ready, error instanceof Error ? error : new Error(GATEWAY_NOT_CONNECTED_MESSAGE))
 
-      if (generation === this.connectionGeneration) { this.invalidate('Hermes gateway protocol negotiation failed') }
+      if (generation === this.connectionGeneration) { this.invalidate('Mbiling gateway protocol negotiation failed') }
       throw error
     }
   }
@@ -522,7 +522,7 @@ export class HermesGateway extends JsonRpcGatewayClient {
   }
 
   private requireConnectionGeneration(generation: number): void {
-    if (generation !== this.connectionGeneration) { throw new Error('Hermes gateway connection changed; reopen the session') }
+    if (generation !== this.connectionGeneration) { throw new Error('Mbiling gateway connection changed; reopen the session') }
   }
 
   // Resume the session (and, for branch-like methods, its parent) on THIS socket before a
@@ -570,8 +570,8 @@ export class HermesGateway extends JsonRpcGatewayClient {
 
   constructor() {
     super({
-      closedErrorMessage: 'Hermes gateway connection closed',
-      connectErrorMessage: 'Could not connect to Hermes gateway',
+      closedErrorMessage: 'Mbiling gateway connection closed',
+      connectErrorMessage: 'Could not connect to Mbiling gateway',
       createRequestId: nextId => nextId,
       notConnectedErrorMessage: GATEWAY_NOT_CONNECTED_MESSAGE,
       // The channel already answered -32603; surface the crash in devtools like the dial-failure sink.
@@ -579,7 +579,7 @@ export class HermesGateway extends JsonRpcGatewayClient {
         console.error(`[gateway] server request handler crashed for ${request.method} (${request.id}):`, error),
       // The channel already answered -32601; note the missing registry in devtools.
       onUnhandledRequest: request =>
-        console.warn(`[gateway] Hermes Desktop has no server-request registry for ${request.method} (${request.id})`),
+        console.warn(`[gateway] Mbiling Desktop has no server-request registry for ${request.method} (${request.id})`),
       requestTimeoutMs: DEFAULT_GATEWAY_REQUEST_TIMEOUT_MS,
       socketFactory: openGatewaySocket
     })
