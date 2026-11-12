@@ -25,7 +25,7 @@ function rig() {
 
 describe('normalizeDictionaryWord', () => {
   it('accepts one word of letters, marks, digits, apostrophes and hyphens', () => {
-    expect(normalizeDictionaryWord('Hermes')).toBe('Hermes')
+    expect(normalizeDictionaryWord('Mbiling')).toBe('Mbiling')
     expect(normalizeDictionaryWord('  naïve  ')).toBe('naïve')
     expect(normalizeDictionaryWord("don't")).toBe("don't")
     expect(normalizeDictionaryWord('re-run')).toBe('re-run')
@@ -44,7 +44,7 @@ describe('normalizeDictionaryWord', () => {
       '--',
       '<script>',
       '-Hermes',
-      "'Hermes'",
+      "'Mbiling'",
       'Hermes-',
       'a/b',
       'x'.repeat(65),
@@ -62,19 +62,19 @@ describe('hermes:spellcheck:dictionary', () => {
   it("adds and removes a word on the sender's own session", async () => {
     const { call, session } = rig()
 
-    expect(await call({ op: 'add', word: ' Hermes ' })).toBe(true)
-    expect(session.addWordToSpellCheckerDictionary).toHaveBeenCalledWith('Hermes')
+    expect(await call({ op: 'add', word: ' Mbiling ' })).toBe(true)
+    expect(session.addWordToSpellCheckerDictionary).toHaveBeenCalledWith('Mbiling')
 
-    expect(await call({ op: 'remove', word: 'Hermes' })).toBe(true)
-    expect(session.removeWordFromSpellCheckerDictionary).toHaveBeenCalledWith('Hermes')
+    expect(await call({ op: 'remove', word: 'Mbiling' })).toBe(true)
+    expect(session.removeWordFromSpellCheckerDictionary).toHaveBeenCalledWith('Mbiling')
   })
 
   it('refuses an invalid word or an unknown op without touching the dictionary', async () => {
     const { call, session } = rig()
 
     expect(await call({ op: 'add', word: 'two words' })).toBe(false)
-    expect(await call({ op: 'list', word: 'Hermes' })).toBe(false)
-    expect(await call({ op: 'constructor', word: 'Hermes' })).toBe(false)
+    expect(await call({ op: 'list', word: 'Mbiling' })).toBe(false)
+    expect(await call({ op: 'constructor', word: 'Mbiling' })).toBe(false)
     expect(await call(undefined)).toBe(false)
 
     expect(session.addWordToSpellCheckerDictionary).not.toHaveBeenCalled()
@@ -86,6 +86,6 @@ describe('hermes:spellcheck:dictionary', () => {
 
     session.addWordToSpellCheckerDictionary.mockReturnValue(false)
 
-    expect(await call({ op: 'add', word: 'Hermes' })).toBe(false)
+    expect(await call({ op: 'add', word: 'Mbiling' })).toBe(false)
   })
 })

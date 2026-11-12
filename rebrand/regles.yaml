@@ -1,0 +1,78 @@
+# Règles de renommage Hermes -> Mbiling (niveau 1 : tout ce que l'utilisateur voit).
+# Ce fichier est une DONNÉE : on change le renommage ici, jamais dans le script.
+
+marque:
+  # Remplacements, appliqués dans l'ordre (les expressions longues d'abord).
+  remplacements:
+    - ["Hermes Agent", "Mbiling"]
+    - ["Hermes Desktop", "Mbiling Desktop"]
+    - ["Hermes Light", "Mbiling"]
+    - ["Hermes Cloud", "Mbiling Cloud"]
+    - ["Hermes", "Mbiling"]
+  # Le mot n'est PAS remplacé s'il est collé à l'un de ces caractères
+  # (identifiants techniques : X-Hermes-Token, @Hermes, chemins, variables...).
+  caracteres_interdits_avant: "-_/@.$"
+  caracteres_interdits_apres: "-_/@"
+
+# Périmètre « texte » : fichiers de traduction, tout le fichier est du texte affiché.
+texte:
+  - "locales/**/*.yaml"
+  - "locales/**/*.json"
+  - "apps/desktop/src/i18n/**/*.ts"
+  - "apps/desktop/src/i18n/**/*.tsx"
+  - "web/src/i18n/**/*.ts"
+  - "web/src/i18n/**/*.tsx"
+
+# Périmètre « chaînes » : code d'interface ; seul le contenu des chaînes de
+# caractères et du texte JSX est modifié, jamais les identifiants ni les commentaires.
+chaines:
+  - "apps/desktop/src/**/*.ts"
+  - "apps/desktop/src/**/*.tsx"
+  - "apps/desktop/electron/**/*.ts"
+  - "apps/desktop/electron/**/*.cjs"
+  - "apps/desktop/product-identity.cjs"
+  - "apps/desktop/index.html"
+  - "apps/shared/**/*.ts"
+  - "apps/shared/**/*.tsx"
+  - "web/src/**/*.ts"
+  - "web/src/**/*.tsx"
+  - "web/index.html"
+  - "ui-tui/src/**/*.ts"
+  - "ui-tui/src/**/*.tsx"
+
+# Remplacements exacts, fichier par fichier (identité technique visible :
+# nom de l'exécutable, identifiant de l'application, éditeur).
+exacts:
+  "apps/desktop/product-identity.cjs":
+    - ["kebab: 'hermes',", "kebab: 'mbiling',"]
+    - ["'hermes-light'", "'mbiling-light'"]
+    - ["'hermes-bundled'", "'mbiling-bundled'"]
+    - ["'HermesLight'", "'MbilingLight'"]
+    - ["'HermesBundled'", "'MbilingBundled'"]
+    - ["com.nousresearch.", "com.mbiling."]
+    - ["`NousResearch.", "`Mbiling."]
+
+# Jamais modifiés, quel que soit le périmètre.
+exclusions:
+  - "LICENSE"
+  - "NOTICE"
+  - "rebrand/**"
+  - "**/node_modules/**"
+
+# Images remplacées par le logo Mbiling, redimensionné à la taille de chaque cible.
+images:
+  source: "rebrand/assets/logo.png"
+  marge: 0.06
+  cibles:
+    - "apps/desktop/assets/icon.png"
+    - "apps/desktop/assets/icon-dark.png"
+    - "apps/desktop/assets/icon-mac.png"
+    - "apps/desktop/assets/icon.ico"
+    - "apps/desktop/assets/icon-dark.ico"
+    - "apps/desktop/assets/appx/*.png"
+    - "apps/desktop/public/hermes.png"
+    - "apps/desktop/public/apple-touch-icon.png"
+
+# Lignes tolérées par « --verifier » (expressions régulières).
+exceptions_verification:
+  - "Nous Research"
