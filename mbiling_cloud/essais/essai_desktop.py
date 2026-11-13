@@ -124,7 +124,7 @@ def main() -> int:
         c = lancer("echo bonjour depuis le Desktop; pwd")
         sortie = c.stdout.read()
         verifier("une commande de l'agent s'exécute sur le PC, dans le dossier autorisé",
-                 "bonjour depuis le Desktop" in sortie and "Mbiling-Test" in sortie and c.wait(10) == 0, sortie.strip()[:120])
+                 "bonjour depuis le Desktop" in sortie and "Mbiling-Test" in sortie and c.wait(10) == 0, sortie.strip()[:400])
 
         c = lancer("date +%F > rapport.txt; cat rapport.txt")
         sortie = c.stdout.read()
@@ -149,6 +149,14 @@ def main() -> int:
                 pilote.kill()
         relais.terminate()
         relais.wait(10)
+        if not reussi:
+            # Diagnostic complet : sans lui, un échec rare ne peut pas être expliqué après coup.
+            print("\n--- sortie du pilote ---")
+            print("\n".join(lignes[-60:]))
+            journal = donnees / "logs" / "mains.log"
+            if journal.exists():
+                print("--- journal des Mains (fin) ---")
+                print("\n".join(journal.read_text(encoding="utf-8", errors="replace").splitlines()[-60:]))
     print(f"\nCaptures : {captures}")
     print("RÉSULTAT : " + ("tout passe" if reussi else "au moins un échec"))
     return 0 if reussi else 1
