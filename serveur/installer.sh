@@ -76,10 +76,19 @@ fi
 
 compose up -d --remove-orphans
 
-# Profils d'agents de la cellule, créés une seule fois (copie de la configuration de départ).
+# Caddy ne relit pas seul son fichier monté (administration désactivée) : on ne le
+# redémarre que si le Caddyfile a changé depuis la dernière installation.
+empreinte="$(sha256sum "$dossier/Caddyfile" | cut -d' ' -f1)"
+if [ "$(sudo cat "$MBILING_DONNEES/.caddyfile.sha256" 2>/dev/null)" != "$empreinte" ]; then
+	compose restart passerelle
+	echo "$empreinte" | sudo tee "$MBILING_DONNEES/.caddyfile.sha256" >/dev/null
+fi
+
+# Profils d'agents de la cellule, créés une seule fois (copie de la configuration de départ),
+# sous l'utilisateur du moteur pour que ses fichiers lui appartiennent.
 for profil in $MBILING_PROFILS; do
 	if ! sudo test -d "$cellule_donnees/profiles/$profil"; then
-		compose exec -T cellule /opt/mbiling/docker/main-wrapper.sh profile create "$profil" --clone
+		compose exec -T -u mbiling -e HOME=/opt/data cellule mbiling profile create "$profil" --clone
 	fi
 done
 
