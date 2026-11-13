@@ -104,7 +104,8 @@ function demarrer(config, options = {}) {
     if (refus) {
       journal('REFUS', demande.id, refus)
       envoyer({ t: 'sortie', id: demande.id, d: `[Mains Mbiling] Commande refusée sur cet ordinateur : ${refus}.\n` })
-      envoyer({ t: 'fin', id: demande.id, code: 126 })
+      // 77 (EX_NOPERM) : 126 ferait croire au moteur qu'un fichier n'est pas exécutable (« chmod +x »).
+      envoyer({ t: 'fin', id: demande.id, code: 77 })
       return
     }
     // Le script passe par un fichier : la ligne de commande de Windows est limitée à 32 Ko.
