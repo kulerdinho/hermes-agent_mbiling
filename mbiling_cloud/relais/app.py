@@ -14,13 +14,22 @@ Protocole avec les Mains (messages JSON, un par trame texte) :
   PC  -> Relais : {"t": "sortie", "id", "d": "texte"}
   PC  -> Relais : {"t": "fin", "id", "code": 0}
   Relais -> PC  : {"t": "annuler", "id"}
+
+Les PC sont inscrits automatiquement : quand un utilisateur connecté autorise l'agent à utiliser
+son PC, la cellule demande au Relais un jeton d'appareil (POST /interne/appareils). Le Relais ne
+garde que l'EMPREINTE (SHA-256) de ce jeton, dans le fichier ``fichier_appareils`` ; le jeton
+lui-même n'est rendu qu'une fois, puis conservé chiffré sur le PC.
 """
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import hmac
 import json
 import os
+import secrets
+import threading
+import time
 import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -65,6 +74,57 @@ class Appareil:
             await self.socket.send_text(json.dumps(message, ensure_ascii=False))
 
 
+def empreinte(jeton: str) -> str:
+    return hashlib.sha256(jeton.encode("utf-8")).hexdigest()
+
+
+class RegistreAppareils:
+    """PC inscrits : empreinte du jeton -> fiche. Persisté dans un fichier JSON (écriture atomique)."""
+
+    def __init__(self, chemin: Path | None) -> None:
+        self.chemin = chemin
+        self.verrou = threading.Lock()
+        self.fiches: dict[str, dict[str, Any]] = {}
+        if chemin and chemin.exists():
+            self.fiches = json.loads(chemin.read_text(encoding="utf-8") or "{}")
+
+    def _sauver(self) -> None:
+        if not self.chemin:
+            return
+        self.chemin.parent.mkdir(parents=True, exist_ok=True)
+        provisoire = self.chemin.with_suffix(self.chemin.suffix + ".tmp")
+        provisoire.write_text(json.dumps(self.fiches, ensure_ascii=False, indent=2), encoding="utf-8")
+        os.replace(provisoire, self.chemin)
+
+    def inscrire(self, organisation: str, nom: str) -> tuple[str, str]:
+        jeton = secrets.token_urlsafe(32)
+        identifiant = f"pc-{uuid.uuid4().hex[:12]}"
+        with self.verrou:
+            self.fiches[empreinte(jeton)] = {
+                "identifiant": identifiant, "organisation": organisation, "nom": nom[:120],
+                "cree": int(time.time()), "revoque": False,
+            }
+            self._sauver()
+        return identifiant, jeton
+
+    def trouver(self, jeton: str) -> tuple[str, str] | None:
+        fiche = self.fiches.get(empreinte(jeton))
+        if not fiche or fiche.get("revoque"):
+            return None
+        return fiche["identifiant"], fiche["organisation"]
+
+    def revoquer(self, identifiant: str) -> bool:
+        with self.verrou:
+            trouve = False
+            for fiche in self.fiches.values():
+                if fiche["identifiant"] == identifiant and not fiche.get("revoque"):
+                    fiche["revoque"] = True
+                    trouve = True
+            if trouve:
+                self._sauver()
+        return trouve
+
+
 class Demande(BaseModel):
     organisation: str
     script: str
@@ -73,14 +133,21 @@ class Demande(BaseModel):
     stdin: str | None = None
 
 
+class Inscription(BaseModel):
+    organisation: str
+    nom: str = ""
+
+
 def creer_app() -> FastAPI:
     config = charger_config()
     limites = config["limites"]
     jeton_interne = secret(config["jeton_interne_env"])
-    # jeton d'appareil -> (identifiant d'appareil, organisation)
-    appareils_connus = {
-        secret(a["jeton_env"]): (a["identifiant"], a["organisation"]) for a in config["appareils"]
+    # Appareils déclarés à la main dans la configuration (essais) : empreinte -> (identifiant, organisation).
+    appareils_fixes = {
+        empreinte(secret(a["jeton_env"])): (a["identifiant"], a["organisation"]) for a in config.get("appareils") or []
     }
+    fichier = config.get("fichier_appareils")
+    registre = RegistreAppareils(Path(fichier) if fichier else None)
     connectes: dict[str, Appareil] = {}  # organisation -> appareil (un seul en phase 0)
 
     app = FastAPI(title="Relais des Mains Mbiling", docs_url=None, redoc_url=None)
@@ -103,9 +170,10 @@ def creer_app() -> FastAPI:
             await socket.close(code=4400)
             return
         trouve = None
-        for jeton, valeur in appareils_connus.items():
-            if premier.get("t") == "bonjour" and hmac.compare_digest(str(premier.get("jeton", "")).encode(), jeton.encode()):
-                trouve = valeur
+        if premier.get("t") == "bonjour":
+            jeton = str(premier.get("jeton", ""))
+            # Recherche par empreinte : le Relais ne connaît jamais les jetons en clair.
+            trouve = appareils_fixes.get(empreinte(jeton)) or registre.trouver(jeton)
         if not trouve:
             await socket.send_text(json.dumps({"t": "refus", "raison": "jeton d'appareil invalide"}))
             await socket.close(code=4401)
@@ -137,6 +205,27 @@ def creer_app() -> FastAPI:
             await appareil.socket.close()
         except Exception:
             pass
+
+    @app.post("/interne/appareils")
+    async def inscrire(demande: Inscription, authorization: str | None = Header(default=None)) -> dict[str, Any]:
+        """Inscrit un PC pour une organisation. Le jeton n'est rendu qu'ici, une seule fois."""
+        verifier_interne(authorization)
+        if not demande.organisation.strip():
+            raise HTTPException(status_code=400, detail="organisation requise")
+        identifiant, jeton = registre.inscrire(demande.organisation.strip(), demande.nom.strip())
+        return {"appareil": identifiant, "jeton": jeton}
+
+    @app.delete("/interne/appareils/{identifiant}")
+    async def revoquer(identifiant: str, authorization: str | None = Header(default=None)) -> dict[str, Any]:
+        """Révoque un PC : son jeton est refusé, et sa connexion en cours est fermée."""
+        verifier_interne(authorization)
+        if not registre.revoquer(identifiant):
+            raise HTTPException(status_code=404, detail="appareil inconnu")
+        for organisation, appareil in list(connectes.items()):
+            if appareil.identifiant == identifiant:
+                del connectes[organisation]
+                await _fermer(appareil, "appareil révoqué")
+        return {"revoque": identifiant}
 
     @app.get("/interne/appareil/{organisation}")
     async def appareil_de(organisation: str, authorization: str | None = Header(default=None)) -> dict[str, Any]:

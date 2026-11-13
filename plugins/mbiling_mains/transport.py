@@ -28,7 +28,7 @@ class ConfigRelais:
     delai_connexion_s: float = 10.0
 
     @classmethod
-    def depuis_environnement(cls) -> "ConfigRelais":
+    def depuis_environnement(cls) -> ConfigRelais:
         manquantes = [n for n in ("MBILING_RELAIS_URL", "MBILING_RELAIS_JETON", "MBILING_ORGANISATION") if not os.environ.get(n)]
         if manquantes:
             raise MainsIndisponibles("Configuration des Mains incomplète : " + ", ".join(manquantes))
@@ -47,6 +47,24 @@ def _connexion(config: ConfigRelais, delai: float | None) -> tuple[http.client.H
     u = urlsplit(config.url)
     classe = http.client.HTTPSConnection if u.scheme == "https" else http.client.HTTPConnection
     return classe(u.hostname, u.port, timeout=delai), (u.path or "")
+
+
+def inscrire_appareil(config: ConfigRelais, nom: str) -> dict:
+    """Inscrit un PC de l'organisation auprès du Relais : renvoie {"appareil", "jeton"} (jeton rendu une fois)."""
+    conn, base = _connexion(config, config.delai_connexion_s)
+    try:
+        corps = json.dumps({"organisation": config.organisation, "nom": nom}).encode("utf-8")
+        conn.request("POST", f"{base}/interne/appareils", body=corps, headers={
+            "Authorization": f"Bearer {config.jeton}", "Content-Type": "application/json"})
+        rep = conn.getresponse()
+        reponse = rep.read()
+        if rep.status != 200:
+            raise MainsIndisponibles(f"Relais : {rep.status} {reponse[:200].decode('utf-8', 'replace')}")
+        return json.loads(reponse)
+    except OSError as exc:
+        raise MainsIndisponibles(f"Relais injoignable : {exc}") from exc
+    finally:
+        conn.close()
 
 
 def info_appareil(config: ConfigRelais) -> dict:
