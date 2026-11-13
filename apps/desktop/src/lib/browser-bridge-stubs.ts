@@ -43,6 +43,25 @@ export const BROWSER_BRIDGE_STUBS = {
     throw browserUnsupported('Gateway reconfiguration')
   },
   cancelBootstrap: async () => ({ cancelled: false, ok: true }),
+  // The browser build has no first-launch screen and cannot run the Mains (desktop only).
+  getDefaultConnection: async () => ({ adresse: '', clientLeger: false }),
+  mains: {
+    status: async () => {
+      throw browserUnsupported('The Mains')
+    },
+    setToken: async () => {
+      throw browserUnsupported('The Mains')
+    },
+    setActive: async () => {
+      throw browserUnsupported('The Mains')
+    },
+    restart: async () => {
+      throw browserUnsupported('The Mains')
+    },
+    open: async () => {
+      throw browserUnsupported('The Mains')
+    }
+  },
   // Rendering an untrusted link must not contact its destination. PrettyLink
   // uses the URL slug when no title is available; Electron keeps its resolver.
   fetchLinkTitle: async () => '',

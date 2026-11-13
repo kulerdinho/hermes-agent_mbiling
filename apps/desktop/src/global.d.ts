@@ -223,6 +223,14 @@ declare global {
       }
       getBootProgress: () => Promise<DesktopBootProgress>
       getConnectionConfig: (profile?: null | string) => Promise<DesktopConnectionConfig>
+      getDefaultConnection: () => Promise<{ adresse: string; clientLeger: boolean }>
+      mains: {
+        status: () => Promise<MbilingMainsStatus>
+        setToken: (token: string) => Promise<MbilingMainsStatus>
+        setActive: (active: boolean) => Promise<MbilingMainsStatus>
+        restart: () => Promise<MbilingMainsStatus>
+        open: (which: 'politique' | 'reglages' | 'journal') => Promise<null | string>
+      }
       saveConnectionConfig: (payload: DesktopConnectionConfigInput) => Promise<DesktopConnectionConfig>
       applyConnectionConfig: (payload: DesktopConnectionConfigInput) => Promise<DesktopConnectionConfig>
       testConnectionConfig: (payload: DesktopConnectionConfigInput) => Promise<DesktopConnectionTestResult>
@@ -1876,4 +1884,21 @@ export interface MbilingSelectPathsOptions {
 export interface BackendExit {
   code: number | null
   signal: string | null
+}
+
+/** State of the Mains on this PC (electron/mains-desktop.ts). */
+export interface MbilingMainsStatus {
+  actif: boolean
+  jetonDefini: boolean
+  chiffrementDisponible: boolean
+  enMarche: boolean
+  connecte: boolean
+  appareil: string | null
+  raison: string | null
+  relais: string
+  dossiers: string[]
+  bash: string | null
+  fichierPolitique: string
+  fichierReglages: string
+  journal: string
 }

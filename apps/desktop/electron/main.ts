@@ -358,6 +358,7 @@ import { ACTIVE_LOG_POLL_MS, planLogRotation, reclaimActiveLogIfOversized } from
 import { registerMachineProfile } from './machine-profile'
 import { createMainProcessLagWatchdog } from './main-process-lag-watchdog'
 import { activateWindow, ensureMainWindow, shouldQuitOnLastChatClosed } from './main-window-lifecycle'
+import { registerMainsIpc, startMains, stopMains } from './mains-desktop'
 import {
   assertManagedUpdatePreflightClear,
   executeManagedRemoteUpdate,
@@ -379,6 +380,7 @@ import {
   waitForManagedSshBootstrapFence,
   waitForManagedUpdateOperations
 } from './managed-ssh-update'
+import { registerDefaultConnectionIpc } from './mbiling-desktop-config'
 import { registerMcpOauthCallbackIpc } from './mcp-oauth-callback-ipc'
 import { isMediaCapturePermission } from './media-capture-permission'
 import { createMediaProtocolHandler, MEDIA_PROTOCOL, mediaProtocolDownloadName } from './media-protocol'
@@ -16608,6 +16610,7 @@ app.on('before-quit', () => {
 // Close the pooled keep-alive sockets on quit so lingering connections can't
 // hold the event loop open or leak FDs past app teardown.
 app.on('will-quit', () => {
+  stopMains()
   closeGatewayTicketBridges()
   killTimedGitChildren()
   sshIsolatedKeepalives.stopAll()
@@ -17176,6 +17179,10 @@ ipcMain.handle('mbiling:version', async (_event, scope?: { connectionId?: string
 // The About page's "Restart Mbiling" button (shown when bundleSwapPending):
 // load the already-swapped bundle without asking the user to quit manually.
 // The relaunch re-executes by path, so the fresh process loads the bundle now there.
+// Mbiling: the Mains (this PC runs the server agent's commands) and the first-launch address.
+registerMainsIpc()
+registerDefaultConnectionIpc(ipcMain, isLightVariant)
+
 ipcMain.handle('mbiling:app:relaunch', async () => {
   rememberLog('[updates] renderer requested an app relaunch (swapped bundle pending)')
   relaunchApp(relauncher, { args: buildNoSandboxRelaunchArgs(process.argv.slice(1)) })
@@ -17721,6 +17728,8 @@ app.on('open-url', (event, url) => {
 })
 
 app.whenReady().then(() => {
+  startMains()
+
   if (NVIDIA_DRIVER_MAJOR !== null) {
     rememberLog(nvidiaEglRecovery.startupMessage)
   }

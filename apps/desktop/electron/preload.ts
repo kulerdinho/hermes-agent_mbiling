@@ -286,6 +286,14 @@ contextBridge.exposeInMainWorld('mbilingDesktop', {
   },
   getBootProgress: () => ipcRenderer.invoke('mbiling:boot-progress:get'),
   getConnectionConfig: profile => ipcRenderer.invoke('mbiling:connection-config:get', profile),
+  getDefaultConnection: () => ipcRenderer.invoke('mbiling:default-connection'),
+  mains: {
+    status: () => ipcRenderer.invoke('mbiling:mains:status'),
+    setToken: token => ipcRenderer.invoke('mbiling:mains:set-token', token),
+    setActive: active => ipcRenderer.invoke('mbiling:mains:set-active', active),
+    restart: () => ipcRenderer.invoke('mbiling:mains:restart'),
+    open: which => ipcRenderer.invoke('mbiling:mains:open', which)
+  },
   saveConnectionConfig: payload => ipcRenderer.invoke('mbiling:connection-config:save', payload),
   applyConnectionConfig: payload => ipcRenderer.invoke('mbiling:connection-config:apply', payload),
   testConnectionConfig: payload => ipcRenderer.invoke('mbiling:connection-config:test', payload),

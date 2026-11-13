@@ -611,6 +611,7 @@ export interface Translations extends NoticeTranslations {
     pluginPages: Record<'agentSettings' | 'blurb' | 'empty' | 'manage' | 'missing', string> & {
       pageCount: (n: number) => string
     }
+    mains: Record<'title' | 'intro' | 'enabled' | 'statusOff' | 'statusNoToken' | 'statusConnecting' | 'statusConnected' | 'relay' | 'token' | 'tokenPlaceholder' | 'tokenSet' | 'tokenMissing' | 'saveToken' | 'removeToken' | 'folders' | 'noFolders' | 'editPolicy' | 'bash' | 'bashMissing' | 'lastProblem' | 'noProblem' | 'openLog' | 'editSettings' | 'restart', string>
     nav: {
       providers: string
       providerAccounts: string
@@ -628,6 +629,7 @@ export interface Translations extends NoticeTranslations {
       about: string
       billing: string
       notifications: string
+      mains: string
       vault: string
       plugins: string
     }

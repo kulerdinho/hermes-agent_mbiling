@@ -302,6 +302,15 @@ export function DesktopInstallOverlay({ enabled = true }: DesktopInstallOverlayP
   const [copied, setCopied] = useState(false)
   const [cancelling, setCancelling] = useState(false)
   const [remoteOpen, setRemoteOpen] = useState(false)
+  // Remote-only client (light variant): no local install to offer, straight to the connection.
+  const [remoteOnly, setRemoteOnly] = useState(false)
+
+  useEffect(() => {
+    void window.mbilingDesktop
+      ?.getDefaultConnection?.()
+      .then(({ clientLeger }) => setRemoteOnly(clientLeger))
+      .catch(() => undefined)
+  }, [])
   const [now, setNow] = useState(() => Date.now())
   const logEndRef = useRef<HTMLDivElement | null>(null)
 
@@ -437,8 +446,8 @@ export function DesktopInstallOverlay({ enabled = true }: DesktopInstallOverlayP
     return null
   }
 
-  if (remoteOpen) {
-    return <FirstRunRemoteSetup onBack={() => setRemoteOpen(false)} />
+  if (remoteOpen || (remoteOnly && state.setupChoice)) {
+    return <FirstRunRemoteSetup canGoBack={!remoteOnly} onBack={() => setRemoteOpen(false)} />
   }
 
   if (state.setupChoice) {

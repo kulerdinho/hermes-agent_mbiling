@@ -17,6 +17,7 @@ import {
   Info,
   Keyboard,
   KeyRound,
+  Monitor,
   Network,
   RefreshCw,
   Search,
@@ -54,6 +55,7 @@ import { SECTIONS } from './constants'
 import { GatewaySettings } from './gateway-settings'
 import { KeybindSettings } from './keybind-settings'
 import { KEYS_VIEWS, KeysSettings, type KeysView } from './keys-settings'
+import { MainsSettings } from './mains-settings'
 import { movedSettingsTabRedirect } from './moved-tabs'
 import { NotificationsSettings } from './notifications-settings'
 import {
@@ -83,6 +85,7 @@ const SETTINGS_VIEWS: readonly SettingsViewId[] = [
   'keybinds',
   'keys',
   'vault',
+  'mains',
   'notifications',
   'billing',
   'sessions',
@@ -92,6 +95,7 @@ const SETTINGS_VIEWS: readonly SettingsViewId[] = [
 
 // Pages that take nothing but the resolved sub-page.
 const SUBPAGE_VIEWS: Partial<Record<SettingsViewId, ComponentType<{ subpage?: string }>>> = {
+  mains: MainsSettings,
   'config:appearance': AppearanceSettings,
   about: AboutSettings,
   // 'connections' renders the unified page too so the frame before the alias
@@ -286,6 +290,13 @@ export function SettingsView({ onClose, onConfigSaved, onMainModelChanged }: Set
 
             return [entry]
           }),
+          {
+            active: activeView === 'mains',
+            icon: Monitor,
+            id: 'mains',
+            label: t.settings.nav.mains,
+            onSelect: () => setActiveView('mains')
+          },
           {
             active: activeView === 'notifications',
             icon: Bell,
