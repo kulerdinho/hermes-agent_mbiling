@@ -111,6 +111,9 @@ profond:
     # Le dépôt d'origine devient le dépôt Mbiling (mais pas ses dépôts voisins,
     # par exemple NousResearch/hermes-agent-self-evolution).
     - ['NousResearch/hermes-agent(?![A-Za-z0-9_-])', 'kulerdinho/mbiling']
+    # L'autotest SQLite (Dockerfile, tests/docker) insère le nom du produit puis cherche
+    # un trigramme qu'il contient : « erm » (dans hermes) devient « bil » (dans mbiling).
+    - ["MATCH 'erm'", "MATCH 'bil'"]
 
   # Identifiants EXTERNES laissés tels quels (expressions régulières, insensibles à la casse).
   proteges:

@@ -1,0 +1,33 @@
+# Passerelle Mbiling (phase 0).
+# Le TLS est assuré par le tunnel Cloudflare : ici, HTTP simple sur le réseau local.
+{
+	admin off
+	auto_https off
+	servers {
+		# Le tunnel arrive par le pont Docker : lui faire confiance pour l'adresse du client.
+		trusted_proxies static private_ranges
+	}
+}
+
+:8090 {
+	log
+
+	handle /sante {
+		respond "ok" 200
+	}
+
+	# Les routes d'administration du Relais ne sortent jamais du serveur.
+	handle /interne/* {
+		respond 404
+	}
+
+	# Les Mains (PC de l'utilisateur) se connectent au Relais en WebSocket.
+	handle /mains {
+		reverse_proxy relais:8000
+	}
+
+	# Tout le reste va à la cellule (API et WebSocket du Desktop, protégés par son jeton).
+	handle {
+		reverse_proxy cellule:9119
+	}
+}

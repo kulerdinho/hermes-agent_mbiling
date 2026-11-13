@@ -1,0 +1,22 @@
+# Configuration du Relais des Mains sur le serveur (phase 0).
+# Les jetons ne sont jamais écrits ici : seulement le NOM de la variable qui les contient
+# (générées par installer.sh dans serveur/.env).
+
+# Il sert aussi au tunnel du navigateur (lot 6) : BROWSER_CDP_URL=http://relais:8000/cdp/<jeton>/<organisation>.
+jeton_interne_env: MBILING_RELAIS_JETON_INTERNE
+
+# PC inscrits automatiquement : le Relais n'y garde que l'empreinte de chaque jeton.
+# Ce dossier est sauvegardé chaque nuit.
+fichier_appareils: /opt/data/appareils.json
+
+# PC de test déclaré à la main, pour les essais de la phase 0.
+appareils:
+  - identifiant: pc-test-1
+    organisation: org-test
+    jeton_env: MBILING_JETON_APPAREIL_PC_TEST_1
+
+limites:
+  delai_bonjour_s: 10
+  taille_script_max: 2000000
+  file_sortie_max: 2000
+  delai_navigateur_s: 30     # attente maximale d'une réponse du navigateur du PC (lancement compris)
