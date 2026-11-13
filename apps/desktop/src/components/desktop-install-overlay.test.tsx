@@ -609,43 +609,119 @@ it.each([
   }
 )
 
-describe('DesktopInstallOverlay Mbiling first launch', () => {
+describe('DesktopInstallOverlay Mbiling first launch (sign-in only)', () => {
   const choice = { platform: 'win32', activeRoot: 'C:/Users/me/.mbiling', local: 'none', bundled: false } as const
+  const BASE = 'https://api.mbiling.test'
 
-  it('proposes the configured Mbiling server address in the connection form', async () => {
+  function signInMock(options: { clientLeger?: boolean; reachable?: boolean; authMode?: 'oauth' | 'token'; connected?: boolean } = {}) {
     const desktop = installDesktopMock(bootstrapState({ setupChoice: choice }))
+    const calls = {
+      getDefaultConnection: vi.fn().mockResolvedValue({ adresse: BASE, clientLeger: options.clientLeger ?? false }),
+      consent: vi.fn().mockResolvedValue({}),
+      apply: vi.fn().mockResolvedValue({})
+    }
     Object.assign(desktop, {
-      getDefaultConnection: vi.fn().mockResolvedValue({ adresse: 'https://api.mbiling.test', clientLeger: false })
+      getDefaultConnection: calls.getDefaultConnection,
+      probeConnectionConfig: vi.fn().mockResolvedValue({
+        baseUrl: BASE,
+        reachable: options.reachable ?? true,
+        authMode: options.authMode ?? 'oauth',
+        providers: [],
+        version: null,
+        error: null
+      }),
+      oauthLoginConnectionConfig: vi.fn().mockResolvedValue({ ok: true, baseUrl: BASE, connected: options.connected ?? true }),
+      applyConnectionConfig: calls.apply,
+      mains: { consent: calls.consent }
     })
 
-    render(<DesktopInstallOverlay />)
-    fireEvent.click(await screen.findByText('Connect to existing Mbiling'))
+    return { desktop, calls }
+  }
 
-    expect(await screen.findByDisplayValue('https://api.mbiling.test')).toBeTruthy()
-    expect(screen.getByText('Back')).toBeTruthy()
-  })
-
-  it('takes the remote-only client straight to the connection form, with no way back to a local install', async () => {
-    const desktop = installDesktopMock(bootstrapState({ setupChoice: choice }))
-    Object.assign(desktop, {
-      getDefaultConnection: vi.fn().mockResolvedValue({ adresse: 'https://api.mbiling.test', clientLeger: true })
-    })
-
+  it('shows a single sign-in button, with no address or token field', async () => {
+    signInMock()
     render(<DesktopInstallOverlay />)
 
-    expect(await screen.findByDisplayValue('https://api.mbiling.test')).toBeTruthy()
+    expect(await screen.findByText('Sign in to Mbiling')).toBeTruthy()
+    expect(screen.queryByText('Gateway URL')).toBeNull()
     expect(screen.queryByText('Install Mbiling locally')).toBeNull()
-    expect(screen.queryByText('Back')).toBeNull()
+    expect(document.querySelector('input[type="text"], input[type="password"], input:not([type])')).toBeNull()
   })
 
-  it('leaves the address empty when no default is configured', async () => {
+  it('signs in through the browser, records the PC consent, then applies the connection', async () => {
+    const { desktop, calls } = signInMock()
+    render(<DesktopInstallOverlay />)
+
+    fireEvent.click(await screen.findByText('Sign in to Mbiling'))
+
+    await waitFor(() => expect(calls.apply).toHaveBeenCalledTimes(1))
+    expect(desktop.probeConnectionConfig).toHaveBeenCalledWith(BASE)
+    expect(desktop.oauthLoginConnectionConfig).toHaveBeenCalledWith(BASE)
+    expect(calls.consent).toHaveBeenCalledWith(true)
+    expect(calls.apply).toHaveBeenCalledWith({ mode: 'remote', remoteAuthMode: 'oauth', remoteUrl: BASE })
+    expect(calls.consent.mock.invocationCallOrder[0]).toBeLessThan(calls.apply.mock.invocationCallOrder[0])
+  })
+
+  it('respects an unticked "allow this PC" box', async () => {
+    const { calls } = signInMock()
+    render(<DesktopInstallOverlay />)
+
+    fireEvent.click(await screen.findByRole('checkbox'))
+    fireEvent.click(screen.getByText('Sign in to Mbiling'))
+
+    await waitFor(() => expect(calls.apply).toHaveBeenCalledTimes(1))
+    expect(calls.consent).toHaveBeenCalledWith(false)
+  })
+
+  it('explains an unreachable server and applies nothing', async () => {
+    const { calls } = signInMock({ reachable: false })
+    render(<DesktopInstallOverlay />)
+
+    fireEvent.click(await screen.findByText('Sign in to Mbiling'))
+
+    expect(await screen.findByText(/can't be reached right now/)).toBeTruthy()
+    expect(calls.apply).not.toHaveBeenCalled()
+  })
+
+  it('does not apply anything when the browser sign-in is not completed', async () => {
+    const { calls } = signInMock({ connected: false })
+    render(<DesktopInstallOverlay />)
+
+    fireEvent.click(await screen.findByText('Sign in to Mbiling'))
+
+    expect(await screen.findByText("Sign-in wasn't completed. Try again.")).toBeTruthy()
+    expect(calls.apply).not.toHaveBeenCalled()
+    expect(calls.consent).not.toHaveBeenCalled()
+  })
+
+  it('says so when the server offers no account sign-in', async () => {
+    const { calls } = signInMock({ authMode: 'token' })
+    render(<DesktopInstallOverlay />)
+
+    fireEvent.click(await screen.findByText('Sign in to Mbiling'))
+
+    expect(await screen.findByText("This Mbiling server doesn't offer account sign-in yet.")).toBeTruthy()
+    expect(calls.apply).not.toHaveBeenCalled()
+  })
+
+  it('keeps the address form as an advanced path, prefilled, and comes back to sign-in (light build)', async () => {
+    signInMock({ clientLeger: true })
+    render(<DesktopInstallOverlay />)
+
+    fireEvent.click(await screen.findByText('Advanced connection settings'))
+    expect(await screen.findByDisplayValue(BASE)).toBeTruthy()
+    expect(screen.queryByText('Install Mbiling locally')).toBeNull()
+
+    fireEvent.click(screen.getByText('Back'))
+    expect(await screen.findByText('Sign in to Mbiling')).toBeTruthy()
+  })
+
+  it('keeps the old setup choice when no default address is configured', async () => {
     const desktop = installDesktopMock(bootstrapState({ setupChoice: choice }))
     Object.assign(desktop, { getDefaultConnection: vi.fn().mockResolvedValue({ adresse: '', clientLeger: false }) })
-
     render(<DesktopInstallOverlay />)
-    fireEvent.click(await screen.findByText('Connect to existing Mbiling'))
 
-    expect(await screen.findByText('Gateway URL')).toBeTruthy()
-    expect(screen.queryByDisplayValue('https://api.mbiling.test')).toBeNull()
+    expect(await screen.findByText('Install Mbiling locally')).toBeTruthy()
+    expect(screen.queryByText('Sign in to Mbiling')).toBeNull()
   })
 })

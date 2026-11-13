@@ -611,7 +611,7 @@ export interface Translations extends NoticeTranslations {
     pluginPages: Record<'agentSettings' | 'blurb' | 'empty' | 'manage' | 'missing', string> & {
       pageCount: (n: number) => string
     }
-    mains: Record<'title' | 'intro' | 'enabled' | 'statusOff' | 'statusNoToken' | 'statusConnecting' | 'statusConnected' | 'relay' | 'token' | 'tokenPlaceholder' | 'tokenSet' | 'tokenMissing' | 'saveToken' | 'removeToken' | 'folders' | 'noFolders' | 'editPolicy' | 'bash' | 'bashMissing' | 'lastProblem' | 'noProblem' | 'openLog' | 'editSettings' | 'restart', string>
+    mains: Record<'tokenAuto' | 'tokenEnrolling' | 'manualToken' | 'title' | 'intro' | 'enabled' | 'statusOff' | 'statusNoToken' | 'statusConnecting' | 'statusConnected' | 'relay' | 'token' | 'tokenPlaceholder' | 'tokenSet' | 'tokenMissing' | 'saveToken' | 'removeToken' | 'folders' | 'noFolders' | 'editPolicy' | 'bash' | 'bashMissing' | 'lastProblem' | 'noProblem' | 'openLog' | 'editSettings' | 'restart', string>
     nav: {
       providers: string
       providerAccounts: string
@@ -3326,6 +3326,7 @@ export interface Translations extends NoticeTranslations {
   }
 
   install: {
+    mbilingSignIn: Record<'title' | 'desc' | 'button' | 'waiting' | 'connecting' | 'allowPc' | 'allowPcHint' | 'unreachable' | 'noSignIn' | 'cancelled' | 'failed' | 'advanced' | 'retry', string>
     stageStates: Record<string, string>
     oneTimeTitle: string
     unsupportedDesc: (platform: string) => string

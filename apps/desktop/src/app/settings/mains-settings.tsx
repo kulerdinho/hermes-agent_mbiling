@@ -20,6 +20,8 @@ export function MainsSettings() {
   const [token, setToken] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // Signed in to a Mbiling server, this PC is linked automatically; typing a token is a support path.
+  const [manual, setManual] = useState(false)
 
   const refresh = useCallback(async () => {
     const mains = window.mbilingDesktop?.mains
@@ -88,6 +90,17 @@ export function MainsSettings() {
 
       <ListRow description={status?.relais || '—'} title={copy.relay} />
 
+      {status?.inscriptionAutomatique && !manual ? (
+        <ListRow
+          action={
+            <Button onClick={() => setManual(true)} size="sm" variant="ghost">
+              {copy.manualToken}
+            </Button>
+          }
+          description={status.inscriptionEnCours ? copy.tokenEnrolling : copy.tokenAuto}
+          title={copy.token}
+        />
+      ) : (
       <ListRow
         action={
           <div className="flex items-center gap-2">
@@ -127,6 +140,7 @@ export function MainsSettings() {
         description={status?.jetonDefini ? copy.tokenSet : copy.tokenMissing}
         title={copy.token}
       />
+      )}
 
       <ListRow
         action={

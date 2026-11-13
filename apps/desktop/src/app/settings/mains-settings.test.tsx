@@ -18,7 +18,9 @@ const BASE: MbilingMainsStatus = {
   bash: 'C:/Program Files/Mbiling/resources/git/bin/bash.exe',
   fichierPolitique: 'C:/data/mains-politique.json',
   fichierReglages: 'C:/data/mains.json',
-  journal: 'C:/data/logs/mains.log'
+  journal: 'C:/data/logs/mains.log',
+  inscriptionAutomatique: false,
+  inscriptionEnCours: false
 }
 
 function installMains(status: MbilingMainsStatus) {
@@ -76,6 +78,17 @@ describe('MainsSettings', () => {
 
     fireEvent.click(await screen.findByText('Edit the local policy'))
     await waitFor(() => expect(mains.open).toHaveBeenCalledWith('politique'))
+  })
+
+  it('shows the automatic link instead of a token field once signed in to a server', async () => {
+    installMains({ ...BASE, inscriptionAutomatique: true, jetonDefini: true })
+    render(<MainsSettings />)
+
+    expect(await screen.findByText('This PC is linked to your Mbiling account automatically.')).toBeTruthy()
+    expect(screen.queryByPlaceholderText('Paste the device token')).toBeNull()
+
+    fireEvent.click(screen.getByText('Enter a token manually'))
+    expect(await screen.findByPlaceholderText('Paste the device token')).toBeTruthy()
   })
 
   it('surfaces the last problem reported by the Mains', async () => {

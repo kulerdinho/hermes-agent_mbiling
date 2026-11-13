@@ -753,6 +753,9 @@ export const en: Translations = {
       missing: 'That plugin has no settings page. It may be disabled or uninstalled.'
     },
     mains: {
+      tokenAuto: "This PC is linked to your Mbiling account automatically.",
+      tokenEnrolling: "Linking this PC to your account…",
+      manualToken: "Enter a token manually",
       title: "This PC (Mains)",
       intro: "Lets the Mbiling agent on the server run commands and work on files on this computer, only inside the folders you allow. The local policy is checked on this computer before every command, whatever the server asks.",
       enabled: "Let the agent use this PC",
@@ -3884,6 +3887,21 @@ export const en: Translations = {
   },
 
   install: {
+    mbilingSignIn: {
+      title: "Welcome to Mbiling",
+      desc: "Sign in with your Mbiling account to connect this app.",
+      button: "Sign in to Mbiling",
+      waiting: "Finish signing in in your browser…",
+      connecting: "Connecting…",
+      allowPc: "Allow the Mbiling agent to work on this PC",
+      allowPcHint: "Only inside the folders you allow (by default, Mbiling-Test in your Documents). You can change this anytime in Settings, This PC.",
+      unreachable: "Mbiling can't be reached right now. Check your internet connection and try again.",
+      noSignIn: "This Mbiling server doesn't offer account sign-in yet.",
+      cancelled: "Sign-in wasn't completed. Try again.",
+      failed: "Connection failed:",
+      advanced: "Advanced connection settings",
+      retry: "Try again",
+    },
     stageStates: {
       pending: 'Pending',
       running: 'Installing',

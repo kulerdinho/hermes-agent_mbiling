@@ -1,5 +1,5 @@
 {
-  "actif": true,
+  "actif": false,
   "relais_url": "wss://api.mbiling.com/mains",
   "bash": null,
   "marge_timeout_s": 15,

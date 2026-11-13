@@ -186,3 +186,90 @@ test('the first-launch address comes from the settings file', async () => {
   fs.writeFileSync(path.join(dirs.root, 'userData', 'connexion-par-defaut.json'), 'not json')
   assert.deepEqual(await invoke('mbiling:default-connection'), { adresse: '', clientLeger: true })
 })
+
+// --- Automatic pairing: the app enrols this PC with the connected server ------------------------
+
+async function loadMainsConnected(reply: unknown = { appareil: 'pc-auto', jeton: 'jeton-auto', relais_url: 'wss://srv.test/mains' }) {
+  const request = vi.fn(async () => reply)
+  const mod = await import('./mains-desktop')
+  mod.registerMainsIpc({ request, connected: () => true })
+
+  return { mains: mod, request }
+}
+
+const tick = () => new Promise(resolve => setTimeout(resolve, 0))
+
+test('the consent answer is recorded without starting anything', async () => {
+  const { mains, request } = await loadMainsConnected()
+
+  await invoke('mbiling:mains:consent', false)
+  assert.equal(mains.mainsStatus().actif, false)
+  assert.equal(request.mock.calls.length, 0)
+  assert.equal(core.demarrer.mock.calls.length, 0)
+})
+
+test('once allowed and connected, the PC enrols by itself and the Mains start', async () => {
+  const { mains, request } = await loadMainsConnected()
+
+  const status = (await invoke('mbiling:mains:enrol')) as { jetonDefini: boolean; enMarche: boolean; relais: string }
+
+  assert.deepEqual(request.mock.calls[0].slice(0, 2), ['/api/plugins/mbiling_mains/appareil', 'POST'])
+  assert.equal(JSON.parse(request.mock.calls[0][2] as string).nom, os.hostname())
+  assert.equal(status.jetonDefini, true)
+  assert.equal(status.enMarche, true)
+  assert.equal(status.relais, 'wss://srv.test/mains', 'the relay address given by the server is kept')
+  const sealed = fs.readFileSync(path.join(dirs.root, 'userData', 'mains-jeton.bin')).toString()
+  assert.ok(!sealed.includes('jeton-auto'), 'the device token must never be stored in clear')
+  assert.equal((core.demarrer.mock.calls[0][1] as { jeton: string }).jeton, 'jeton-auto')
+  assert.equal(mains.mainsStatus().inscriptionAutomatique, true)
+})
+
+test('applying a connection starts the Mains, which enrol when allowed and no token exists', async () => {
+  const { mains, request } = await loadMainsConnected()
+  await invoke('mbiling:mains:consent', true)
+
+  mains.startMains()
+  await tick()
+  await tick()
+
+  assert.equal(request.mock.calls.length, 1)
+  assert.equal(mains.mainsStatus().jetonDefini, true)
+})
+
+test('never enrols while no remote server is connected', async () => {
+  const request = vi.fn(async () => ({ appareil: 'x', jeton: 'y' }))
+  const mod = await import('./mains-desktop')
+  mod.registerMainsIpc({ request, connected: () => false })
+  await invoke('mbiling:mains:consent', true)
+
+  mod.startMains()
+  await tick()
+
+  assert.equal(request.mock.calls.length, 0)
+  assert.equal(mod.mainsStatus().inscriptionAutomatique, false)
+  await assert.rejects(() => invoke('mbiling:mains:enrol') as Promise<unknown>, /connectez-vous/)
+})
+
+test('a relay refusal (revoked token) triggers exactly one re-enrolment', async () => {
+  const { request } = await loadMainsConnected()
+  await invoke('mbiling:mains:enrol')
+  const surEtat = (core.demarrer.mock.calls[0][1] as { surEtat: (s: object) => void }).surEtat
+
+  surEtat({ connecte: false, appareil: null, raison: 'refusé par le Relais : jeton inconnu' })
+  await tick()
+  await tick()
+  assert.equal(request.mock.calls.length, 2)
+
+  const surEtat2 = (core.demarrer.mock.calls.at(-1)![1] as { surEtat: (s: object) => void }).surEtat
+  surEtat2({ connecte: false, appareil: null, raison: 'refusé par le Relais : jeton inconnu' })
+  await tick()
+  assert.equal(request.mock.calls.length, 2, 'no enrolment loop')
+})
+
+test('an enrolment failure is reported and nothing is stored', async () => {
+  const { mains } = await loadMainsConnected({ appareil: 'pc', jeton: '' })
+
+  await assert.rejects(() => invoke('mbiling:mains:enrol') as Promise<unknown>, /inscription de ce PC impossible/)
+  assert.equal(mains.mainsStatus().jetonDefini, false)
+  assert.match(mains.mainsStatus().raison ?? '', /inscription de ce PC impossible/)
+})

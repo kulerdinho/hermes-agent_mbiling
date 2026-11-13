@@ -22,6 +22,7 @@ import { cn } from '@/lib/utils'
 
 import { localCardPresentation } from './desktop-install-local-card'
 import { FirstRunRemoteSetup } from './remote-setup/first-run'
+import { FirstRunSignIn } from './remote-setup/sign-in'
 
 /**
  * DesktopInstallOverlay
@@ -302,13 +303,17 @@ export function DesktopInstallOverlay({ enabled = true }: DesktopInstallOverlayP
   const [copied, setCopied] = useState(false)
   const [cancelling, setCancelling] = useState(false)
   const [remoteOpen, setRemoteOpen] = useState(false)
-  // Remote-only client (light variant): no local install to offer, straight to the connection.
-  const [remoteOnly, setRemoteOnly] = useState(false)
+  // Mbiling first launch: with a server address in the app's settings, the user only signs in
+  // (FirstRunSignIn). The address/token forms and the local install stay behind "Advanced".
+  // The light (remote-only) build never offers a local install.
+  const [defaults, setDefaults] = useState<{ adresse: string; clientLeger: boolean } | null>(null)
+  const [advanced, setAdvanced] = useState(false)
+  const remoteOnly = Boolean(defaults?.clientLeger)
 
   useEffect(() => {
     void window.mbilingDesktop
       ?.getDefaultConnection?.()
-      .then(({ clientLeger }) => setRemoteOnly(clientLeger))
+      .then(value => setDefaults(value))
       .catch(() => undefined)
   }, [])
   const [now, setNow] = useState(() => Date.now())
@@ -446,8 +451,20 @@ export function DesktopInstallOverlay({ enabled = true }: DesktopInstallOverlayP
     return null
   }
 
+  if (state.setupChoice && defaults?.adresse && !advanced && !remoteOpen) {
+    return <FirstRunSignIn onAdvanced={() => setAdvanced(true)} />
+  }
+
   if (remoteOpen || (remoteOnly && state.setupChoice)) {
-    return <FirstRunRemoteSetup canGoBack={!remoteOnly} onBack={() => setRemoteOpen(false)} />
+    return (
+      <FirstRunRemoteSetup
+        onBack={() => {
+          setRemoteOpen(false)
+          // The remote-only build has no setup choice: back means back to "Sign in".
+          setAdvanced(false)
+        }}
+      />
+    )
   }
 
   if (state.setupChoice) {

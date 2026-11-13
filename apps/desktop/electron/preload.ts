@@ -289,6 +289,8 @@ contextBridge.exposeInMainWorld('mbilingDesktop', {
   getDefaultConnection: () => ipcRenderer.invoke('mbiling:default-connection'),
   mains: {
     status: () => ipcRenderer.invoke('mbiling:mains:status'),
+    enrol: () => ipcRenderer.invoke('mbiling:mains:enrol'),
+    consent: allowed => ipcRenderer.invoke('mbiling:mains:consent', allowed),
     setToken: token => ipcRenderer.invoke('mbiling:mains:set-token', token),
     setActive: active => ipcRenderer.invoke('mbiling:mains:set-active', active),
     restart: () => ipcRenderer.invoke('mbiling:mains:restart'),

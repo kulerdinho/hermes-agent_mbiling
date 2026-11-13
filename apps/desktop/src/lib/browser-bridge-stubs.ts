@@ -49,6 +49,12 @@ export const BROWSER_BRIDGE_STUBS = {
     status: async () => {
       throw browserUnsupported('The Mains')
     },
+    enrol: async () => {
+      throw browserUnsupported('The Mains')
+    },
+    consent: async () => {
+      throw browserUnsupported('The Mains')
+    },
     setToken: async () => {
       throw browserUnsupported('The Mains')
     },

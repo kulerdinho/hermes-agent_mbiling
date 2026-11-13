@@ -754,6 +754,9 @@ export const deOverrides = {
       missing: 'Dieses Plugin hat keine Einstellungsseite. Es ist eventuell deaktiviert oder deinstalliert.'
     },
     mains: {
+      tokenAuto: "Dieser PC wird automatisch mit Ihrem Mbiling-Konto verbunden.",
+      tokenEnrolling: "Dieser PC wird mit Ihrem Konto verbunden…",
+      manualToken: "Token manuell eingeben",
       title: "Dieser PC (Mains)",
       intro: "Erlaubt dem Mbiling-Agenten auf dem Server, auf diesem Computer Befehle auszuführen und mit Dateien zu arbeiten – nur in den Ordnern, die Sie freigeben. Die lokale Richtlinie wird vor jedem Befehl auf diesem Computer geprüft, egal was der Server verlangt.",
       enabled: "Dem Agenten diesen PC erlauben",
@@ -4324,6 +4327,21 @@ export const deOverrides = {
     }
   },
   install: {
+    mbilingSignIn: {
+      title: "Willkommen bei Mbiling",
+      desc: "Melden Sie sich mit Ihrem Mbiling-Konto an, um diese App zu verbinden.",
+      button: "Bei Mbiling anmelden",
+      waiting: "Schließen Sie die Anmeldung im Browser ab…",
+      connecting: "Verbinde…",
+      allowPc: "Dem Mbiling-Agenten erlauben, auf diesem PC zu arbeiten",
+      allowPcHint: "Nur in den Ordnern, die Sie freigeben (standardmäßig Mbiling-Test in Ihren Dokumenten). Jederzeit änderbar unter Einstellungen, Dieser PC.",
+      unreachable: "Mbiling ist gerade nicht erreichbar. Prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
+      noSignIn: "Dieser Mbiling-Server bietet noch keine Anmeldung mit Konto an.",
+      cancelled: "Die Anmeldung wurde nicht abgeschlossen. Versuchen Sie es erneut.",
+      failed: "Verbindung fehlgeschlagen:",
+      advanced: "Erweiterte Verbindungseinstellungen",
+      retry: "Erneut versuchen",
+    },
     stageStates: {
       pending: 'Ausstehend',
       running: 'Am Installieren',

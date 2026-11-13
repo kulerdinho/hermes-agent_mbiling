@@ -226,6 +226,8 @@ declare global {
       getDefaultConnection: () => Promise<{ adresse: string; clientLeger: boolean }>
       mains: {
         status: () => Promise<MbilingMainsStatus>
+        enrol: () => Promise<MbilingMainsStatus>
+        consent: (allowed: boolean) => Promise<MbilingMainsStatus>
         setToken: (token: string) => Promise<MbilingMainsStatus>
         setActive: (active: boolean) => Promise<MbilingMainsStatus>
         restart: () => Promise<MbilingMainsStatus>
@@ -1901,4 +1903,6 @@ export interface MbilingMainsStatus {
   fichierPolitique: string
   fichierReglages: string
   journal: string
+  inscriptionAutomatique: boolean
+  inscriptionEnCours: boolean
 }

@@ -758,6 +758,9 @@ export const esOverrides = {
       missing: 'Este plugin no tiene página de ajustes. Puede que esté desactivado o desinstalado.'
     },
     mains: {
+      tokenAuto: "Este PC se vincula automáticamente a su cuenta de Mbiling.",
+      tokenEnrolling: "Vinculando este PC a su cuenta…",
+      manualToken: "Introducir un token manualmente",
       title: "Este PC (Mains)",
       intro: "Permite que el agente Mbiling del servidor ejecute comandos y trabaje con archivos en este equipo, solo dentro de las carpetas que usted autorice. La política local se comprueba en este equipo antes de cada comando, pida lo que pida el servidor.",
       enabled: "Permitir que el agente use este PC",
@@ -4314,6 +4317,21 @@ export const esOverrides = {
     }
   },
   install: {
+    mbilingSignIn: {
+      title: "Bienvenido a Mbiling",
+      desc: "Inicie sesión con su cuenta de Mbiling para conectar esta aplicación.",
+      button: "Iniciar sesión en Mbiling",
+      waiting: "Termine de iniciar sesión en su navegador…",
+      connecting: "Conectando…",
+      allowPc: "Permitir que el agente Mbiling trabaje en este PC",
+      allowPcHint: "Solo en las carpetas que usted autorice (por defecto, Mbiling-Test en sus Documentos). Puede cambiarlo en Ajustes, Este PC.",
+      unreachable: "No se puede contactar con Mbiling ahora. Compruebe su conexión a internet e inténtelo de nuevo.",
+      noSignIn: "Este servidor Mbiling aún no ofrece inicio de sesión con cuenta.",
+      cancelled: "No se completó el inicio de sesión. Inténtelo de nuevo.",
+      failed: "Error de conexión:",
+      advanced: "Ajustes de conexión avanzados",
+      retry: "Reintentar",
+    },
     stageStates: {
       pending: 'Pendiente',
       running: 'Instalando',

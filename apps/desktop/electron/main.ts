@@ -15508,6 +15508,9 @@ ipcMain.handle('mbiling:connection-config:apply', async (_event, payload) => {
       })
   })
 
+  // Mbiling: a new server connection is where this PC gets (or renews) its Mains token.
+  startMains()
+
   return sanitizeDesktopConnectionConfig(config, payload?.profile)
 })
 
@@ -17180,7 +17183,11 @@ ipcMain.handle('mbiling:version', async (_event, scope?: { connectionId?: string
 // load the already-swapped bundle without asking the user to quit manually.
 // The relaunch re-executes by path, so the fresh process loads the bundle now there.
 // Mbiling: the Mains (this PC runs the server agent's commands) and the first-launch address.
-registerMainsIpc()
+registerMainsIpc({
+  // Authenticated with the user's sign-in to the primary server (bearer or session cookie).
+  request: (pathname, method, body) => requestJsonForProfile(primaryProfileKey(), pathname, method, body),
+  connected: () => primaryBackendIsRemote()
+})
 registerDefaultConnectionIpc(ipcMain, isLightVariant)
 
 ipcMain.handle('mbiling:app:relaunch', async () => {
