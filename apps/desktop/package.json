@@ -4,7 +4,7 @@
   "private": true,
   "version": "0.0.0",
   "description": "Native desktop shell for Mbiling Agent.",
-  "author": "Nous Research",
+  "author": "Mbiling",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kulerdinho/mbiling.git"

@@ -40,6 +40,8 @@ import { existsSync } from 'node:fs'
 
 import { rcedit } from 'rcedit'
 
+import editeur from '../editeur.cjs'
+
 import { isMain } from './utils.mjs'
 
 // A real-time file scanner (AV/EDR) holds a short exclusive handle on a freshly
@@ -88,8 +90,8 @@ async function stampExeIdentity(
     'version-string': {
       ProductName: 'Mbiling',
       FileDescription: 'Mbiling',
-      CompanyName: 'Nous Research',
-      LegalCopyright: 'Copyright (c) 2026 Nous Research'
+      CompanyName: editeur.nom,
+      LegalCopyright: editeur.copyright
     }
   }
 

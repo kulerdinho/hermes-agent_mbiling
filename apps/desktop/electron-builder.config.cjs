@@ -11,6 +11,7 @@
 'use strict'
 
 const fs = require('node:fs')
+const editeur = require('./editeur.cjs')
 const path = require('node:path')
 const feedContract = require('./update-feed.cjs')
 const { createMacSigner } = require('./scripts/mac-sign.mjs')
@@ -71,6 +72,7 @@ const publicUrl = feedContract.feedBaseUrl(process.env.CLOUDFLARE_R2_PUBLIC_URL)
 
 /** @satisfies {Configuration} */
 module.exports = {
+  copyright: editeur.copyright,
   electronVersion,
   appId,
   productName: displayName,
@@ -136,6 +138,9 @@ module.exports = {
       from: 'assets/icon.ico',
       to: 'icon.ico'
     },
+    // Mbiling: the original licence notices (MIT requires them in every distributed copy).
+    { from: '../../LICENSE', to: 'LICENSE.txt' },
+    { from: '../../NOTICE', to: 'NOTICE.txt' },
     // Mbiling: default settings (first-launch address, the Mains, the local policy).
     { from: 'config', to: 'mbiling-config', filter: ['*.json'] },
     // Mbiling: Git for Windows (portable), the Mains' bash. Present only after
@@ -257,7 +262,7 @@ module.exports = {
     applicationId: appNamePascal,
     displayName,
     publisher: store ? mustStoreMsix(storeMsixWhenStore).publisher : OUT_OF_STORE_PUBLISHER,
-    publisherDisplayName: store ? mustStoreMsix(storeMsixWhenStore).publisherDisplayName : 'Nous Research',
+    publisherDisplayName: store ? mustStoreMsix(storeMsixWhenStore).publisherDisplayName : editeur.nom,
     // The native quad is the build time (scripts/msix-shared.mjs::nativeQuad),
     // baked into the manifest template, so the builder's own build-number
     // override would stamp a second, conflicting version.
@@ -287,7 +292,7 @@ module.exports = {
   },
   linux: {
     category: 'Development',
-    maintainer: 'Nous Research <support@mbiling.com>',
+    maintainer: `${editeur.nom} <${editeur.contact}>`,
     synopsis: light
       ? 'Remote-only desktop client for Mbiling Agent.'
       : 'Native desktop shell for Mbiling Agent.',
