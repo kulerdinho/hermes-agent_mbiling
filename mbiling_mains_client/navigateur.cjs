@@ -1,212 +1,228 @@
 'use strict'
 /**
- * Navigateur des Mains — côté PC (phase 0, lot 6).
+ * Navigateur des Mains Mbiling — côté PC (lot 6).
  *
- * L'agent pilote un navigateur SUR CE PC, par le protocole CDP, à travers le Relais :
- *   - on lance le navigateur déjà installé (Edge ou Chrome), avec un profil dédié à Mbiling
- *     (séparé du profil personnel), en fenêtre visible : l'utilisateur voit ce que fait l'agent ;
- *   - son port de débogage n'écoute qu'en local (127.0.0.1) ; seul ce module s'y connecte ;
- *   - la politique locale refuse la navigation vers les sites interdits, quoi que dise le serveur.
+ * Lance le navigateur DÉJÀ présent sur le PC (Edge ou Chrome) avec un profil réservé à Mbiling,
+ * fenêtre visible, port de débogage ouvert uniquement sur 127.0.0.1, puis relaie le protocole
+ * CDP entre le Relais et ce navigateur. Les sites interdits par la politique locale sont refusés
+ * ici, sur le PC, avant d'atteindre le navigateur.
  *
- * Messages avec le Relais (sur la connexion des Mains) :
- *   Relais -> PC : {"t": "cdp_http", "id", "chemin": "/json/version"}
- *   PC -> Relais : {"t": "cdp_http_reponse", "id", "statut", "corps", "port"} | {"t": "cdp_erreur", "id", "raison"}
- *   Relais -> PC : {"t": "cdp_ouvrir", "id", "chemin": "/devtools/browser/..."}
- *   PC -> Relais : {"t": "cdp_ouvert", "id"}
- *   dans les deux sens : {"t": "cdp", "id", "d": "<trame CDP>"}
- *   Relais -> PC : {"t": "cdp_fermer", "id"}      PC -> Relais : {"t": "cdp_ferme", "id"}
+ * Aucune valeur n'est écrite ici : tout vient de la configuration des Mains (clé « navigateur »)
+ * et de la politique (clé « sites_interdits »).
  *
- * Aucune valeur n'est écrite ici : tout vient de la section "navigateur" de la configuration
- * (voir config.exemple.json) et des "sites_interdits" de la politique.
+ * Messages échangés avec le Relais (sur la connexion des Mains) :
+ *   Relais -> PC : {t:"cdp_http", id, methode, chemin}         PC -> Relais : {t:"cdp_http_rep", id, statut, corps}
+ *   Relais -> PC : {t:"cdp_ouvrir", canal, chemin}              PC -> Relais : {t:"cdp_ouvert", canal} | {t:"cdp_erreur", canal, raison}
+ *   dans les deux sens : {t:"cdp", canal, d}   puis {t:"cdp_fermer", canal}
  */
 const { spawn } = require('node:child_process')
 const fs = require('node:fs')
+const os = require('node:os')
 const path = require('node:path')
 
-// Emplacements habituels des navigateurs (comme pour bash, on cherche ce qui est déjà installé).
-const EMPLACEMENTS = {
-  edge: [
-    'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe',
-    'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
-    '/usr/bin/microsoft-edge'
-  ],
-  chrome: [
-    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
-    path.join(process.env.LOCALAPPDATA || '', 'Google', 'Chrome', 'Application', 'chrome.exe'),
-    '/usr/bin/google-chrome',
-    '/usr/bin/chromium'
-  ]
-}
-
-// Commandes CDP qui ouvrent une adresse : c'est là que la politique des sites s'applique.
+/** Méthodes CDP qui ouvrent une adresse : contrôlées par la politique locale. */
 const METHODES_NAVIGATION = new Set(['Page.navigate', 'Target.createTarget'])
 
-function trouverNavigateur(reglages) {
-  const candidats = [reglages.chemin, ...(reglages.preference || []).flatMap((nom) => EMPLACEMENTS[nom] || [])].filter(Boolean)
-  const trouve = candidats.find((c) => fs.existsSync(c))
-  if (!trouve) throw new Error('aucun navigateur trouvé : indiquez son chemin dans la configuration ("navigateur.chemin")')
+function candidatsNavigateur(prefere) {
+  const pf = process.env.ProgramFiles || 'C:\\Program Files'
+  const pf86 = process.env['ProgramFiles(x86)'] || 'C:\\Program Files (x86)'
+  const local = process.env.LOCALAPPDATA || ''
+  const edge = [
+    path.join(pf86, 'Microsoft', 'Edge', 'Application', 'msedge.exe'),
+    path.join(pf, 'Microsoft', 'Edge', 'Application', 'msedge.exe')
+  ]
+  const chrome = [
+    path.join(pf, 'Google', 'Chrome', 'Application', 'chrome.exe'),
+    path.join(pf86, 'Google', 'Chrome', 'Application', 'chrome.exe'),
+    path.join(local, 'Google', 'Chrome', 'Application', 'chrome.exe')
+  ]
+  const autres = ['/usr/bin/google-chrome', '/usr/bin/chromium', '/usr/bin/chromium-browser',
+    '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome']
+  return (prefere === 'chrome' ? [...chrome, ...edge] : [...edge, ...chrome]).concat(autres)
+}
+
+function trouverNavigateur(config) {
+  const trouve = [config.chemin, ...candidatsNavigateur(config.prefere)].filter(Boolean).find(c => fs.existsSync(c))
+  if (!trouve) throw new Error('aucun navigateur trouvé (Edge ou Chrome) : indiquez son chemin dans la configuration ("navigateur.chemin")')
   return trouve
 }
 
-/** Renvoie la raison du refus si la trame CDP ouvre un site interdit, sinon null. */
-function verifierSite(sitesInterdits, trame) {
-  if (!sitesInterdits.length || !trame.includes('"url"')) return null
-  let message
-  try {
-    message = JSON.parse(trame)
-  } catch {
-    return null
-  }
-  const adresse = METHODES_NAVIGATION.has(message.method) && message.params ? String(message.params.url || '') : ''
-  const motif = adresse && sitesInterdits.find((m) => m.test(adresse))
-  return motif ? `la politique locale interdit ce site (${motif})` : null
+function compilerSitesInterdits(politique) {
+  return (politique.sites_interdits || []).map(source => new RegExp(source, 'i'))
 }
 
-const attendre = (ms) => new Promise((resoudre) => setTimeout(resoudre, ms))
+/** Raison du refus si l'adresse est interdite, sinon null. */
+function verifierAdresse(interdits, adresse) {
+  if (typeof adresse !== 'string' || !adresse) return null
+  for (const motif of interdits) if (motif.test(adresse)) return `site interdit par la politique de ce PC (${motif})`
+  return null
+}
 
-function creerNavigateur(reglages, { journal, envoyer, SocketWeb, sitesInterdits = [] }) {
-  const profil = path.resolve(reglages.profil)
-  const fichierPort = path.join(profil, 'DevToolsActivePort')
-  const interdits = sitesInterdits.map((source) => new RegExp(source, 'i'))
-  const canaux = new Map() // id -> { socket, attente: [] }
+const attendre = ms => new Promise(r => setTimeout(r, ms))
+
+/**
+ * Crée le relais CDP du PC. `envoyer(message)` envoie au Relais ; `journal(...)` écrit le journal local.
+ * Renvoie { traiter(message) -> bool, arreter() }.
+ */
+function creerNavigateur(config, politique, { envoyer, journal, SocketWeb }) {
+  const reglages = { actif: true, prefere: 'edge', delai_lancement_s: 20, ...(config || {}) }
+  const interdits = compilerSitesInterdits(politique || {})
+  const profil = reglages.profil || path.join(os.homedir(), '.mbiling', 'navigateur')
+  const canaux = new Map()
+  let processus = null
   let port = null
   let lancement = null
 
-  async function repond(p) {
+  function portActif() {
     try {
-      const reponse = await fetch(`http://127.0.0.1:${p}/json/version`, { signal: AbortSignal.timeout(2000) })
-      return reponse.ok
-    } catch {
-      return false
-    }
-  }
-
-  function lirePort() {
-    try {
-      const valeur = Number(fs.readFileSync(fichierPort, 'utf8').split('\n')[0])
-      return Number.isInteger(valeur) && valeur > 0 ? valeur : null
+      const premiere = fs.readFileSync(path.join(profil, 'DevToolsActivePort'), 'utf8').split(/\r?\n/)[0]
+      const n = Number(premiere)
+      return Number.isInteger(n) && n > 0 ? n : null
     } catch {
       return null
     }
   }
 
-  async function lancer() {
-    // Un navigateur de ce profil tourne peut-être encore (lancement précédent) : on le reprend.
-    const existant = lirePort()
-    if (existant && (await repond(existant))) return existant
-    fs.rmSync(fichierPort, { force: true })
-    fs.mkdirSync(profil, { recursive: true })
-    const executable = trouverNavigateur(reglages)
-    // Port 0 : le navigateur choisit un port libre et l'écrit dans DevToolsActivePort.
-    // Le débogage à distance n'écoute que sur 127.0.0.1.
-    const enfant = spawn(executable, [
-      `--user-data-dir=${profil}`,
-      '--remote-debugging-port=0',
-      '--no-first-run',
-      '--no-default-browser-check',
-      'about:blank'
-    ], { detached: true, stdio: 'ignore' })
-    enfant.on('error', (e) => journal('NAVIGATEUR ERREUR', e.message))
-    enfant.unref()
-    journal('NAVIGATEUR', executable)
-    const limite = Date.now() + reglages.delai_demarrage_s * 1000
-    while (Date.now() < limite) {
-      const p = lirePort()
-      if (p && (await repond(p))) return p
-      await attendre(200)
+  async function repond(p) {
+    try {
+      const r = await fetch(`http://127.0.0.1:${p}/json/version`, { signal: AbortSignal.timeout(1500) })
+      return r.ok
+    } catch {
+      return false
     }
-    throw new Error(`le navigateur n'a pas ouvert son port de débogage en ${reglages.delai_demarrage_s} s`)
   }
 
-  async function assurer() {
+  /** Lance le navigateur si besoin et renvoie son port de débogage local. */
+  async function assurerNavigateur() {
     if (port && (await repond(port))) return port
-    if (!lancement) {
-      lancement = lancer().finally(() => {
-        lancement = null
+    if (lancement) return lancement
+    lancement = (async () => {
+      fs.mkdirSync(profil, { recursive: true })
+      fs.rmSync(path.join(profil, 'DevToolsActivePort'), { force: true })
+      const executable = trouverNavigateur(reglages)
+      const args = [
+        '--remote-debugging-port=0', // port libre choisi par le navigateur, écrit dans DevToolsActivePort
+        '--remote-debugging-address=127.0.0.1',
+        `--user-data-dir=${profil}`, // profil séparé du profil personnel de l'utilisateur
+        '--no-first-run',
+        '--no-default-browser-check',
+        ...(reglages.arguments || []),
+        'about:blank'
+      ]
+      processus = spawn(executable, args, { detached: false, stdio: 'ignore', windowsHide: false })
+      processus.on('exit', () => {
+        processus = null
+        port = null
       })
+      journal('NAVIGATEUR', `lancement de ${executable}`)
+      const limite = Date.now() + reglages.delai_lancement_s * 1000
+      while (Date.now() < limite) {
+        const p = portActif()
+        if (p && (await repond(p))) {
+          port = p
+          journal('NAVIGATEUR', `prêt sur 127.0.0.1:${p}`)
+          return p
+        }
+        await attendre(200)
+      }
+      throw new Error(`le navigateur n'a pas ouvert son port de débogage en ${reglages.delai_lancement_s} s`)
+    })()
+    try {
+      return await lancement
+    } finally {
+      lancement = null
     }
-    port = await lancement
-    return port
   }
 
   async function http(message) {
     try {
-      if (!String(message.chemin).startsWith('/json')) throw new Error('chemin CDP non autorisé')
-      const p = await assurer()
-      const reponse = await fetch(`http://127.0.0.1:${p}${message.chemin}`, { signal: AbortSignal.timeout(10000) })
-      envoyer({ t: 'cdp_http_reponse', id: message.id, statut: reponse.status, corps: await reponse.text(), port: p })
+      if (!reglages.actif) throw new Error('le navigateur des Mains est désactivé sur ce PC')
+      const p = await assurerNavigateur()
+      const chemin = String(message.chemin || '/json/version')
+      if (!chemin.startsWith('/json')) throw new Error('chemin CDP non autorisé')
+      const r = await fetch(`http://127.0.0.1:${p}${chemin}`, { method: message.methode || 'GET' })
+      envoyer({ t: 'cdp_http_rep', id: message.id, statut: r.status, corps: await r.text() })
     } catch (e) {
-      envoyer({ t: 'cdp_erreur', id: message.id, raison: e.message })
+      envoyer({ t: 'cdp_http_rep', id: message.id, statut: 502, corps: JSON.stringify({ erreur: e.message }) })
     }
   }
 
   async function ouvrir(message) {
-    const canal = { socket: null, attente: [] }
-    canaux.set(message.id, canal)
+    const { canal } = message
     try {
-      if (!String(message.chemin).startsWith('/devtools/')) throw new Error('chemin CDP non autorisé')
-      const p = await assurer()
-      if (!canaux.has(message.id)) return // fermé pendant le lancement du navigateur
-      const socket = new SocketWeb(`ws://127.0.0.1:${p}${message.chemin}`)
-      canal.socket = socket
-      socket.onopen = () => {
-        for (const trame of canal.attente) socket.send(trame)
-        canal.attente = []
-        envoyer({ t: 'cdp_ouvert', id: message.id })
-      }
-      socket.onmessage = (evenement) => {
-        envoyer({ t: 'cdp', id: message.id, d: typeof evenement.data === 'string' ? evenement.data : evenement.data.toString() })
-      }
+      if (!reglages.actif) throw new Error('le navigateur des Mains est désactivé sur ce PC')
+      const p = await assurerNavigateur()
+      const chemin = String(message.chemin || '')
+      if (!chemin.startsWith('/devtools/')) throw new Error('chemin CDP non autorisé')
+      const socket = new SocketWeb(`ws://127.0.0.1:${p}${chemin}`)
+      canaux.set(canal, socket)
+      socket.onopen = () => envoyer({ t: 'cdp_ouvert', canal })
+      socket.onmessage = ev => envoyer({ t: 'cdp', canal, d: typeof ev.data === 'string' ? ev.data : ev.data.toString() })
       socket.onerror = () => {}
       socket.onclose = () => {
-        if (canaux.delete(message.id)) envoyer({ t: 'cdp_ferme', id: message.id })
+        if (canaux.delete(canal)) envoyer({ t: 'cdp_fermer', canal })
       }
     } catch (e) {
-      canaux.delete(message.id)
-      envoyer({ t: 'cdp_erreur', id: message.id, raison: e.message })
+      envoyer({ t: 'cdp_erreur', canal, raison: e.message })
     }
   }
 
-  function transmettre(message) {
-    const canal = canaux.get(message.id)
-    if (!canal) return
-    const refus = verifierSite(interdits, message.d)
-    if (refus) {
-      journal('REFUS', message.id, refus)
-      // Réponse CDP d'erreur à la commande, sans rien transmettre au navigateur.
-      const commande = JSON.parse(message.d)
-      envoyer({ t: 'cdp', id: message.id, d: JSON.stringify({ id: commande.id, sessionId: commande.sessionId, error: { code: -32000, message: `[Mains Mbiling] ${refus}` } }) })
-      return
+  /** Message CDP venu de l'agent : refusé ici si son adresse est interdite. */
+  function versNavigateur(message) {
+    const socket = canaux.get(message.canal)
+    if (!socket) return
+    let commande = null
+    try {
+      commande = JSON.parse(message.d)
+    } catch {
+      commande = null
     }
-    if (canal.socket && canal.socket.readyState === 1) canal.socket.send(message.d)
-    else canal.attente.push(message.d)
+    if (commande && METHODES_NAVIGATION.has(commande.method)) {
+      const refus = verifierAdresse(interdits, commande.params && commande.params.url)
+      if (refus) {
+        journal('REFUS', `navigation vers ${commande.params.url} : ${refus}`)
+        const reponse = { id: commande.id, error: { code: -32000, message: `[Mains Mbiling] ${refus}` } }
+        if (commande.sessionId) reponse.sessionId = commande.sessionId
+        envoyer({ t: 'cdp', canal: message.canal, d: JSON.stringify(reponse) })
+        return
+      }
+    }
+    if (socket.readyState === 1) socket.send(message.d)
   }
 
-  function fermer(id) {
-    const canal = canaux.get(id)
-    canaux.delete(id)
-    if (canal && canal.socket) canal.socket.close()
-  }
-
-  const traitements = {
-    cdp_http: http,
-    cdp_ouvrir: ouvrir,
-    cdp: transmettre,
-    cdp_fermer: (message) => fermer(message.id)
+  function fermer(canal) {
+    const socket = canaux.get(canal)
+    canaux.delete(canal)
+    if (socket) {
+      try {
+        socket.close()
+      } catch {}
+    }
   }
 
   return {
-    /** Traite un message "cdp*" du Relais. */
+    /** Traite un message du Relais destiné au navigateur ; renvoie false s'il ne le concerne pas. */
     traiter(message) {
-      const traitement = traitements[message.t]
-      if (traitement) traitement(message)
+      if (message.t === 'cdp_http') void http(message)
+      else if (message.t === 'cdp_ouvrir') void ouvrir(message)
+      else if (message.t === 'cdp') versNavigateur(message)
+      else if (message.t === 'cdp_fermer') fermer(message.canal)
+      else return false
+      return true
     },
-    /** Ferme les canaux CDP (connexion au Relais perdue). Le navigateur reste ouvert. */
-    fermerTout() {
-      for (const id of [...canaux.keys()]) fermer(id)
+    /** La connexion au Relais est coupée : les canaux en cours n'ont plus de destinataire. */
+    deconnecte() {
+      for (const canal of [...canaux.keys()]) fermer(canal)
+    },
+    arreter() {
+      for (const canal of [...canaux.keys()]) fermer(canal)
+      if (processus) {
+        try {
+          processus.kill()
+        } catch {}
+      }
     }
   }
 }
 
-module.exports = { creerNavigateur, verifierSite, trouverNavigateur }
+module.exports = { creerNavigateur, verifierAdresse, compilerSitesInterdits, trouverNavigateur }

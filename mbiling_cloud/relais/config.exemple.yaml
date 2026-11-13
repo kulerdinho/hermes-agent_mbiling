@@ -6,11 +6,9 @@
 # d'environnement qui les contient (au moins 24 caractères aléatoires chacun).
 
 # Jeton que la cellule (plugin mbiling_mains) présente au Relais.
+# Il sert aussi au navigateur du PC : la cellule règle
+#   BROWSER_CDP_URL=http://<relais>/cdp/<jeton interne>/<organisation>
 jeton_interne_env: MBILING_RELAIS_JETON_INTERNE
-
-# Tunnel du navigateur (facultatif) : jeton que la cellule met dans son adresse CDP
-# (http://relais:<port>/cdp/<organisation>/<jeton>). Sans cette ligne, le tunnel est désactivé.
-# jeton_cdp_env: MBILING_RELAIS_JETON_CDP
 
 # PC inscrits automatiquement (quand l'utilisateur autorise l'agent à utiliser son PC) :
 # le Relais n'y garde que l'empreinte de chaque jeton. Mettre ce fichier sur un volume sauvegardé.
@@ -25,5 +23,5 @@ appareils:
 limites:
   delai_bonjour_s: 10        # temps laissé au PC pour se présenter
   taille_script_max: 2000000 # octets ; les écritures de fichiers passent dans le script
-  file_sortie_max: 2000      # messages de sortie en attente par commande
-  delai_cdp_s: 30            # attente maximale d'une réponse du navigateur du PC (lancement compris)
+  file_sortie_max: 2000      # messages de sortie en attente par commande (et par canal du navigateur)
+  delai_navigateur_s: 30     # temps laissé au PC pour lancer son navigateur et répondre (tunnel CDP)

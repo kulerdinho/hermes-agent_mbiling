@@ -2,7 +2,7 @@
   "name": "mbiling",
   "productName": "Mbiling",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Native desktop shell for Mbiling Agent.",
   "author": "Mbiling",
   "repository": {

@@ -14,7 +14,7 @@ import path from 'node:path'
 import { app, ipcMain, safeStorage, shell } from 'electron'
 
 import * as mainsCore from '../../../mbiling_mains_client/mains.cjs'
-import type { MainsConfig, MainsEtat, MainsNavigateur } from '../../../mbiling_mains_client/mains.cjs'
+import type { MainsConfig, MainsEtat, NavigateurConfig } from '../../../mbiling_mains_client/mains.cjs'
 
 import { expandUserPath, readMbilingConfig, userConfigPath } from './mbiling-desktop-config'
 
@@ -24,13 +24,14 @@ interface MainsDesktopSettings {
   bash: string | null
   marge_timeout_s: number
   reconnexion: { delai_initial_ms: number; delai_max_ms: number }
-  /** The browser the agent drives on this PC (dedicated profile, visible window). */
-  navigateur?: MainsNavigateur
+  /** The PC's browser, driven by the agent through the Relay (CDP tunnel). */
+  navigateur?: NavigateurConfig
 }
 
 interface MainsPolicy {
   dossiers_autorises: string[]
   interdits: string[]
+  /** Addresses the agent may never open in the PC's browser. */
   sites_interdits: string[]
 }
 
@@ -138,6 +139,16 @@ function readPolicy(): MainsPolicy {
   }
 }
 
+/** Browser settings; its profile lives in the app's data folder unless set otherwise. */
+function browserSettings(settings: MainsDesktopSettings): NavigateurConfig {
+  const browser = settings.navigateur || {}
+
+  return {
+    ...browser,
+    profil: browser.profil ? expandUserPath(browser.profil) : path.join(app.getPath('userData'), 'navigateur')
+  }
+}
+
 function resolveBash(settings: MainsDesktopSettings): string | null {
   try {
     return mainsCore.trouverBash({ bash: settings.bash }, bundledBashCandidates())
@@ -186,9 +197,7 @@ export function startMains(): void {
       marge_timeout_s: settings.marge_timeout_s,
       reconnexion: settings.reconnexion,
       politique: readPolicy(),
-      ...(settings.navigateur
-        ? { navigateur: { ...settings.navigateur, profil: expandUserPath(settings.navigateur.profil) } }
-        : {})
+      navigateur: browserSettings(settings)
     }
 
     engine = mainsCore.demarrer(config, {

@@ -2,10 +2,8 @@
 # Les jetons ne sont jamais écrits ici : seulement le NOM de la variable qui les contient
 # (générées par installer.sh dans serveur/.env).
 
+# Il sert aussi au tunnel du navigateur (lot 6) : BROWSER_CDP_URL=http://relais:8000/cdp/<jeton>/<organisation>.
 jeton_interne_env: MBILING_RELAIS_JETON_INTERNE
-
-# Tunnel du navigateur (lot 6) : jeton que la cellule met dans son adresse CDP.
-jeton_cdp_env: MBILING_RELAIS_JETON_CDP
 
 # PC inscrits automatiquement : le Relais n'y garde que l'empreinte de chaque jeton.
 # Ce dossier est sauvegardé chaque nuit.
@@ -21,4 +19,4 @@ limites:
   delai_bonjour_s: 10
   taille_script_max: 2000000
   file_sortie_max: 2000
-  delai_cdp_s: 30            # attente maximale d'une réponse du navigateur du PC (lancement compris)
+  delai_navigateur_s: 30     # attente maximale d'une réponse du navigateur du PC (lancement compris)

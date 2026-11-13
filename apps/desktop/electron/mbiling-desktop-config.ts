@@ -42,12 +42,9 @@ export function readMbilingConfig<T>(name: MbilingConfigName): T {
   return JSON.parse(fs.readFileSync(userFile, 'utf8').replace(/^\uFEFF/, '')) as T
 }
 
-/** `{documents}` / `{home}` / `{donnees}` (the app's data folder) in a configured path become real folders. */
+/** `{documents}` / `{home}` in a configured path become the user's real folders. */
 export function expandUserPath(value: string): string {
-  return value
-    .replaceAll('{documents}', app.getPath('documents'))
-    .replaceAll('{home}', app.getPath('home'))
-    .replaceAll('{donnees}', app.getPath('userData'))
+  return value.replaceAll('{documents}', app.getPath('documents')).replaceAll('{home}', app.getPath('home'))
 }
 
 export interface DefaultConnection {
@@ -60,23 +57,32 @@ export interface DefaultConnection {
    * install. Off for users: Mbiling only works signed in to a Mbiling account in the cloud.
    */
   connexionAvancee: boolean
+  /** Social sign-ins offered as buttons ("Continue with Google"), from the settings file. */
+  fournisseurs: { id: string; libelle: string }[]
 }
 
 /** IPC answering the renderer's first-launch screen. */
 export function registerDefaultConnectionIpc(ipcMain: Electron.IpcMain, isLight: () => boolean): void {
   ipcMain.handle('mbiling:default-connection', (): DefaultConnection => {
-    let config: { adresse?: unknown; connexion_avancee?: unknown } = {}
+    let config: { adresse?: unknown; connexion_avancee?: unknown; fournisseurs?: unknown } = {}
 
     try {
-      config = readMbilingConfig<{ adresse?: unknown; connexion_avancee?: unknown }>('connexion')
+      config = readMbilingConfig<{ adresse?: unknown; connexion_avancee?: unknown; fournisseurs?: unknown }>(
+        'connexion'
+      )
     } catch {
       config = {}
     }
 
+    const fournisseurs = (Array.isArray(config.fournisseurs) ? config.fournisseurs : [])
+      .map(f => ({ id: String((f as { id?: unknown })?.id ?? '').trim(), libelle: String((f as { libelle?: unknown })?.libelle ?? '').trim() }))
+      .filter(f => /^[a-z0-9_-]{1,40}$/.test(f.id) && f.libelle)
+
     return {
       adresse: String(config.adresse || '').trim(),
       clientLeger: isLight(),
-      connexionAvancee: config.connexion_avancee === true
+      connexionAvancee: config.connexion_avancee === true,
+      fournisseurs
     }
   })
 }

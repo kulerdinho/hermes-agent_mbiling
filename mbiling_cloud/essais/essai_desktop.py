@@ -132,7 +132,7 @@ def main() -> int:
 
         c = lancer("echo test > /c/Windows/mbiling.txt")
         sortie = c.stdout.read()
-        verifier("écriture dans C:\\Windows refusée par le PC", "refusée" in sortie and c.wait(10) == 126)
+        verifier("écriture dans C:\\Windows refusée par le PC", "refusée" in sortie and c.wait(10) == 77)
         journal = donnees / "logs" / "mains.log"
         verifier("le refus est inscrit dans le journal local", journal.exists() and "REFUS" in journal.read_text(encoding="utf-8"))
 

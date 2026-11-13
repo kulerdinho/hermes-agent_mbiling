@@ -302,10 +302,45 @@ def _select_native_provider(provider: str):
     return candidates[0] if len(candidates) == 1 else None
 
 
+def _idp_hint_settings() -> tuple[str, frozenset[str]]:
+    """``dashboard.oauth.idp_hint``: the accounts service's query parameter that preselects a
+    social sign-in (Keycloak ``kc_idp_hint``, Auth0 ``connection``...) and the hints the desktop
+    may ask for (e.g. google, apple). Empty parameter = feature off."""
+    try:
+        from mbiling_cli.config import load_config_readonly
+        oauth = ((load_config_readonly().get("dashboard") or {}).get("oauth") or {})
+        hint = oauth.get("idp_hint") or {}
+    except Exception:
+        return "", frozenset()
+    if not isinstance(hint, dict):
+        return "", frozenset()
+    param = str(hint.get("param") or "").strip()
+    allowed = frozenset(str(v).strip().lower() for v in (hint.get("allowed") or []) if str(v).strip())
+    return param, allowed
+
+
+def _with_idp_hint(resp, idp_hint: str):
+    """Mbiling: the desktop's "Continue with Google / Apple" goes straight to that provider's page
+    on the accounts service. Only an allowed hint is added; anything else is ignored."""
+    hint = (idp_hint or "").strip().lower()
+    if not hint:
+        return resp
+    param, allowed = _idp_hint_settings()
+    if not param or hint not in allowed:
+        return resp
+    location = resp.headers.get("location") or ""
+    if not location:
+        return resp
+    parts = urlparse(location)
+    query = f"{parts.query}&" if parts.query else ""
+    resp.headers["location"] = urlunparse(parts._replace(query=query + urlencode({param: hint})))
+    return resp
+
+
 @router.get("/auth/native/authorize", name="auth_native_authorize")
 async def auth_native_authorize(
     request: Request, provider: str = "", code_challenge: str = "",
-    code_challenge_method: str = "", redirect_uri: str = "", state: str = ""):
+    code_challenge_method: str = "", redirect_uri: str = "", state: str = "", idp_hint: str = ""):
     """Begin an RFC 8252 native-app login: stash a pending broker authorization keyed by an
     opaque ``broker_state`` riding in the gateway's own PKCE cookie (the desktop's
     challenge/state never touch it), then run the normal upstream round trip. Password providers
@@ -350,7 +385,7 @@ async def auth_native_authorize(
     resp = _start_upstream_login(
         request, p, audit_failure=False, extra_pkce={"broker": broker_state})
     _audit(request, AuditEvent.NATIVE_AUTHORIZE_START, provider=p.name)
-    return resp
+    return _with_idp_hint(resp, idp_hint)
 
 
 @router.get("/auth/callback", name="auth_callback")

@@ -1,4 +1,8 @@
 {
   "adresse": "https://api.mbiling.com",
-  "connexion_avancee": false
+  "connexion_avancee": false,
+  "fournisseurs": [
+    { "id": "google", "libelle": "Google" },
+    { "id": "apple", "libelle": "Apple" }
+  ]
 }

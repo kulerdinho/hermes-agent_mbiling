@@ -674,6 +674,28 @@ describe('DesktopInstallOverlay Mbiling first launch (sign-in only)', () => {
     expect(calls.consent.mock.invocationCallOrder[0]).toBeLessThan(calls.apply.mock.invocationCallOrder[0])
   })
 
+  it('offers "Continue with Google / Apple" and sends the choice to the browser sign-in', async () => {
+    const { desktop, calls } = signInMock()
+    Object.assign(desktop, {
+      getDefaultConnection: vi.fn().mockResolvedValue({
+        adresse: BASE,
+        clientLeger: false,
+        connexionAvancee: false,
+        fournisseurs: [
+          { id: 'google', libelle: 'Google' },
+          { id: 'apple', libelle: 'Apple' }
+        ]
+      })
+    })
+    render(<DesktopInstallOverlay />)
+
+    expect(await screen.findByText('Continue with Apple')).toBeTruthy()
+    fireEvent.click(screen.getByText('Continue with Google'))
+
+    await waitFor(() => expect(calls.apply).toHaveBeenCalledTimes(1))
+    expect(desktop.oauthLoginConnectionConfig).toHaveBeenCalledWith(BASE, { idpHint: 'google' })
+  })
+
   it('respects an unticked "allow this PC" box', async () => {
     const { calls } = signInMock()
     render(<DesktopInstallOverlay />)

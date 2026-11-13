@@ -24,7 +24,12 @@ import {
 import { resolveDesktopGatewayWsUrl } from '@/lib/gateway-ws-url'
 import { hostHas } from '@/lib/host-capabilities'
 import { browserLaunchProfile } from '@/lib/platform'
-import { BACKEND_BOOT_WAIT_TIMEOUT_MS, RECONNECT_ATTEMPT_TIMEOUT_MS, withTimeout } from '@/lib/with-timeout'
+import {
+  BACKEND_BOOT_WAIT_TIMEOUT_MS,
+  RECONNECT_ATTEMPT_TIMEOUT_MS,
+  withTimeout,
+  withTimeoutPausedWhile
+} from '@/lib/with-timeout'
 import { MbilingGateway } from '@/mbiling'
 import {
   $desktopBoot,
@@ -1537,10 +1542,14 @@ export function useGatewayBoot({
         // round-trip must not hang "Starting Mbiling…" forever. Initial boot
         // rides out a full backend cold spawn, so it gets the shared 45s
         // backend-boot budget, not the 20s reconnect budget.
-        const conn = await withTimeout(
+        // Mbiling: the first launch waits for the user to sign in (boot phase bootstrap.choice);
+        // that wait never counts against the budget, or the sign-in screen would turn into
+        // "couldn't start" after three minutes.
+        const conn = await withTimeoutPausedWhile(
           getWindowBackend(true),
           BACKEND_BOOT_WAIT_TIMEOUT_MS,
-          'Timed out connecting to Mbiling backend'
+          'Timed out connecting to Mbiling backend',
+          async () => (await desktop.getBootProgress?.())?.phase === 'bootstrap.choice'
         )
 
         if (cancelled) {

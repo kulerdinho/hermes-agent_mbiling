@@ -7,18 +7,20 @@ export interface MainsConfig {
   marge_timeout_s: number
   reconnexion: { delai_initial_ms: number; delai_max_ms: number }
   politique?: { dossiers_autorises?: string[]; interdits?: string[]; sites_interdits?: string[] }
-  navigateur?: MainsNavigateur
+  /** Lot 6 : navigateur du PC piloté par l'agent (tunnel CDP). */
+  navigateur?: NavigateurConfig
 }
 
-/** Navigateur piloté par l'agent sur ce PC (lot 6). */
-export interface MainsNavigateur {
-  actif: boolean
-  /** Chemin explicite du navigateur ; sinon le premier trouvé selon `preference`. */
+export interface NavigateurConfig {
+  actif?: boolean
+  /** « edge » ou « chrome » : celui essayé en premier. */
+  prefere?: string
+  /** Chemin explicite du navigateur (sinon Edge ou Chrome trouvés sur le PC). */
   chemin?: string | null
-  preference: string[]
-  /** Dossier du profil dédié à Mbiling (séparé du profil personnel). */
-  profil: string
-  delai_demarrage_s: number
+  /** Profil réservé à Mbiling, séparé du profil personnel de l'utilisateur. */
+  profil?: string | null
+  delai_lancement_s?: number
+  arguments?: string[]
 }
 
 export interface MainsEtat {

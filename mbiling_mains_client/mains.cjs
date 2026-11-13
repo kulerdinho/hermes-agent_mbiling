@@ -101,12 +101,8 @@ function demarrer(config, options = {}) {
     if (socket && socket.readyState === 1) socket.send(JSON.stringify(message))
   }
 
-  // Navigateur piloté par l'agent (lot 6) : seulement si la configuration l'active.
-  const navigateur = config.navigateur && config.navigateur.actif
-    ? creerNavigateur(config.navigateur, {
-      journal, envoyer, SocketWeb, sitesInterdits: (config.politique || {}).sites_interdits || []
-    })
-    : null
+  // Lot 6 : le navigateur du PC, piloté par l'agent à travers le Relais (tunnel CDP).
+  const navigateur = creerNavigateur(config.navigateur, config.politique || {}, { envoyer, journal, SocketWeb })
 
   function executer(demande) {
     const refus = verifierPolitique(politique, demande.script)
@@ -192,15 +188,14 @@ function demarrer(config, options = {}) {
       } else if (message.t === 'annuler') {
         journal('ANNULER', message.id)
         tuerArbre(enCours.get(message.id))
-      } else if (typeof message.t === 'string' && message.t.startsWith('cdp')) {
-        if (navigateur) navigateur.traiter(message)
-        else envoyer({ t: 'cdp_erreur', id: message.id, raison: 'le navigateur est désactivé sur ce PC' })
+      } else {
+        navigateur.traiter(message)
       }
     }
     socket.onerror = () => {}
     socket.onclose = () => {
       for (const tache of enCours.values()) tuerArbre(tache)
-      if (navigateur) navigateur.fermerTout()
+      navigateur.deconnecte()
       if (arrete) return
       surEtat({ connecte: false, appareil: null, raison: 'déconnecté' })
       journal('DÉCONNECTÉ', `nouvel essai dans ${attente} ms`)
@@ -214,7 +209,7 @@ function demarrer(config, options = {}) {
     arreter() {
       arrete = true
       for (const tache of enCours.values()) tuerArbre(tache)
-      if (navigateur) navigateur.fermerTout()
+      navigateur.arreter()
       if (socket) socket.close()
     }
   }

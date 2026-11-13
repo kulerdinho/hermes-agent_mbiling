@@ -6,9 +6,9 @@ la copie de l'utilisateur prime toujours sur celle livrée.
 
 | Fichier | Contenu |
 |---|---|
-| `connexion-par-defaut.json` | Adresse du serveur Mbiling auquel l'application se connecte (connexion par compte uniquement). `connexion_avancee` : réservé à l'équipe, propose aussi la connexion manuelle et l'installation locale ; `false` pour les utilisateurs. |
-| `mains.json` | Les Mains : activées ou non, adresse du Relais, délais, chemin de bash (facultatif). |
-| `mains-politique.json` | Dossiers autorisés et motifs interdits, appliqués sur le PC avant toute commande, quoi que demande le serveur. `{documents}` désigne le dossier Documents de l'utilisateur. |
+| `connexion-par-defaut.json` | Adresse du serveur Mbiling auquel l'application se connecte (connexion par compte uniquement). `connexion_avancee` : réservé à l'équipe, propose aussi la connexion manuelle et l'installation locale ; `false` pour les utilisateurs. `fournisseurs` : boutons « Continuer avec … » (Google, Apple), transmis au service de comptes ; le serveur n'accepte que ceux listés dans `dashboard.oauth.idp_hint.allowed`. |
+| `mains.json` | Les Mains : activées ou non, adresse du Relais, délais, chemin de bash (facultatif). `navigateur` : le navigateur du PC que l'agent peut piloter (`actif`, `prefere` edge/chrome, `chemin` facultatif, `profil` : profil réservé à Mbiling, par défaut dans le dossier de données de l'application, `delai_lancement_s`, `arguments`). |
+| `mains-politique.json` | Dossiers autorisés et motifs interdits, appliqués sur le PC avant toute commande, quoi que demande le serveur. `sites_interdits` : adresses que l'agent ne peut jamais ouvrir dans le navigateur du PC. `{documents}` désigne le dossier Documents de l'utilisateur. |
 
-Le jeton d'appareil n'est jamais dans ces fichiers : il est saisi dans les réglages de
-l'application et conservé chiffré par Windows.
+Le jeton d'appareil n'est jamais dans ces fichiers : il est obtenu automatiquement à la connexion
+au compte Mbiling et conservé chiffré par Windows.
