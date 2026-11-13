@@ -452,3 +452,33 @@ describe('I18nProvider before sign-in (no server config yet)', () => {
     expect(screen.getByTestId('locale').textContent).toBe('en')
   })
 })
+
+describe('I18nProvider while the config request is still pending (not signed in)', () => {
+  afterEach(() => {
+    cleanup()
+    Reflect.deleteProperty(window, 'mbilingDesktop')
+  })
+
+  it('shows the Windows language right away, then a saved choice wins', async () => {
+    Object.defineProperty(window, 'mbilingDesktop', {
+      configurable: true,
+      value: { getMachineProfile: vi.fn().mockResolvedValue({ locale: 'fr' }) }
+    })
+    let answer: (config: MbilingConfigRecord) => void = () => {}
+    const configClient: I18nConfigClient = {
+      getConfig: vi.fn(() => new Promise<MbilingConfigRecord>(resolve => (answer = resolve))),
+      saveConfig: vi.fn()
+    }
+
+    render(
+      <I18nProvider configClient={configClient}>
+        <LanguageProbe />
+      </I18nProvider>
+    )
+
+    await waitFor(() => expect(screen.getByTestId('locale').textContent).toBe('fr'))
+
+    await act(async () => answer({ display: { language: 'de' } } as MbilingConfigRecord))
+    await waitFor(() => expect(screen.getByTestId('locale').textContent).toBe('de'))
+  })
+})

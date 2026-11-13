@@ -168,6 +168,20 @@ export function I18nProvider({
     const MAX_LOCALE_RETRIES = 10
     const LOCALE_RETRY_DELAY_MS = 3_000
 
+    // Mbiling: before sign-in the config request waits for a server that is not connected yet
+    // (it neither answers nor fails). Show Windows' display language right away; a language
+    // saved in the account's config replaces it as soon as the config is read.
+    let configSettled = false
+
+    void window.mbilingDesktop
+      ?.getMachineProfile?.()
+      .then(profile => {
+        if (!cancelled && !configSettled && !userLocaleRef.current) {
+          setLocaleState(resolveInitialLocale(null, profile?.locale))
+        }
+      })
+      .catch(() => undefined)
+
     const loadLocale = () => {
       setIsLoadingConfig(true)
       setConfigLoadError(null)
@@ -175,6 +189,8 @@ export function I18nProvider({
       return configClient
         .getConfig()
         .then(async config => {
+          configSettled = true
+
           if (cancelled || userLocaleRef.current) {
             return
           }
