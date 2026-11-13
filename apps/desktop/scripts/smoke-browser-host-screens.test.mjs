@@ -14,7 +14,7 @@ describe('browser smoke startup screens', () => {
   })
 
   it('finds the boot-failure screen on the page', () => {
-    const titles = shownTitles("Mbiling couldn't start\nMbiling' background service didn't come up.\nRetry")
+    const titles = shownTitles("Mbiling couldn't start\nMbiling's background service didn't come up.\nRetry")
 
     expect(titles).toEqual(["Mbiling couldn't start"])
     expect(startupScreenFailures(titles, { allowGatewayFailure: false })).toEqual([

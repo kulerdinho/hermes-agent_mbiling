@@ -1073,7 +1073,7 @@ def _installed_desktop_apps() -> list[Path]:
     When no owned copy is left, a recorded one that has gone missing still counts: its ownership
     stamp left with the bundle, and without the record nothing would ever put it back (Finder, the
     Dock and Spotlight lose Mbiling for good). A copy moved to the other Applications folder keeps
-    its stamp, so it is found instead of doubled. Mbiling' GUI uninstall deletes the record.
+    its stamp, so it is found instead of doubled. Mbiling's GUI uninstall deletes the record.
     """
     if not _owns_installed_desktop_apps():
         return []

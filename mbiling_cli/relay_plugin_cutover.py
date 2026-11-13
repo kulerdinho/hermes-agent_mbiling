@@ -1,4 +1,4 @@
-"""Shared migration guards for Mbiling' native NeMo Relay ownership."""
+"""Shared migration guards for Mbiling's native NeMo Relay ownership."""
 
 from __future__ import annotations
 

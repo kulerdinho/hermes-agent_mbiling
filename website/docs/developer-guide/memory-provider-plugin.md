@@ -297,7 +297,7 @@ own directory, so a provider installed from the plugin catalog keeps all of them
 | Desktop → Capabilities → Tools → Memory (config panel) | `config_schema.py` (below) |
 | `mbiling memory setup` wizard | `get_config_schema()` declares the fields the wizard prompts for, `save_config(config, mbiling_home)` persists them, `post_setup(mbiling_home, config)` runs afterwards for anything interactive (OAuth, first sync); `get_status_config()` feeds `mbiling memory status` |
 | `mbiling <provider> …` subcommands | `cli.py` with `register_cli(subparser)` ([Adding CLI Commands](#adding-cli-commands)) |
-| Python dependencies | `pyproject.toml` `[project] dependencies` (or `python_dependencies` in `plugin.yaml`); installed under Mbiling' own pins at install time and re-applied across `mbiling update` |
+| Python dependencies | `pyproject.toml` `[project] dependencies` (or `python_dependencies` in `plugin.yaml`); installed under Mbiling's own pins at install time and re-applied across `mbiling update` |
 
 Your provider's name, `memory.<name>` config section, data directory and tool names are the
 contract with existing users. A provider that moves out of core keeps all four; Mbiling then

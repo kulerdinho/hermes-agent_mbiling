@@ -1,4 +1,4 @@
-"""Login shells in the image keep Mbiling' own dirs on PATH.
+"""Login shells in the image keep Mbiling's own dirs on PATH.
 
 Debian's ``/etc/profile`` resets PATH for every login shell, so without
 ``/etc/profile.d/mbiling.sh`` a ``bash -l`` (``docker exec <c> bash -l``, ssh, the

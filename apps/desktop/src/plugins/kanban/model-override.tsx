@@ -82,7 +82,7 @@ export function ModelOverrideField({
 
     current: { effort: value.effort, fast: false, model: value.model, provider: value.provider },
 
-    // Read-only against Mbiling' global presets is deliberate: see applyPreset.
+    // Read-only against Mbiling's global presets is deliberate: see applyPreset.
     presetFor: () => ({}),
 
     select: (model, provider) => {

@@ -1962,7 +1962,7 @@ export { APPROVAL_RESPOND_TIMEOUT_MS } from '@mbiling/shared'
 /** THE id minter: a v4 UUID on every origin. `crypto.randomUUID` exists only in secure contexts,
  *  so a Webapp opened over plain HTTP from another machine has none. */
 export { randomUuid } from '@mbiling/shared'
-/** Mbiling' reasoning levels, so a plugin surfacing a thinking depth uses the
+/** Mbiling's reasoning levels, so a plugin surfacing a thinking depth uses the
  *  same scale as the rest of the app (labels: `reasoningEffortLabel`). */
 export {
   DEFAULT_REASONING_EFFORT,

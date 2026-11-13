@@ -55,7 +55,7 @@ class TestCodexItemToToolName:
         ) == "web_search"
 
     def test_mbiling_tools_mcp_server_emits_bare_tool_name(self):
-        """The mbiling-tools MCP server wraps Mbiling' own tools for codex;
+        """The mbiling-tools MCP server wraps Mbiling's own tools for codex;
         the inner dispatch subprocess can't fire native progress events,
         so the codex-level event IS the display event — shown without the
         mcp.mbiling-tools.* namespacing (from #26541 by @simpolism)."""

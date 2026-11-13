@@ -197,7 +197,7 @@ def _parse_target(target: str) -> tuple[str, str | None]:
     if profile and not _PROFILE_RE.match(profile):
         raise ValueError(f"Invalid agent/profile name: {profile!r}")
     if profile:
-        # Profile ids are lowercase (normalize_profile_name); 'box/Mbiling' must address the
+        # Profile ids are lowercase (normalize_profile_name); 'box/Mbiling's must address the
         # peer's real 'mbiling' profile on every peer, including those that compare prefixes exactly.
         from mbiling_cli.profiles import normalize_profile_name
         profile = normalize_profile_name(profile)

@@ -112,7 +112,7 @@ def test_venv_import_setup_scopes_to_sys_path_not_global_environ(
     ``_ensure_windows_gateway_venv_imports`` patches the CURRENT process via
     ``sys.path``/``site.addsitedir`` only. Mutating ``os.environ["PYTHONPATH"]``
     there poisoned every child process spawned from the gateway session —
-    non-Mbiling Python tools resolved Mbiling' venv packages ahead of their own.
+    non-Mbiling Python tools resolved Mbiling's venv packages ahead of their own.
     """
     import gateway.run as gateway_run
 

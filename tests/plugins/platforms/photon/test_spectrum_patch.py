@@ -1,4 +1,4 @@
-"""Regression tests for Mbiling' Spectrum mixed text+attachment workaround."""
+"""Regression tests for Mbiling's Spectrum mixed text+attachment workaround."""
 
 from __future__ import annotations
 

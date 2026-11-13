@@ -12,7 +12,7 @@ Mbiling integrates with Buzz three ways. Pick by where Mbiling runs and what you
 
 | | ① Desktop runtime | ② Relay bridge (ACP) | ③ Native gateway platform |
 |---|---|---|---|
-| **What it is** | Buzz Desktop spawns Mbiling locally as a managed harness | Buzz's `buzz-acp` bridges a channel to `mbiling acp` over stdio | Mbiling' gateway joins Buzz as a first-class messaging platform |
+| **What it is** | Buzz Desktop spawns Mbiling locally as a managed harness | Buzz's `buzz-acp` bridges a channel to `mbiling acp` over stdio | Mbiling's gateway joins Buzz as a first-class messaging platform |
 | **Mbiling runs** | On your desktop, launched by Buzz | On a server, launched by `buzz-acp` | In your own gateway, alongside Telegram/Discord/etc. |
 | **Best for** | Trying Mbiling inside Buzz Desktop with zero config | A hosted agent identity when Buzz owns the transport | Full Mbiling: memory, skills, approvals, cron, sessions |
 | **Inbound** | ACP stdio | ACP stdio (via relay WebSocket) | NIP-42-authenticated Nostr WebSocket (poll fallback) |
@@ -36,7 +36,7 @@ The spawned Mbiling uses the same config, credentials, memory, and skills as `mb
 
 ## ③ Native gateway platform (recommended for full Mbiling)
 
-The bundled `buzz` platform plugin makes Buzz a normal Mbiling messaging platform — channels, DMs, mention gating, threaded replies, reactions, images, and cron delivery (`deliver=buzz`), with Mbiling' own approvals, memory, and session management intact. Inbound arrives over a persistent NIP-42-authenticated Nostr WebSocket (dependency-free BIP-340 signing) with automatic fallback to CLI polling; outbound goes through the `buzz` CLI.
+The bundled `buzz` platform plugin makes Buzz a normal Mbiling messaging platform — channels, DMs, mention gating, threaded replies, reactions, images, and cron delivery (`deliver=buzz`), with Mbiling's own approvals, memory, and session management intact. Inbound arrives over a persistent NIP-42-authenticated Nostr WebSocket (dependency-free BIP-340 signing) with automatic fallback to CLI polling; outbound goes through the `buzz` CLI.
 
 ```bash
 mbiling gateway setup   # pick Buzz

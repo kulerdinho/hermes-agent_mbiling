@@ -437,7 +437,7 @@ DEFAULT_CONFIG = {
         "cdp_url": "",  # persistent CDP endpoint for attaching to an existing Chromium/Chrome
         # Consent to browse with the user's REAL logins locally: runs on a Mbiling-managed SNAPSHOT
         # of the ACTIVE default-Chromium profile (Local State -> profile.last_used; cookies, logins,
-        # prefs copied and re-synced per fresh session) driven by Mbiling' packaged Chromium. The
+        # prefs copied and re-synced per fresh session) driven by Mbiling's packaged Chromium. The
         # snapshot dir sidesteps Chrome 136+'s default-profile debugging block and never contends
         # with the running browser. Turning off deletes ~/.mbiling/browser-profile/ so credentials
         # don't outlive consent. Chromium-family only; a profile that can't be copied (Firefox default,
@@ -656,7 +656,7 @@ DEFAULT_CONFIG = {
         # Show the one-time autoraise banner; False keeps the autoraise, hides the notice.
         "codex_gpt55_autoraise_notice": True,
         # Codex app-server thread compaction mode. The codex agent owns the thread context, so
-        # Mbiling' summarizer cannot shrink it. native = codex decides; mbiling = Mbiling' threshold
+        # Mbiling's summarizer cannot shrink it. native = codex decides; mbiling = Mbiling's threshold
         # triggers thread/compact/start; off = never auto-trigger.
         "codex_app_server_auto": "native",
         # Opt in to OpenAI server-side compaction on the Responses API. Only gpt-5.6-family on
@@ -955,7 +955,7 @@ DEFAULT_CONFIG = {
         "runtime_footer": {
             "enabled": False,
             # order shown; drop any to hide. Opt-in extras: latency, served_model (alias → the
-            # deployment a routing proxy reported / Mbiling' fallback route).
+            # deployment a routing proxy reported / Mbiling's fallback route).
             "fields": ["model", "context_pct", "cwd"],
         },
         # CLI/TUI status bar fields. Non-empty = only listed fields show (built-in order kept,

@@ -96,7 +96,7 @@ def _format_missing_scopes(missing_scopes: list[str]) -> str:
 
 
 def install_deps():
-    """Sync Mbiling' declared Google extra, ready for the next process."""
+    """Sync Mbiling's declared Google extra, ready for the next process."""
     if pm is None:
         print("ERROR: Run this script in the Mbiling environment; use mbiling setup first.")
         return False

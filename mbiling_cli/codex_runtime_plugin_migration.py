@@ -378,7 +378,7 @@ def _looks_like_test_tempdir(path: str) -> bool:
 
 
 def _build_mbiling_tools_mcp_entry() -> dict:
-    """Codex stdio entry launching Mbiling' own tool surface as an MCP server (web/vision/
+    """Codex stdio entry launching Mbiling's own tool surface as an MCP server (web/vision/
     image/skills/kanban call-backs).
 
     MBILING_HOME passes through only IF SET, read from os.environ (not get_mbiling_home()): when
@@ -407,7 +407,7 @@ def _build_mbiling_tools_mcp_entry() -> dict:
     env["MBILING_REDACT_SECRETS"] = env.get("MBILING_REDACT_SECRETS", "true")
     return {
         "command": sys.executable,
-        # -P: codex starts this in the user's workspace, which must not shadow Mbiling' own packages.
+        # -P: codex starts this in the user's workspace, which must not shadow Mbiling's own packages.
         "args": ["-P", "-m", "agent.transports.mbiling_tools_mcp_server"],
         "env": env,
         # Generous timeouts — image_generate or delegate_task can take a while.
@@ -430,7 +430,7 @@ def migrate(
     ``discover_plugins`` spawns the live codex CLI (set False in tests); discovery is best-effort
     and never blocks the migration. ``default_permission_profile`` (default ":workspace"; built-ins
     carry a leading ":", user profiles do not; None leaves codex's read-only default) avoids an
-    approval prompt on every write. ``expose_mbiling_tools`` registers Mbiling' own tool surface
+    approval prompt on every write. ``expose_mbiling_tools`` registers Mbiling's own tool surface
     (agent/transports/mbiling_tools_mcp_server.py, launched on demand by codex over stdio) as an MCP
     server so the codex subprocess can call back for tools it lacks.
     """

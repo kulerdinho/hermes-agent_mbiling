@@ -10,7 +10,7 @@ description: >-
   execution share one board: a motion is a sub-task of a per-project team channel task,
   speech and votes are `[agora:msg]` comments, the conclusion is written to task.result,
   and an adopted conclusion becomes execution tasks parented to the motion so context
-  reaches workers through Mbiling' own parent handoff. Ships 20 tools, 3 kanban lifecycle
+  reaches workers through Mbiling's own parent handoff. Ships 20 tools, 3 kanban lifecycle
   hooks, a dashboard tab and an `mbiling agora` CLI; installing writes nothing — the three
   bundled skills are deployed by an explicit `mbiling agora setup`. Disclosure — creates a
   Mbiling profile per worker by asking core to provision it (`mbiling profile create

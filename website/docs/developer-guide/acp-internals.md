@@ -6,7 +6,7 @@ description: "How the ACP adapter works: lifecycle, sessions, event bridge, appr
 
 # ACP Internals
 
-The ACP adapter wraps Mbiling' synchronous `AIAgent` in an async JSON-RPC stdio server.
+The ACP adapter wraps Mbiling's synchronous `AIAgent` in an async JSON-RPC stdio server.
 
 Key implementation files:
 
@@ -168,12 +168,12 @@ repair is session rotation, not another row.
 
 ACP does not implement its own auth store.
 
-Instead it reuses Mbiling' runtime resolver:
+Instead it reuses Mbiling's runtime resolver:
 
 - `acp_adapter/auth.py`
 - `mbiling_cli/runtime_provider.py`
 
-So ACP advertises and uses the currently configured Mbiling provider/credentials. It also always advertises a terminal setup auth method (`mbiling-setup`, args `--setup`) so first-run ACP clients can open Mbiling' interactive model/provider configuration before starting a normal ACP session.
+So ACP advertises and uses the currently configured Mbiling provider/credentials. It also always advertises a terminal setup auth method (`mbiling-setup`, args `--setup`) so first-run ACP clients can open Mbiling's interactive model/provider configuration before starting a normal ACP session.
 
 ## Working directory binding
 

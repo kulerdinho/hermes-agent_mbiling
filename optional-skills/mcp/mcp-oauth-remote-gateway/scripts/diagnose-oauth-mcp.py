@@ -31,7 +31,7 @@ UA = "python-httpx/0.27"  # CF blocks default urllib UA on many providers
 
 
 def _mbiling_home():
-    # Prefer Mbiling' own resolver (profile-safe); fall back to env then ~/.mbiling.
+    # Prefer Mbiling's own resolver (profile-safe); fall back to env then ~/.mbiling.
     try:
         from mbiling_constants import get_mbiling_home
         return str(get_mbiling_home())

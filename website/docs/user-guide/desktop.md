@@ -978,7 +978,7 @@ The opt-in HUD modifier-tap helper is built with the Electron bundle and package
 **Silence every folder prompt with one switch.** macOS prompts per-category
 (Desktop, then Downloads, then Documents, ...) as Mbiling touches each folder.
 A single **Full Disk Access** grant covers all of them, permanently — and
-with Mbiling' stable signing identities it survives every update:
+with Mbiling's stable signing identities it survives every update:
 
 1. System Settings → **Privacy & Security → Full Disk Access** (or run
    `open "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles"`)

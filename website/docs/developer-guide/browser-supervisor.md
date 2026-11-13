@@ -6,7 +6,7 @@ description: "How Mbiling detects and responds to native JS dialogs and interact
 
 # Browser CDP Supervisor
 
-The CDP supervisor closes two long-standing gaps in Mbiling' browser tooling:
+The CDP supervisor closes two long-standing gaps in Mbiling's browser tooling:
 
 1. **Native JS dialogs** (`alert`/`confirm`/`prompt`/`beforeunload`) block the
    page's JS thread. Without supervision, the agent has no way to know a

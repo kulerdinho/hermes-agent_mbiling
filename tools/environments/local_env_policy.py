@@ -44,7 +44,7 @@ _STATIC_PROVIDER_ENV_BLOCKLIST = frozenset({
     # registry mirrors env_vars only for api_key profiles, and discovering the provider plugins
     # from here, at import, would re-mirror them over a plugin's own registry entry.
     "NOUS_API_KEY", "QWEN_API_KEY",
-    # Mbiling' own secrets read in code: the anonymous-inference secret, dashboard auth
+    # Mbiling's own secrets read in code: the anonymous-inference secret, dashboard auth
     # (basic, OIDC, drain) and the Google Meet realtime key.
     "MBILING_ANON_API_SECRET", "MBILING_DASHBOARD_BASIC_AUTH_PASSWORD",
     "MBILING_DASHBOARD_BASIC_AUTH_SECRET", "MBILING_DASHBOARD_DRAIN_SECRET",

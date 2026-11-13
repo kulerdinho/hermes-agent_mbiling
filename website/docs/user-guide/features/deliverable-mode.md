@@ -77,7 +77,7 @@ mutilated.
 
 ## Kanban: artifacts ride completion notifications
 
-If you use Mbiling' kanban multi-agent workflow, workers can attach
+If you use Mbiling's kanban multi-agent workflow, workers can attach
 deliverable files to their `kanban_complete` call:
 
 ```python

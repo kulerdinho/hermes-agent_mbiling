@@ -508,7 +508,7 @@ mbiling config set memory.provider hindsight
 echo "HINDSIGHT_API_KEY=your-key" >> ~/.mbiling/.env
 ```
 
-The plugin lands in `~/.mbiling/plugins/hindsight/` (per profile home). A memory provider is activated by `memory.provider` in `config.yaml`, not `plugins.enabled`: accepting the install prompt (or passing `--enable`) sets it, and declining leaves it unchanged so `mbiling memory setup` can pick it later. `mbiling plugins enable hindsight` does not activate a memory provider. `mbiling memory setup`, `mbiling memory status`, `mbiling plugins list` and the dashboard Memory settings all work with the catalog-installed plugin. In local embedded mode the plugin installs `hindsight-all` on first use through Mbiling' lazy-install path, which honours `security.allow_lazy_installs`.
+The plugin lands in `~/.mbiling/plugins/hindsight/` (per profile home). A memory provider is activated by `memory.provider` in `config.yaml`, not `plugins.enabled`: accepting the install prompt (or passing `--enable`) sets it, and declining leaves it unchanged so `mbiling memory setup` can pick it later. `mbiling plugins enable hindsight` does not activate a memory provider. `mbiling memory setup`, `mbiling memory status`, `mbiling plugins list` and the dashboard Memory settings all work with the catalog-installed plugin. In local embedded mode the plugin installs `hindsight-all` on first use through Mbiling's lazy-install path, which honours `security.allow_lazy_installs`.
 
 **Local mode UI:** `hindsight-embed -p mbiling ui start`
 

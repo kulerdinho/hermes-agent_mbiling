@@ -1,4 +1,4 @@
-"""Contracts for Mbiling' shared YAML reader and writer."""
+"""Contracts for Mbiling's shared YAML reader and writer."""
 
 import io
 from concurrent.futures import ThreadPoolExecutor

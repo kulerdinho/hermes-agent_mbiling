@@ -263,7 +263,7 @@ def _install_npm(pkg: str, bin_name: str, extra_pkgs: Optional[list] = None) -> 
     cmd = [pm_bin, *_NODE_PM_ARGV[pm](str(staging)), *install_targets]
     logger.info("[install] %s %s", pm, " ".join(cmd[1:]))
     from tools.environments.local import mbiling_subprocess_env
-    # Package install scripts are third-party code: scrubbed env, never Mbiling' credentials.
+    # Package install scripts are third-party code: scrubbed env, never Mbiling's credentials.
     if not _run_installer(pm, pkg, cmd, timeout=300, env=with_mbiling_node_path(mbiling_subprocess_env())):
         return None
     found = _first_existing(staging / "node_modules" / ".bin" / bin_name)

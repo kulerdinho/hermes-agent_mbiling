@@ -52,7 +52,7 @@ iex (irm https://mbiling.com/install.ps1)
 
 The source installer delegates Python 3.14, Node.js, npm, ripgrep, FFmpeg,
 and Python dependencies to PM. If Git is absent, it stages the verified Git
-for Windows archive in Mbiling' tool store. It does not replace your system Git.
+for Windows archive in Mbiling's tool store. It does not replace your system Git.
 See [installation methods](https://mbiling.com/docs/getting-started/installation)
 for the separate MSIX/App Installer package and its update ownership.
 

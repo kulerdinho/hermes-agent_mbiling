@@ -823,7 +823,7 @@ Advanced per-platform knobs for throttling the outbound message batcher. Most us
 | `MBILING_TOOL_PROGRESS_MODE` | Deprecated compatibility variable for tool progress mode (still read by the gateway as a fallback). Prefer `display.tool_progress` in `config.yaml`. |
 | `MBILING_HUMAN_DELAY_MODE` / `MBILING_HUMAN_DELAY_MIN_MS` / `MBILING_HUMAN_DELAY_MAX_MS` | No longer read. Response pacing is the `human_delay` section of each profile's `config.yaml` (`mode`, `min_ms`, `max_ms`), so multiplexed profiles keep independent pacing. |
 | `MBILING_QUIET` | Suppress non-essential output (`true`/`false`) |
-| `CODEX_HOME` | When [Codex app-server runtime](../user-guide/features/codex-app-server-runtime) is enabled, override the directory Codex CLI reads its config + auth from (default: `~/.codex`). Mbiling' migration writes the managed block to `<CODEX_HOME>/config.toml`. |
+| `CODEX_HOME` | When [Codex app-server runtime](../user-guide/features/codex-app-server-runtime) is enabled, override the directory Codex CLI reads its config + auth from (default: `~/.codex`). Mbiling's migration writes the managed block to `<CODEX_HOME>/config.toml`. |
 | `MBILING_KANBAN_TASK` | Set by the kanban dispatcher when spawning a worker (task UUID). Workers and the spawned `mbiling-tools` MCP subprocess inherit it so kanban tools gate correctly. Don't set manually. |
 | `MBILING_ACP_SKIP_CONFIGURED_MCP` | Obsolete. No longer read, and has no effect. `mbiling acp` is a viewer of the gateway daemon and never starts `config.yaml` MCP servers itself. The gateway starts its profile's `mcp_servers` at boot (filtered for ACP by `platform_toolsets.acp`), and the editor's `session/new` `mcpServers` are attached by the gateway either way. See [ACP host integration](../user-guide/features/acp#host-integration). |
 | `MBILING_API_TIMEOUT` | LLM API call timeout in seconds (default: `1800`) |
@@ -904,7 +904,7 @@ Mbiling sets these itself to carry state across a boundary where no `config.yaml
 | Variable | Description |
 |----------|-------------|
 | `MBILING_SESSION_ID` | **Exported automatically into every tool subprocess** Mbiling spawns (`terminal`, `execute_code`, persistent shell, Docker/Singularity backends, delegated subagent runs). Set by the agent to the current session ID; user scripts called from tools can read it to correlate their output, telemetry, or side effects with the originating Mbiling session. **You should not set this manually** — overriding it from a parent shell only takes effect outside an agent run, and is overwritten the moment the agent starts a session. |
-| `AI_AGENT` | **Set to `mbiling-agent` by the CLI and gateway entry points** (only when not already set by an outer harness), and exported into every terminal-tool shell — including remote backends (Docker, SSH, Modal, Daytona, Singularity, Vercel). The emerging cross-agent standard for child-process attribution — generic tooling (e.g. huggingface_hub's agent detection) reads it to know it runs under an AI agent. The value matches Mbiling' id in the public agent-harness registry. Don't set manually. |
+| `AI_AGENT` | **Set to `mbiling-agent` by the CLI and gateway entry points** (only when not already set by an outer harness), and exported into every terminal-tool shell — including remote backends (Docker, SSH, Modal, Daytona, Singularity, Vercel). The emerging cross-agent standard for child-process attribution — generic tooling (e.g. huggingface_hub's agent detection) reads it to know it runs under an AI agent. The value matches Mbiling's id in the public agent-harness registry. Don't set manually. |
 | `MBILING_AGENT` | **Set to `true` by the CLI and gateway entry points** and exported into every terminal-tool shell so child processes can detect they run inside Mbiling specifically. Don't set manually. |
 
 Terminal session snapshots do not persist injected session/agent attribution
@@ -944,7 +944,7 @@ For task-specific direct endpoints, Mbiling uses the task's configured API key o
 
 ## Fallback Providers (config.yaml only)
 
-The primary model fallback chain is configured exclusively through `config.yaml` — there are no environment variables for it. Add a top-level `fallback_providers` list with `provider` and `model` keys to enable automatic failover when your main model encounters errors. Auxiliary tasks whose provider is `auto` also consult this chain before Mbiling' built-in auxiliary discovery chain.
+The primary model fallback chain is configured exclusively through `config.yaml` — there are no environment variables for it. Add a top-level `fallback_providers` list with `provider` and `model` keys to enable automatic failover when your main model encounters errors. Auxiliary tasks whose provider is `auto` also consult this chain before Mbiling's built-in auxiliary discovery chain.
 
 ```yaml
 fallback_providers:

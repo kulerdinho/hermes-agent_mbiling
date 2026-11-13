@@ -130,7 +130,7 @@ What changes in keychain mode:
   needed to open the vault. Before moving a profile to another machine, run
   `mbiling vault key migrate --to file`.
 - **The keychain may ask.** macOS can ask whether Mbiling may use the entry
-  (for example after an update replaces Mbiling' Python), and a locked Linux
+  (for example after an update replaces Mbiling's Python), and a locked Linux
   keyring asks to be unlocked. Cron jobs that run while you are logged out
   cannot read the key, so their local logins fail with a clear error.
 - **A lost entry means lost items.** If the keychain entry is deleted, the
@@ -185,12 +185,12 @@ against a compromised right one.
 | A program running as you, or a plugin running inside Mbiling | Can decrypt | Can still ask the keychain, or call the vault code directly |
 | An administrator / root, or malware with your privileges | Can decrypt | Can decrypt |
 
-Password-manager session tokens (1Password, Bitwarden) stay in Mbiling' memory
+Password-manager session tokens (1Password, Bitwarden) stay in Mbiling's memory
 only, are dropped after 30 idle minutes or on Lock, and are handed only to the
-single `op`/`bw` command that needs them, never to Mbiling' own environment, the
+single `op`/`bw` command that needs them, never to Mbiling's own environment, the
 terminal tool or any other child process. They are kept out of reach of a plain
 import, which stops casual access by other code in the process, but not a
-plugin determined to read Mbiling' memory.
+plugin determined to read Mbiling's memory.
 
 Plugins are the boundary that matters: a third-party plugin that runs inside
 the Mbiling process can do anything Mbiling can, including filling a saved login.

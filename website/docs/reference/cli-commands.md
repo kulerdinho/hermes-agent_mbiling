@@ -1536,7 +1536,7 @@ mbiling moa configure [name]
 mbiling moa delete <name>
 ```
 
-`mbiling moa configure` reuses Mbiling' provider → model picker for each reference model and the aggregator. A preset is an execution-mode configuration, not a primary model or provider.
+`mbiling moa configure` reuses Mbiling's provider → model picker for each reference model and the aggregator. A preset is an execution-mode configuration, not a primary model or provider.
 
 ## `mbiling fallback`
 

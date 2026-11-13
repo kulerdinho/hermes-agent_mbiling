@@ -18,8 +18,8 @@ Not using OpenAI Codex? `mbiling setup --portal` configures a non-Codex backend 
 - Run OpenAI agent turns against your **ChatGPT subscription** (no API key required) using the same auth flow Codex CLI uses.
 - Use **Codex's own toolset and sandbox** — `shell` for terminal/read/write/search, `apply_patch` for structured edits, `update_plan` for planning, all running inside seatbelt/landlock sandboxing.
 - **Native Codex plugins** — Linear, GitHub, Gmail, Calendar, Canva, etc. — installed via `codex plugin` are auto-migrated and active in your Mbiling session.
-- **Mbiling' richer tools come along** — web_search, web_extract, vision, image generation, skills, and TTS work via an MCP callback. Codex calls back into Mbiling for tools it doesn't have built in.
-- **Memory and skill nudges keep working** — Codex's events are projected into Mbiling' message shape so the self-improvement loop sees a normal-looking transcript.
+- **Mbiling's richer tools come along** — web_search, web_extract, vision, image generation, skills, and TTS work via an MCP callback. Codex calls back into Mbiling for tools it doesn't have built in.
+- **Memory and skill nudges keep working** — Codex's events are projected into Mbiling's message shape so the self-improvement loop sees a normal-looking transcript.
 - **Your Mbiling persona rides along** — the composed system prompt (SOUL.md, MEMORY.md/USER.md, per-channel `system_prompt` overrides) is sent to the codex thread once as developer instructions when the thread starts, and Codex's built-in personality is disabled so it cannot compete with yours.
 
 ## What tools the model actually has
@@ -62,20 +62,20 @@ Mbiling registers itself as an MCP server so codex can call back for tools codex
 
 - **`web_search`** / **`web_extract`** — Firecrawl-backed; tends to be cleaner than scraping for structured content.
 - **`vision_analyze`** — call a separate vision model to inspect an image (different from codex's `view_image` which loads it into the conversation).
-- **`image_generate`** — image generation through Mbiling' image_gen plugin chain.
-- **`skill_view` / `skills_list`** — read from Mbiling' skill library.
-- **`text_to_speech`** — TTS through Mbiling' configured provider.
+- **`image_generate`** — image generation through Mbiling's image_gen plugin chain.
+- **`skill_view` / `skills_list`** — read from Mbiling's skill library.
+- **`text_to_speech`** — TTS through Mbiling's configured provider.
 
-When the model wants one of these, codex spawns the `mbiling_tools_mcp_server` subprocess via stdio MCP, the call is dispatched through `model_tools.handle_function_call()` (same code path as Mbiling' default runtime), and the result is returned to codex like any other MCP response.
+When the model wants one of these, codex spawns the `mbiling_tools_mcp_server` subprocess via stdio MCP, the call is dispatched through `model_tools.handle_function_call()` (same code path as Mbiling's default runtime), and the result is returned to codex like any other MCP response.
 
 ### What's NOT available on this runtime
 
 These four Mbiling tools require the running AIAgent context (mid-loop state) to dispatch, and a stateless MCP callback can't drive them. Switch back to the default runtime (`/codex-runtime auto`) when you need any of them:
 
 - **`delegate_task`** — spawn subagents
-- **`memory`** — Mbiling' persistent memory store
+- **`memory`** — Mbiling's persistent memory store
 - **`session_search`** — cross-session search
-- **`todo`** — Mbiling' todo store (codex's `update_plan` is the in-runtime equivalent)
+- **`todo`** — Mbiling's todo store (codex's `update_plan` is the in-runtime equivalent)
 
 ## Workflow features (`/goal`, kanban, cron)
 
@@ -163,7 +163,7 @@ uses:
    ```bash
    codex login                  # writes tokens to ~/.codex/auth.json
    ```
-   Mbiling' own `mbiling auth add openai-codex` writes to `~/.mbiling/auth.json` — that's a separate session. **Run `codex login` separately** if you haven't.
+   Mbiling's own `mbiling auth add openai-codex` writes to `~/.mbiling/auth.json` — that's a separate session. **Run `codex login` separately** if you haven't.
 
    <a id="named-custom-providers"></a>**Or: a named custom provider.** A `providers.<name>` entry in Mbiling config can use this runtime when the **same name** is defined as a Codex provider. Mbiling config:
 
@@ -190,9 +190,9 @@ uses:
    wire_api = "responses"
    ```
 
-   Mbiling sends only `model` and `modelProvider = "my-gateway"` on `thread/start`; codex resolves `base_url` and reads the key from `env_key` in its own environment. **Mbiling never forwards the API key**, so `MY_GATEWAY_API_KEY` must be present in the process environment Mbiling runs in — `~/.mbiling/.env` is loaded at startup and provider credentials are inherited by the codex subprocess. Auxiliary calls (titles, compression, memory review) still use Mbiling' own `providers.my-gateway` entry.
+   Mbiling sends only `model` and `modelProvider = "my-gateway"` on `thread/start`; codex resolves `base_url` and reads the key from `env_key` in its own environment. **Mbiling never forwards the API key**, so `MY_GATEWAY_API_KEY` must be present in the process environment Mbiling runs in — `~/.mbiling/.env` is loaded at startup and provider credentials are inherited by the codex subprocess. Auxiliary calls (titles, compression, memory review) still use Mbiling's own `providers.my-gateway` entry.
 
-   Caveats: the name after `custom:` is the `providers:` config key and must match the `[model_providers.<name>]` table name exactly — if it does not exist on the codex side, codex reports an unknown provider rather than silently using the Mbiling endpoint. Anonymous `provider: custom` (a bare `base_url`) is not eligible: it has no stable name to hand to codex, so it stays on Mbiling' standard runtime.
+   Caveats: the name after `custom:` is the `providers:` config key and must match the `[model_providers.<name>]` table name exactly — if it does not exist on the codex side, codex reports an unknown provider rather than silently using the Mbiling endpoint. Anonymous `provider: custom` (a bare `base_url`) is not eligible: it has no stable name to hand to codex, so it stays on Mbiling's standard runtime.
 
 3. **(Optional) Install the Codex plugins you want.** When you enable the runtime, Mbiling auto-migrates whichever curated plugins you've already installed via Codex CLI:
    ```bash
@@ -214,7 +214,7 @@ That command:
 - Persists `model.openai_runtime: codex_app_server` to your config.yaml.
 - Migrates user MCP servers from `~/.mbiling/config.yaml` to `~/.codex/config.toml`.
 - **Discovers and migrates installed native Codex plugins** (Linear, GitHub, Gmail, Calendar, Canva, etc.) by querying Codex's `plugin/list` RPC.
-- **Registers Mbiling' own tools as an MCP server** so the codex subprocess can call back for tools codex doesn't ship with.
+- **Registers Mbiling's own tools as an MCP server** so the codex subprocess can call back for tools codex doesn't ship with.
 - **Writes `default_permissions = ":workspace"`** so the sandbox allows writes within the workspace without prompting for every operation.
 - Tells you what was migrated. Takes effect on the **next** session — the current cached agent keeps the prior runtime so prompt caches stay valid.
 
@@ -247,7 +247,7 @@ The value is a single executable path, not a shell command — no quoting or ext
 
 ## Self-improvement loop (memory + skill nudges)
 
-Mbiling' background self-improvement fires on counter thresholds:
+Mbiling's background self-improvement fires on counter thresholds:
 
 - Every 10 user prompts → a forked review agent looks at the conversation and decides whether anything should be saved to memory.
 - Every 10 tool iterations within a single turn → same idea but for skills (`skill_manage` writes).
@@ -264,13 +264,13 @@ How the wiring stays equivalent:
 | Skill trigger (`_iters_since_skill >= _skill_nudge_interval`) | computed after the loop | computed after the codex turn |
 | `_spawn_background_review(messages_snapshot=..., review_memory=..., review_skills=...)` | called when either trigger fires | called identically when either trigger fires |
 
-One detail: the review fork itself needs to call Mbiling' agent-loop tools (`memory`, `skill_manage`), which require Mbiling' own dispatch. So when the parent agent is on `codex_app_server`, the review fork is **downgraded to `codex_responses`** — same OAuth credentials, same `openai-codex` provider, but talks to OpenAI's Responses API directly so Mbiling owns the loop and the agent-loop tools work. This is invisible to the user.
+One detail: the review fork itself needs to call Mbiling's agent-loop tools (`memory`, `skill_manage`), which require Mbiling's own dispatch. So when the parent agent is on `codex_app_server`, the review fork is **downgraded to `codex_responses`** — same OAuth credentials, same `openai-codex` provider, but talks to OpenAI's Responses API directly so Mbiling owns the loop and the agent-loop tools work. This is invisible to the user.
 
 Net effect: enable the codex runtime and your memory + skill nudges keep firing exactly as they would otherwise.
 
 ## How approvals work
 
-Codex requests approval before executing commands or applying patches. These get translated into Mbiling' standard "Dangerous Command" prompt:
+Codex requests approval before executing commands or applying patches. These get translated into Mbiling's standard "Dangerous Command" prompt:
 
 ```
 ╭───────────────────────────────────────╮
@@ -296,10 +296,10 @@ For `apply_patch` (file edit) approvals, Mbiling shows a summary of what changed
 
 Codex has three built-in permission profiles:
 - `:read-only` — no writes; every shell command requires approval
-- `:workspace` — writes within the current workspace allowed without prompts (Mbiling' default when you enable the runtime)
+- `:workspace` — writes within the current workspace allowed without prompts (Mbiling's default when you enable the runtime)
 - `:danger-no-sandbox` — no sandbox at all (don't use this unless you understand it)
 
-You can override the default in `~/.codex/config.toml` outside Mbiling' managed block:
+You can override the default in `~/.codex/config.toml` outside Mbiling's managed block:
 
 ```toml
 default_permissions = ":read-only"
@@ -309,7 +309,7 @@ default_permissions = ":read-only"
 
 ## Auxiliary tasks and ChatGPT subscription token cost
 
-When this runtime is on with the `openai-codex` provider, **auxiliary tasks (title generation, context compression, vision auto-detect, the background self-improvement review fork) also flow through your ChatGPT subscription by default**, because Mbiling' auxiliary client uses the main provider/model when no per-task override is set.
+When this runtime is on with the `openai-codex` provider, **auxiliary tasks (title generation, context compression, vision auto-detect, the background self-improvement review fork) also flow through your ChatGPT subscription by default**, because Mbiling's auxiliary client uses the main provider/model when no per-task override is set.
 
 This isn't specific to `codex_app_server` — it's true for the existing `codex_responses` path too — but it's more visible here because you're explicitly opting in for the subscription billing.
 
@@ -331,7 +331,7 @@ auxiliary:
     model: google/gemini-3-flash-preview
 ```
 
-The self-improvement review fork inherits the main runtime via `_current_main_runtime()` and Mbiling downgrades it from `codex_app_server` to `codex_responses` automatically (so the fork can actually call `memory` and `skill_manage` — Mbiling' own agent-loop tools). That fork still uses your subscription auth unless you've routed aux tasks elsewhere.
+The self-improvement review fork inherits the main runtime via `_current_main_runtime()` and Mbiling downgrades it from `codex_app_server` to `codex_responses` automatically (so the fork can actually call `memory` and `skill_manage` — Mbiling's own agent-loop tools). That fork still uses your subscription auth unless you've routed aux tasks elsewhere.
 
 ## Editing `~/.codex/config.toml` safely
 
@@ -414,7 +414,7 @@ What's not migrated:
 
 Plugins installed via `codex plugin` (Linear, GitHub, Gmail, Calendar, Canva, etc.) are discovered through Codex's `plugin/list` RPC. For each plugin where `installed: true`, Mbiling writes a `[plugins."<name>@openai-curated"]` block enabling it in your Mbiling session.
 
-This means: when your friend says "I have Calendar and GitHub set up in my Codex CLI" and they enable Mbiling' codex runtime, Mbiling activates those automatically. No re-configuration needed.
+This means: when your friend says "I have Calendar and GitHub set up in my Codex CLI" and they enable Mbiling's codex runtime, Mbiling activates those automatically. No re-configuration needed.
 
 What's NOT migrated:
 - Plugins you haven't installed yet — install them in Codex first.
@@ -470,7 +470,7 @@ Known limitations:
 - **`delegate_task`, `memory`, `session_search`, `todo` are unavailable on this runtime.** They need the running AIAgent context which a stateless MCP callback can't provide. Use `/codex-runtime auto` when you need these.
 - **No inline patch preview in approval prompts when codex doesn't track the changeset.** Codex's `fileChange` approval params don't always carry the changeset. Mbiling caches the data from the corresponding `item/started` notification when possible, but if approval arrives before the item has streamed, the prompt falls back to whatever `reason` codex provides.
 - **`fallback_providers` fail over only on quota and rate-limit failures.** When a codex app-server turn fails with a billing / usage-limit / rate-limit error, Mbiling switches to the configured [fallback provider](./fallback-providers.md) and retries the same turn on it; auth failures (`codex login` expired), turn timeouts and unknown-model errors do not fail over on this runtime and surface as the turn's error instead.
-- **Prior Mbiling history is seeded only into a thread codex starts from scratch.** A codex thread that codex hands back via `thread/resume` already holds the conversation. When no resumable thread exists — the session ran on another provider before `/model` switched to openai-codex, codex could not resume the stored thread, or the running thread was retired — the new thread's `developerInstructions` carry Mbiling' system prompt followed by the session's prior turns (user and assistant text, tool names, tool-result previews; the most recent ~32K characters). When the composed prompt changes mid-session (for example `/personality` in the TUI or Desktop), the next turn retires the running thread and starts a new one carrying the updated prompt plus that same history seed.
+- **Prior Mbiling history is seeded only into a thread codex starts from scratch.** A codex thread that codex hands back via `thread/resume` already holds the conversation. When no resumable thread exists — the session ran on another provider before `/model` switched to openai-codex, codex could not resume the stored thread, or the running thread was retired — the new thread's `developerInstructions` carry Mbiling's system prompt followed by the session's prior turns (user and assistant text, tool names, tool-result previews; the most recent ~32K characters). When the composed prompt changes mid-session (for example `/personality` in the TUI or Desktop), the next turn retires the running thread and starts a new one carrying the updated prompt plus that same history seed.
 - **The codex thread itself does survive a restart.** After each committed turn Mbiling stores the codex thread id on the session row (`codex_thread_id` in the session's `model_config`, `mbiling sessions` / `state.db`). The next agent built for that same Mbiling session — a later `/api/sessions/{id}/chat` request, or the first turn after the API server or gateway restarts — issues `thread/resume` for the stored id before `turn/start`, so the model keeps its own memory of the earlier turns (that is why no history seed is sent on resume). When codex cannot hand the thread back (its rollout was deleted, `CODEX_HOME` changed, the previous app-server was killed while still writing it), Mbiling fails closed: it drops the stored id, starts a fresh thread and shows one line — `Codex thread could not be resumed; starting a new one.` — on the status rail of the surface you are on (CLI, TUI/Desktop, messaging gateway). A `/new` session never resumes an older thread.
 - **Sub-second cancellation isn't guaranteed.** Mid-stream interrupts (Ctrl+C while codex is responding) are sent via `turn/interrupt`, but if codex has already flushed the final message, you get the response anyway.
 
@@ -508,7 +508,7 @@ If you find a bug, [open an issue](https://github.com/kulerdinho/mbiling/issues)
         │   │  │    canva, ...)       │     │
         │   │  └─ mbiling-tools ───────┼─────────────────┐
         │   │       (callback to     │     │           │
-        │   │        Mbiling' richer  │     │           │
+        │   │        Mbiling's richer  │     │           │
         │   │        tools)          │     │           │
         │   └─────────────────────────┘     │           │
         └──────────────────────────────────┘           │

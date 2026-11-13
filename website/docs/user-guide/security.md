@@ -950,7 +950,7 @@ the OpenSSL system trust paths. If initialization fails, Mbiling logs the
 failure and falls back to OpenSSL defaults.
 
 For a corporate TLS proxy, install its root through your organization's
-operating-system trust procedure. Mbiling' provider resolver no longer selects
+operating-system trust procedure. Mbiling's provider resolver no longer selects
 trust through `MBILING_CA_BUNDLE` or the old CA-environment-variable ladder.
 Sandboxed subprocesses can have their own separate CA configuration.
 

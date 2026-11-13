@@ -1,7 +1,7 @@
 """Mbiling credential hints and the Anthropic token-endpoint error shape (#113023).
 
 A dead Mbiling login must be repaired with ``mbiling auth add <provider>``; hints that send the user to
-an external CLI's login command do not touch Mbiling' own credentials. The token endpoint's
+an external CLI's login command do not touch Mbiling's own credentials. The token endpoint's
 ``invalid_grant`` body is surfaced as a structured, classifiable error so the pool can quarantine
 instead of benching the dead grant as transient.
 """

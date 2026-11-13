@@ -193,7 +193,7 @@ platforms:
           - excalidraw       # skill commands work here too
 ```
 
-`priority_mode` controls how your list combines with Mbiling' built-in priority list:
+`priority_mode` controls how your list combines with Mbiling's built-in priority list:
 
 - `prepend`: put your commands first, then Mbiling defaults
 - `append`: keep Mbiling defaults first, then your commands

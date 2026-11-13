@@ -627,7 +627,7 @@ class TestChannelIdentity:
 
 
 class TestSnapshotIsCredentialStore:
-    """The copied Cookies/Login Data must live inside Mbiling' secret lifecycle."""
+    """The copied Cookies/Login Data must live inside Mbiling's secret lifecycle."""
 
     def test_excluded_from_backup(self):
         import mbiling_cli.backup as bk

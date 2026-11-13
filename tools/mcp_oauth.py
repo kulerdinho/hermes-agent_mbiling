@@ -3,7 +3,7 @@
 
 The SDK's ``OAuthClientProvider`` does discovery, client identification, PKCE, exchange and
 refresh; this module supplies ``MbilingTokenStorage`` (on-disk persistence), the localhost callback
-listener and ``build_oauth_auth()`` (legacy entry point). client_id is Mbiling' Client ID Metadata
+listener and ``build_oauth_auth()`` (legacy entry point). client_id is Mbiling's Client ID Metadata
 Document URL (CIMD) when the server supports it, else RFC 7591 DCR. ``mcp_servers.<name>.oauth`` keys
 (all optional): client_id, client_secret, scope, redirect_port, redirect_uri (proxy callback),
 redirect_host, client_name, client_metadata_url, cimd, user_agent, timeout."""
@@ -855,7 +855,7 @@ def _callback_outcome(result: dict, cimd_url: str | None):
     if result["auth_code"] is None:
         hint = (
             " If the browser showed an invalid-client error instead of an approval prompt, the authorization "
-            f"server rejected Mbiling' Client ID Metadata Document ({cimd_url}); set ``cimd: false`` under that "
+            f"server rejected Mbiling's Client ID Metadata Document ({cimd_url}); set ``cimd: false`` under that "
             "server's ``oauth:`` block in config.yaml to authorize via dynamic client registration instead."
         ) if cimd_url else ""
         raise OAuthNonInteractiveError(
@@ -1264,6 +1264,6 @@ def build_oauth_auth(server_name: str, server_url: str, oauth_config: dict | Non
         from tools.mcp_oauth_provider import MbilingProviderMixin
 
         MbilingOAuthClientProvider = type("MbilingOAuthClientProvider", (MbilingProviderMixin, _sdk_class("OAuthClientProvider")), {
-            "__doc__": "SDK provider plus Mbiling' token-endpoint fixes (see ``MbilingProviderMixin``).",
+            "__doc__": "SDK provider plus Mbiling's token-endpoint fixes (see ``MbilingProviderMixin``).",
             "__module__": __name__, "_mbiling_logger": logger})
     return MbilingOAuthClientProvider(server_url=server_url, **kwargs)

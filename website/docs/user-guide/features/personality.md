@@ -47,7 +47,7 @@ This keeps personality predictable.
 If Mbiling loaded `SOUL.md` from whatever directory you happened to launch it in, your personality could change unexpectedly between projects. By loading only from `MBILING_HOME`, the personality belongs to the Mbiling instance itself.
 
 That also makes it easier to teach users:
-- "Edit `~/.mbiling/SOUL.md` to change Mbiling' default personality."
+- "Edit `~/.mbiling/SOUL.md` to change Mbiling's default personality."
 
 ## Where to edit it
 

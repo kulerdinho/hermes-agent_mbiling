@@ -11,7 +11,7 @@ docs_url: https://github.com/Zamoca42/hermes-completion-sound
 version: "0.1.0"
 platforms: []
 known_issues:
-- "Mbiling' own completion sound still plays alongside the plugin's until Mbiling adds a way to turn it off (PR #140350)."
+- "Mbiling's own completion sound still plays alongside the plugin's until Mbiling adds a way to turn it off (PR #140350)."
 capabilities:
   provides_tools: []
   provides_hooks: []

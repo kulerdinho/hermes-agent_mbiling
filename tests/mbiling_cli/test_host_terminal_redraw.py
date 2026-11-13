@@ -12,7 +12,7 @@ from mbiling_cli.pty_session import PtySession
 from mbiling_cli.web_host_terminal_sessions import HostOwner, _pump_input, _resize
 from tests.waiting import async_wait_until
 
-# Programs that, like Node's stdout 'resize' event (Mbiling' TUI redraws on it), report a size only
+# Programs that, like Node's stdout 'resize' event (Mbiling's TUI redraws on it), report a size only
 # when the one they read differs from the last, and read it after a busy event loop gets to it.
 _PYTHON_SIZE_WATCHER = """
 import os, signal, time

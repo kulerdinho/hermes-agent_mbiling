@@ -9,7 +9,7 @@ blocks looking only for ``block.text`` — image blocks were silently dropped
 and the agent saw an empty result. Distilled from @c3115644151's PR #17915
 and @gnanirahulnutakki's PR #10848 (both too stale to cherry-pick); this
 test file locks in #10848's approach of plumbing the bytes through
-Mbiling' existing ``cache_image_from_bytes`` so a ``MEDIA:<path>`` tag
+Mbiling's existing ``cache_image_from_bytes`` so a ``MEDIA:<path>`` tag
 goes back to the agent and through to messaging adapters that render
 images natively.
 """
@@ -62,7 +62,7 @@ class TestCacheMcpImageBlock:
         )
         tag = _cache_mcp_image_block(block)
         assert tag.startswith("MEDIA:"), f"expected MEDIA: tag, got {tag!r}"
-        # The cached file should be in Mbiling' image cache dir
+        # The cached file should be in Mbiling's image cache dir
         from gateway.platforms.base import get_image_cache_dir
         cache_dir = str(get_image_cache_dir().resolve())
         assert tag.startswith(f"MEDIA:{cache_dir}"), (

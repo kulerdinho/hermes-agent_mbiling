@@ -424,7 +424,7 @@ tool_timeout_sec = 600.0
         │   │  │    canva, ...)       │     │
         │   │  └─ mbiling-tools ───────┼─────────────────┐
         │   │       (callback to     │     │           │
-        │   │        Mbiling' richer  │     │           │
+        │   │        Mbiling's richer  │     │           │
         │   │        tools)          │     │           │
         │   └─────────────────────────┘     │           │
         └──────────────────────────────────┘           │
