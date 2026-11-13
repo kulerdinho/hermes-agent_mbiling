@@ -3888,6 +3888,7 @@ export const en: Translations = {
 
   install: {
     mbilingSignIn: {
+      continueWith: "Continue with",
       title: "Welcome to Mbiling",
       desc: "Sign in with your Mbiling account to connect this app.",
       button: "Sign in to Mbiling",

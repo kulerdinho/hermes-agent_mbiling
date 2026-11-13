@@ -19,6 +19,14 @@ Les PC sont inscrits automatiquement : quand un utilisateur connecté autorise l
 son PC, la cellule demande au Relais un jeton d'appareil (POST /interne/appareils). Le Relais ne
 garde que l'EMPREINTE (SHA-256) de ce jeton, dans le fichier ``fichier_appareils`` ; le jeton
 lui-même n'est rendu qu'une fois, puis conservé chiffré sur le PC.
+
+Navigateur du PC (tunnel CDP, lot 6) : la cellule règle ``browser.cdp_url`` sur
+``http://<relais>/cdp/<jeton interne>/<organisation>``. Le Relais répond aux requêtes de
+découverte ``/json/...`` (en remplaçant l'adresse locale du navigateur par la sienne) et relaie
+chaque WebSocket ``/devtools/...`` vers les Mains, qui le passent au navigateur du PC :
+  Relais -> PC : {"t": "cdp_http", "id", "methode", "chemin"}   PC -> Relais : {"t": "cdp_http_rep", "id", "statut", "corps"}
+  Relais -> PC : {"t": "cdp_ouvrir", "canal", "chemin"}          PC -> Relais : {"t": "cdp_ouvert"|"cdp_erreur", "canal", ...}
+  dans les deux sens : {"t": "cdp", "canal", "d"} puis {"t": "cdp_fermer", "canal"}
 """
 from __future__ import annotations
 
@@ -27,6 +35,7 @@ import hashlib
 import hmac
 import json
 import os
+import re
 import secrets
 import threading
 import time
@@ -35,8 +44,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, AsyncIterator
 
-from fastapi import FastAPI, Header, HTTPException, WebSocket, WebSocketDisconnect
-from fastapi.responses import StreamingResponse
+from fastapi import FastAPI, Header, HTTPException, Request, WebSocket, WebSocketDisconnect
+from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel
 
 
@@ -68,6 +77,9 @@ class Appareil:
     info: dict[str, Any]
     files: dict[str, asyncio.Queue] = field(default_factory=dict)
     envoi: asyncio.Lock = field(default_factory=asyncio.Lock)
+    # Tunnel du navigateur : réponses HTTP attendues (par id) et canaux WebSocket ouverts (par canal).
+    http_attente: dict[str, asyncio.Future] = field(default_factory=dict)
+    canaux: dict[str, asyncio.Queue] = field(default_factory=dict)
 
     async def envoyer(self, message: dict[str, Any]) -> None:
         async with self.envoi:
@@ -188,9 +200,19 @@ def creer_app() -> FastAPI:
         try:
             while True:
                 message = json.loads(await socket.receive_text())
-                file = appareil.files.get(str(message.get("id")))
-                if file is not None and message.get("t") in ("sortie", "fin"):
-                    await file.put(message)
+                genre = message.get("t")
+                if genre in ("sortie", "fin"):
+                    file = appareil.files.get(str(message.get("id")))
+                    if file is not None:
+                        await file.put(message)
+                elif genre == "cdp_http_rep":
+                    attente = appareil.http_attente.pop(str(message.get("id")), None)
+                    if attente is not None and not attente.done():
+                        attente.set_result(message)
+                elif genre in ("cdp_ouvert", "cdp_erreur", "cdp", "cdp_fermer"):
+                    canal = appareil.canaux.get(str(message.get("canal")))
+                    if canal is not None:
+                        await canal.put(message)
         except (WebSocketDisconnect, RuntimeError, json.JSONDecodeError):
             pass
         finally:
@@ -201,10 +223,111 @@ def creer_app() -> FastAPI:
     async def _fermer(appareil: Appareil, raison: str) -> None:
         for file in list(appareil.files.values()):
             await file.put({"t": "perdu", "raison": raison})
+        for attente in list(appareil.http_attente.values()):
+            if not attente.done():
+                attente.set_result({"statut": 503, "corps": json.dumps({"erreur": raison})})
+        for canal in list(appareil.canaux.values()):
+            await canal.put({"t": "cdp_fermer", "raison": raison})
         try:
             await appareil.socket.close()
         except Exception:
             pass
+
+    # --- Navigateur du PC (tunnel CDP) -------------------------------------------------------
+
+    def verifier_cdp(jeton: str) -> None:
+        if not hmac.compare_digest(jeton.encode(), jeton_interne.encode()):
+            raise HTTPException(status_code=401, detail="jeton invalide")
+
+    delai_cdp = float(limites.get("delai_navigateur_s", 30))
+    adresse_locale = re.compile(r"(ws|http)://(127\.0\.0\.1|localhost|\[::1\]):\d+")
+
+    @app.api_route("/cdp/{jeton}/{organisation}/json{reste:path}", methods=["GET", "PUT"])
+    async def cdp_http(jeton: str, organisation: str, reste: str, request: Request) -> Response:
+        """Découverte CDP (/json/version, /json/list...) répondue par le navigateur du PC."""
+        verifier_cdp(jeton)
+        appareil = connectes.get(organisation)
+        if not appareil:
+            raise HTTPException(status_code=503, detail="aucun appareil connecté pour cette organisation")
+        identifiant = uuid.uuid4().hex
+        attente = asyncio.get_running_loop().create_future()
+        appareil.http_attente[identifiant] = attente
+        chemin = "/json" + reste + (f"?{request.url.query}" if request.url.query else "")
+        await appareil.envoyer({"t": "cdp_http", "id": identifiant, "methode": request.method, "chemin": chemin})
+        try:
+            reponse = await asyncio.wait_for(attente, delai_cdp)
+        except TimeoutError as exc:
+            raise HTTPException(status_code=504, detail="le navigateur du PC ne répond pas") from exc
+        finally:
+            appareil.http_attente.pop(identifiant, None)
+        # L'agent doit joindre le navigateur À TRAVERS le Relais : on remplace son adresse locale.
+        schema_ws = "wss" if request.url.scheme == "https" else "ws"
+        base = f"{request.url.netloc}/cdp/{jeton}/{organisation}"
+        corps = adresse_locale.sub(
+            lambda m: f"{schema_ws if m.group(1) == 'ws' else request.url.scheme}://{base}",
+            str(reponse.get("corps", "")))
+        return Response(content=corps, status_code=int(reponse.get("statut", 502)), media_type="application/json")
+
+    @app.websocket("/cdp/{jeton}/{organisation}/devtools/{reste:path}")
+    async def cdp_websocket(socket: WebSocket, jeton: str, organisation: str, reste: str) -> None:
+        """Une connexion CDP de l'agent, relayée jusqu'au navigateur du PC."""
+        if not hmac.compare_digest(jeton.encode(), jeton_interne.encode()):
+            await socket.close(code=4401)
+            return
+        appareil = connectes.get(organisation)
+        if not appareil:
+            await socket.close(code=4503)
+            return
+        canal = uuid.uuid4().hex
+        file: asyncio.Queue = asyncio.Queue(maxsize=limites["file_sortie_max"])
+        appareil.canaux[canal] = file
+        try:
+            await appareil.envoyer({"t": "cdp_ouvrir", "canal": canal, "chemin": f"/devtools/{reste}"})
+            try:
+                premier = await asyncio.wait_for(file.get(), delai_cdp)
+            except TimeoutError:
+                await socket.close(code=4504)
+                return
+            if premier.get("t") != "cdp_ouvert":
+                await socket.close(code=4502, reason=str(premier.get("raison", ""))[:120])
+                return
+            await socket.accept()
+
+            async def vers_pc() -> None:
+                try:
+                    while True:
+                        texte = await socket.receive_text()
+                        await appareil.envoyer({"t": "cdp", "canal": canal, "d": texte})
+                except (WebSocketDisconnect, RuntimeError):
+                    return  # l'agent a fermé sa connexion : fin normale du canal
+
+            async def vers_agent() -> None:
+                try:
+                    while True:
+                        message = await file.get()
+                        if message.get("t") == "cdp":
+                            await socket.send_text(str(message.get("d", "")))
+                        elif message.get("t") == "cdp_fermer":
+                            return
+                except (WebSocketDisconnect, RuntimeError):
+                    return
+
+            taches = [asyncio.create_task(vers_pc()), asyncio.create_task(vers_agent())]
+            _fini, en_cours = await asyncio.wait(taches, return_when=asyncio.FIRST_COMPLETED)
+            for tache in en_cours:
+                tache.cancel()
+        except (WebSocketDisconnect, RuntimeError):
+            pass
+        finally:
+            appareil.canaux.pop(canal, None)
+            try:
+                await appareil.envoyer({"t": "cdp_fermer", "canal": canal})
+            except Exception:
+                pass
+            try:
+                await socket.close()
+            except Exception:
+                pass
 
     @app.post("/interne/appareils")
     async def inscrire(demande: Inscription, authorization: str | None = Header(default=None)) -> dict[str, Any]:

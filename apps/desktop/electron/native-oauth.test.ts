@@ -275,3 +275,20 @@ test('tokenNeedsRefresh respects the skew window', () => {
   // Unknown expiry ⇒ refresh (validate before use).
   assert.equal(tokenNeedsRefresh({ expiresAt: 0 }, now), true)
 })
+
+test('Mbiling: "Continue with Google" adds the idp_hint the server forwards to the accounts service', () => {
+  const url = new URL(
+    buildNativeAuthorizeUrl('https://gw.example.com', {
+      challenge: 'c',
+      redirectUri: 'http://127.0.0.1:5000/callback',
+      state: 's',
+      idpHint: 'google'
+    })
+  )
+
+  assert.equal(url.searchParams.get('idp_hint'), 'google')
+  assert.equal(
+    new URL(buildNativeAuthorizeUrl('https://gw.example.com', { challenge: 'c', redirectUri: 'http://127.0.0.1:5000/callback', state: 's' })).searchParams.has('idp_hint'),
+    false
+  )
+})

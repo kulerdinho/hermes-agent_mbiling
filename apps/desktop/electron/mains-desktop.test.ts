@@ -181,18 +181,33 @@ test('the first-launch address comes from the settings file', async () => {
   assert.deepEqual(await invoke('mbiling:default-connection'), {
     adresse: 'https://api.mbiling.test',
     clientLeger: true,
-    connexionAvancee: false
+    connexionAvancee: false,
+    fournisseurs: []
   })
 
   fs.writeFileSync(
     path.join(dirs.root, 'userData', 'connexion-par-defaut.json'),
-    JSON.stringify({ adresse: 'https://api.mbiling.test', connexion_avancee: true })
+    JSON.stringify({
+      adresse: 'https://api.mbiling.test',
+      connexion_avancee: true,
+      fournisseurs: [{ id: 'google', libelle: 'Google' }, { id: 'Bad Id!', libelle: 'x' }, { id: 'apple' }]
+    })
   )
-  assert.equal(((await invoke('mbiling:default-connection')) as { connexionAvancee: boolean }).connexionAvancee, true)
+  const avancee = (await invoke('mbiling:default-connection')) as {
+    connexionAvancee: boolean
+    fournisseurs: { id: string; libelle: string }[]
+  }
+  assert.equal(avancee.connexionAvancee, true)
+  assert.deepEqual(avancee.fournisseurs, [{ id: 'google', libelle: 'Google' }], 'invalid entries are dropped')
 
   // An unreadable file never unlocks the manual connection.
   fs.writeFileSync(path.join(dirs.root, 'userData', 'connexion-par-defaut.json'), 'not json')
-  assert.deepEqual(await invoke('mbiling:default-connection'), { adresse: '', clientLeger: true, connexionAvancee: false })
+  assert.deepEqual(await invoke('mbiling:default-connection'), {
+    adresse: '',
+    clientLeger: true,
+    connexionAvancee: false,
+    fournisseurs: []
+  })
 })
 
 // --- Automatic pairing: the app enrols this PC with the connected server ------------------------

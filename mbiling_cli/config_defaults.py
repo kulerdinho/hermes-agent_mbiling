@@ -1026,6 +1026,11 @@ DEFAULT_CONFIG = {
         "oauth": {
             "client_id": "",  # agent:{instance_id} — Portal provisions this
             "portal_url": "",
+            # Mbiling: "Continue with Google / Apple" in the desktop. ``param`` is the accounts
+            # service's query parameter that preselects a social sign-in (Keycloak: kc_idp_hint;
+            # Auth0: connection); ``allowed`` lists the hints the desktop may ask for. Empty
+            # ``param`` turns it off (the accounts page then shows its own choices).
+            "idp_hint": {"param": "", "allowed": ["google", "apple"]},
         },
         # Username/password gate (dashboard_auth/basic plugin, no OAuth IDP). Active when username
         # plus password_hash (preferred) or password (hashed in-memory) are set; empty username =

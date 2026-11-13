@@ -244,6 +244,21 @@ module.exports = {
       }
     ]
   },
+  // Mbiling: classic Windows installer (setup .exe) as a wizard, not a silent one-click: the
+  // user sees each step (Next, install folder, Install) and the uninstaller asks for
+  // confirmation before removing anything. User data is kept unless the user deletes it.
+  nsis: {
+    oneClick: false,
+    perMachine: false,
+    allowToChangeInstallationDirectory: true,
+    createDesktopShortcut: true,
+    createStartMenuShortcut: true,
+    shortcutName: displayName,
+    uninstallDisplayName: displayName,
+    deleteAppDataOnUninstall: false,
+    installerLanguages: ['fr_FR', 'en_US'],
+    language: '1036'
+  },
   win: {
     executableName: windowsExecutableName,
     legalTrademarks: displayName,

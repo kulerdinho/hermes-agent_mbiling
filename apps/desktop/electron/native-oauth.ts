@@ -118,7 +118,7 @@ export function resolveLoginStrategy(
  */
 export function buildNativeAuthorizeUrl(
   baseUrl: string,
-  params: { challenge: string; redirectUri: string; state: string; provider?: string }
+  params: { challenge: string; redirectUri: string; state: string; provider?: string; idpHint?: string }
 ): string {
   const parsed = new URL(baseUrl)
   const prefix = parsed.pathname.replace(/\/+$/, '')
@@ -132,6 +132,12 @@ export function buildNativeAuthorizeUrl(
 
   if (params.provider) {
     q.set('provider', params.provider)
+  }
+
+  // Mbiling: "Continue with Google / Apple" — the server forwards an allowed hint to the
+  // accounts service so its page opens straight on that sign-in.
+  if (params.idpHint) {
+    q.set('idp_hint', params.idpHint)
   }
 
   return `${parsed.protocol}//${parsed.host}${prefix}/auth/native/authorize?${q.toString()}`

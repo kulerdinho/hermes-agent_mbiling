@@ -10,5 +10,9 @@
     "(^|[/\\\\~])\\.ssh([/\\\\\\s'\"]|$)",
     "appdata[/\\\\]+(local|roaming)[/\\\\]+(google|microsoft[/\\\\]+edge|mozilla)",
     "\\b(reg(\\.exe)?\\s+(add|delete)|netsh|bcdedit|format\\s+[a-z]:|Set-MpPreference|sc(\\.exe)?\\s+(stop|delete|config))\\b"
+  ],
+  "sites_interdits": [
+    "^file:",
+    "^(chrome|edge)://(settings|password-manager|wallet|flags)"
   ]
 }
