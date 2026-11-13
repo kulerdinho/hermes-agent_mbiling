@@ -6,7 +6,7 @@ la copie de l'utilisateur prime toujours sur celle livrée.
 
 | Fichier | Contenu |
 |---|---|
-| `connexion-par-defaut.json` | Adresse du serveur Mbiling auquel l'application se connecte (connexion par compte uniquement). `connexion_avancee` : réservé à l'équipe, propose aussi la connexion manuelle et l'installation locale ; `false` pour les utilisateurs. |
+| `connexion-par-defaut.json` | Adresse du serveur Mbiling auquel l'application se connecte (connexion par compte uniquement). `connexion_avancee` : réservé à l'équipe, propose aussi la connexion manuelle et l'installation locale ; `false` pour les utilisateurs. `fournisseurs` : boutons « Continuer avec … » (Google, Apple), transmis au service de comptes ; le serveur n'accepte que ceux listés dans `dashboard.oauth.idp_hint.allowed`. |
 | `mains.json` | Les Mains : activées ou non, adresse du Relais, délais, chemin de bash (facultatif). |
 | `mains-politique.json` | Dossiers autorisés et motifs interdits, appliqués sur le PC avant toute commande, quoi que demande le serveur. `{documents}` désigne le dossier Documents de l'utilisateur. |
 

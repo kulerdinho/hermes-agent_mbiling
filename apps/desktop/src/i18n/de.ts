@@ -4328,6 +4328,7 @@ export const deOverrides = {
   },
   install: {
     mbilingSignIn: {
+      continueWith: "Weiter mit",
       title: "Willkommen bei Mbiling",
       desc: "Melden Sie sich mit Ihrem Mbiling-Konto an, um diese App zu verbinden.",
       button: "Bei Mbiling anmelden",

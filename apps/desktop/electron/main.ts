@@ -15317,6 +15317,9 @@ ipcMain.handle('mbiling:connection-config:oauth-login', async (_event, rawUrl, r
   // cloud or token draft signs in on the legacy jar — the jar the saved
   // entry reads — so login and read can never disagree. Invalid or missing
   // values fail closed to the legacy jar in the resolver.
+  // Mbiling: "Continue with Google / Apple" (a short provider id; anything else is dropped).
+  const loginIdpHint =
+    typeof rawOpts?.idpHint === 'string' && /^[a-z0-9_-]{1,40}$/.test(rawOpts.idpHint) ? rawOpts.idpHint : undefined
   const pendingKind = typeof rawOpts?.kind === 'string' ? rawOpts.kind : ''
   const pendingAuthMode = typeof rawOpts?.authMode === 'string' ? rawOpts.authMode : ''
 
@@ -15360,7 +15363,7 @@ ipcMain.handle('mbiling:connection-config:oauth-login', async (_event, rawUrl, r
         },
         postJson: (url, body, opts) => postJsonNoAuth(url, body, opts),
         rememberLog
-      })
+      }, { idpHint: loginIdpHint })
 
       if (!authIsCurrent()) {
         throw new NativeAuthChangedError()

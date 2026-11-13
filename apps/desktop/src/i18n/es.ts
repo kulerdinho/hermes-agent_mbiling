@@ -4318,6 +4318,7 @@ export const esOverrides = {
   },
   install: {
     mbilingSignIn: {
+      continueWith: "Continuar con",
       title: "Bienvenido a Mbiling",
       desc: "Inicie sesión con su cuenta de Mbiling para conectar esta aplicación.",
       button: "Iniciar sesión en Mbiling",

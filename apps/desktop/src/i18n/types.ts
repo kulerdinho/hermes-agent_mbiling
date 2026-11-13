@@ -3326,7 +3326,7 @@ export interface Translations extends NoticeTranslations {
   }
 
   install: {
-    mbilingSignIn: Record<'title' | 'desc' | 'button' | 'waiting' | 'connecting' | 'allowPc' | 'allowPcHint' | 'unreachable' | 'noSignIn' | 'cancelled' | 'failed' | 'advanced' | 'retry', string>
+    mbilingSignIn: Record<'continueWith' | 'title' | 'desc' | 'button' | 'waiting' | 'connecting' | 'allowPc' | 'allowPcHint' | 'unreachable' | 'noSignIn' | 'cancelled' | 'failed' | 'advanced' | 'retry', string>
     stageStates: Record<string, string>
     oneTimeTitle: string
     unsupportedDesc: (platform: string) => string

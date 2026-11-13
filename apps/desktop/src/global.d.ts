@@ -223,7 +223,12 @@ declare global {
       }
       getBootProgress: () => Promise<DesktopBootProgress>
       getConnectionConfig: (profile?: null | string) => Promise<DesktopConnectionConfig>
-      getDefaultConnection: () => Promise<{ adresse: string; clientLeger: boolean; connexionAvancee: boolean }>
+      getDefaultConnection: () => Promise<{
+        adresse: string
+        clientLeger: boolean
+        connexionAvancee: boolean
+        fournisseurs?: { id: string; libelle: string }[]
+      }>
       mains: {
         status: () => Promise<MbilingMainsStatus>
         enrol: () => Promise<MbilingMainsStatus>
@@ -1481,6 +1486,8 @@ export interface DesktopOauthLoginOptions {
   kind?: DesktopConnectionKind
   /** Draft auth mode ('oauth' | 'token') the save will persist. */
   authMode?: 'oauth' | 'token'
+  /** Mbiling: preselected sign-in on the accounts service ("google", "apple"). */
+  idpHint?: string
 }
 
 export interface DesktopOauthLoginResult {
