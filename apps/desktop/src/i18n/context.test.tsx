@@ -406,3 +406,49 @@ describe('I18nProvider', () => {
     vi.useRealTimers()
   })
 })
+
+describe('I18nProvider before sign-in (no server config yet)', () => {
+  afterEach(() => {
+    cleanup()
+    Reflect.deleteProperty(window, 'mbilingDesktop')
+  })
+
+  it('follows the Windows display language instead of English', async () => {
+    Object.defineProperty(window, 'mbilingDesktop', {
+      configurable: true,
+      value: { getMachineProfile: vi.fn().mockResolvedValue({ locale: 'fr-FR' }) }
+    })
+    const configClient: I18nConfigClient = {
+      getConfig: vi.fn().mockRejectedValue(new Error('not signed in yet')),
+      saveConfig: vi.fn()
+    }
+
+    render(
+      <I18nProvider configClient={configClient}>
+        <LanguageProbe />
+      </I18nProvider>
+    )
+
+    await waitFor(() => expect(screen.getByTestId('locale').textContent).toBe('fr'))
+  })
+
+  it('stays in English for a Windows language Mbiling does not ship', async () => {
+    Object.defineProperty(window, 'mbilingDesktop', {
+      configurable: true,
+      value: { getMachineProfile: vi.fn().mockResolvedValue({ locale: 'sw-KE' }) }
+    })
+    const configClient: I18nConfigClient = {
+      getConfig: vi.fn().mockRejectedValue(new Error('not signed in yet')),
+      saveConfig: vi.fn()
+    }
+
+    render(
+      <I18nProvider configClient={configClient}>
+        <LanguageProbe />
+      </I18nProvider>
+    )
+
+    await act(async () => {})
+    expect(screen.getByTestId('locale').textContent).toBe('en')
+  })
+})

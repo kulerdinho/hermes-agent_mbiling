@@ -210,6 +210,17 @@ export function I18nProvider({
           setConfigLoadError(toError(error))
           setLocaleState(DEFAULT_LOCALE)
 
+          // Mbiling: before the user has signed in there is no server config to read; follow
+          // Windows' display language instead of English (a saved choice still wins later).
+          void window.mbilingDesktop
+            ?.getMachineProfile?.()
+            .then(profile => {
+              if (!cancelled && !userLocaleRef.current) {
+                setLocaleState(resolveInitialLocale(null, profile?.locale))
+              }
+            })
+            .catch(() => undefined)
+
           if (retryCount < MAX_LOCALE_RETRIES) {
             retryCount += 1
             retryTimer = setTimeout(() => {
