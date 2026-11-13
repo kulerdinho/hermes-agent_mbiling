@@ -3,9 +3,14 @@
   "jeton_env": "MBILING_JETON_APPAREIL",
   "bash": null,
   "marge_timeout_s": 15,
-  "reconnexion": { "delai_initial_ms": 1000, "delai_max_ms": 30000 },
+  "reconnexion": {
+    "delai_initial_ms": 1000,
+    "delai_max_ms": 30000
+  },
   "politique": {
-    "dossiers_autorises": ["C:\\Users\\VOUS\\Documents\\Mbiling-Test"],
+    "dossiers_autorises": [
+      "C:\\Users\\VOUS\\Documents\\Mbiling-Test"
+    ],
     "interdits": [
       "(^|[^\\w])/c/windows([/\\s'\"]|$)",
       "c:[\\\\/]+windows",
@@ -14,6 +19,18 @@
       "(^|[/\\\\~])\\.ssh([/\\\\\\s'\"]|$)",
       "appdata[/\\\\]+(local|roaming)[/\\\\]+(google|microsoft[/\\\\]+edge|mozilla)",
       "\\b(reg(\\.exe)?\\s+(add|delete)|netsh|bcdedit|format\\s+[a-z]:|Set-MpPreference|sc(\\.exe)?\\s+(stop|delete|config))\\b"
+    ],
+    "sites_interdits": [
+      "^file:",
+      "^(chrome|edge)://(settings|password-manager|wallet|flags)"
     ]
+  },
+  "navigateur": {
+    "actif": true,
+    "prefere": "edge",
+    "chemin": null,
+    "profil": "C:\\Users\\VOUS\\.mbiling\\navigateur",
+    "delai_lancement_s": 20,
+    "arguments": []
   }
 }

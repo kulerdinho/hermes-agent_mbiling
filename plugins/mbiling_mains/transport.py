@@ -5,6 +5,12 @@ La configuration vient de l'environnement de la cellule, jamais du code :
   MBILING_RELAIS_URL    adresse interne du Relais (ex. http://relais:8700)
   MBILING_RELAIS_JETON  jeton interne partagé avec le Relais
   MBILING_ORGANISATION  identifiant de l'organisation servie par cette cellule
+
+Navigateur du PC (lot 6) : pour que l'agent pilote le navigateur du PC à travers le Relais, la
+cellule règle aussi
+  BROWSER_CDP_URL = <MBILING_RELAIS_URL>/cdp/<MBILING_RELAIS_JETON>/<MBILING_ORGANISATION>
+(ou ``browser.cdp_url`` dans sa configuration). Le moteur interroge alors ``/json/version`` et
+reçoit l'adresse WebSocket du Relais, jamais celle du PC.
 """
 from __future__ import annotations
 

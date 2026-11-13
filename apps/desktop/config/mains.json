@@ -3,5 +3,16 @@
   "relais_url": "wss://api.mbiling.com/mains",
   "bash": null,
   "marge_timeout_s": 15,
-  "reconnexion": { "delai_initial_ms": 1000, "delai_max_ms": 30000 }
+  "reconnexion": {
+    "delai_initial_ms": 1000,
+    "delai_max_ms": 30000
+  },
+  "navigateur": {
+    "actif": true,
+    "prefere": "edge",
+    "chemin": null,
+    "profil": null,
+    "delai_lancement_s": 20,
+    "arguments": []
+  }
 }

@@ -14,7 +14,7 @@ import path from 'node:path'
 import { app, ipcMain, safeStorage, shell } from 'electron'
 
 import * as mainsCore from '../../../mbiling_mains_client/mains.cjs'
-import type { MainsConfig, MainsEtat } from '../../../mbiling_mains_client/mains.cjs'
+import type { MainsConfig, MainsEtat, NavigateurConfig } from '../../../mbiling_mains_client/mains.cjs'
 
 import { expandUserPath, readMbilingConfig, userConfigPath } from './mbiling-desktop-config'
 
@@ -24,11 +24,15 @@ interface MainsDesktopSettings {
   bash: string | null
   marge_timeout_s: number
   reconnexion: { delai_initial_ms: number; delai_max_ms: number }
+  /** The PC's browser, driven by the agent through the Relay (CDP tunnel). */
+  navigateur?: NavigateurConfig
 }
 
 interface MainsPolicy {
   dossiers_autorises: string[]
   interdits: string[]
+  /** Addresses the agent may never open in the PC's browser. */
+  sites_interdits: string[]
 }
 
 export interface MainsStatus {
@@ -130,7 +134,18 @@ function readPolicy(): MainsPolicy {
 
   return {
     dossiers_autorises: (policy.dossiers_autorises || []).map(expandUserPath),
-    interdits: policy.interdits || []
+    interdits: policy.interdits || [],
+    sites_interdits: policy.sites_interdits || []
+  }
+}
+
+/** Browser settings; its profile lives in the app's data folder unless set otherwise. */
+function browserSettings(settings: MainsDesktopSettings): NavigateurConfig {
+  const browser = settings.navigateur || {}
+
+  return {
+    ...browser,
+    profil: browser.profil ? expandUserPath(browser.profil) : path.join(app.getPath('userData'), 'navigateur')
   }
 }
 
@@ -181,7 +196,8 @@ export function startMains(): void {
       bash: settings.bash,
       marge_timeout_s: settings.marge_timeout_s,
       reconnexion: settings.reconnexion,
-      politique: readPolicy()
+      politique: readPolicy(),
+      navigateur: browserSettings(settings)
     }
 
     engine = mainsCore.demarrer(config, {
