@@ -97,7 +97,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
       bootstrapState({
         setupChoice: {
           platform: 'win32',
-          activeRoot: 'C:\\Users\\me\\AppData\\Local\\mbiling\\mbiling-agent',
+          activeRoot: 'C://Users//me//AppData//Local//mbiling//mbiling-agent',
           local: 'none',
           bundled: false
         }
@@ -119,7 +119,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
       bootstrapState({
         setupChoice: {
           platform: 'win32',
-          activeRoot: 'C:\\Users\\me\\AppData\\Local\\mbiling\\mbiling-agent',
+          activeRoot: 'C://Users//me//AppData//Local//mbiling//mbiling-agent',
           local: 'none',
           bundled: false
         }
@@ -146,7 +146,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
       bootstrapState({
         setupChoice: {
           platform: 'win32',
-          activeRoot: 'C:\\Users\\me\\AppData\\Local\\mbiling\\mbiling-agent',
+          activeRoot: 'C://Users//me//AppData//Local//mbiling//mbiling-agent',
           local: 'none',
           bundled: false
         }
@@ -170,7 +170,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
       bootstrapState({
         setupChoice: {
           platform: 'win32',
-          activeRoot: 'C:\\Users\\me\\AppData\\Local\\mbiling\\mbiling-agent',
+          activeRoot: 'C://Users//me//AppData//Local//mbiling//mbiling-agent',
           local: 'none',
           bundled: false
         }
@@ -198,7 +198,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
       bootstrapState({
         setupChoice: {
           platform: 'win32',
-          activeRoot: 'C:\\Users\\me\\AppData\\Local\\mbiling\\mbiling-agent',
+          activeRoot: 'C://Users//me//AppData//Local//mbiling//mbiling-agent',
           local: 'none',
           bundled: false
         }
@@ -218,7 +218,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
         type: 'setup-choice',
         active: false,
         platform: 'win32',
-        activeRoot: 'C:\\Users\\me\\AppData\\Local\\mbiling\\mbiling-agent-repaired'
+        activeRoot: 'C://Users//me//AppData//Local//mbiling//mbiling-agent-repaired'
       })
     })
 
@@ -590,7 +590,7 @@ it.each([
     footer: boolean
   ): Promise<void> => {
     const state: DesktopBootstrapState = bootstrapState({
-      setupChoice: { platform: 'win32', activeRoot: 'C:\\Mbiling', local: local ?? 'none', bundled }
+      setupChoice: { platform: 'win32', activeRoot: 'C://Mbiling', local: local ?? 'none', bundled }
     })
 
     if (local === undefined && state.setupChoice) {
@@ -608,3 +608,44 @@ it.each([
     }
   }
 )
+
+describe('DesktopInstallOverlay Mbiling first launch', () => {
+  const choice = { platform: 'win32', activeRoot: 'C:/Users/me/.mbiling', local: 'none', bundled: false } as const
+
+  it('proposes the configured Mbiling server address in the connection form', async () => {
+    const desktop = installDesktopMock(bootstrapState({ setupChoice: choice }))
+    Object.assign(desktop, {
+      getDefaultConnection: vi.fn().mockResolvedValue({ adresse: 'https://api.mbiling.test', clientLeger: false })
+    })
+
+    render(<DesktopInstallOverlay />)
+    fireEvent.click(await screen.findByText('Connect to existing Mbiling'))
+
+    expect(await screen.findByDisplayValue('https://api.mbiling.test')).toBeTruthy()
+    expect(screen.getByText('Back')).toBeTruthy()
+  })
+
+  it('takes the remote-only client straight to the connection form, with no way back to a local install', async () => {
+    const desktop = installDesktopMock(bootstrapState({ setupChoice: choice }))
+    Object.assign(desktop, {
+      getDefaultConnection: vi.fn().mockResolvedValue({ adresse: 'https://api.mbiling.test', clientLeger: true })
+    })
+
+    render(<DesktopInstallOverlay />)
+
+    expect(await screen.findByDisplayValue('https://api.mbiling.test')).toBeTruthy()
+    expect(screen.queryByText('Install Mbiling locally')).toBeNull()
+    expect(screen.queryByText('Back')).toBeNull()
+  })
+
+  it('leaves the address empty when no default is configured', async () => {
+    const desktop = installDesktopMock(bootstrapState({ setupChoice: choice }))
+    Object.assign(desktop, { getDefaultConnection: vi.fn().mockResolvedValue({ adresse: '', clientLeger: false }) })
+
+    render(<DesktopInstallOverlay />)
+    fireEvent.click(await screen.findByText('Connect to existing Mbiling'))
+
+    expect(await screen.findByText('Gateway URL')).toBeTruthy()
+    expect(screen.queryByDisplayValue('https://api.mbiling.test')).toBeNull()
+  })
+})

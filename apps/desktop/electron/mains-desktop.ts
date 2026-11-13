@@ -59,12 +59,18 @@ function bundledBashCandidates(): string[] {
     return []
   }
 
-  const local = process.env.LOCALAPPDATA || ''
+  const candidates: string[] = []
 
-  return [
-    path.join(process.resourcesPath, 'git', 'bin', 'bash.exe'),
-    path.join(local, 'mbiling', 'git', 'bin', 'bash.exe')
-  ]
+  // resourcesPath is set by Electron; it is absent when the module runs outside it (tests, tools).
+  if (typeof process.resourcesPath === 'string' && process.resourcesPath) {
+    candidates.push(path.join(process.resourcesPath, 'git', 'bin', 'bash.exe'))
+  }
+
+  if (process.env.LOCALAPPDATA) {
+    candidates.push(path.join(process.env.LOCALAPPDATA, 'mbiling', 'git', 'bin', 'bash.exe'))
+  }
+
+  return candidates
 }
 
 function writeLog(...parts: unknown[]): void {
