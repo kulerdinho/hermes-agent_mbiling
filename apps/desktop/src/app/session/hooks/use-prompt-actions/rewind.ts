@@ -10,10 +10,9 @@
  */
 
 import type { AppendMessage, ThreadMessage } from '@assistant-ui/react'
-import { JsonRpcGatewayError } from '@hermes/shared'
+import { JsonRpcGatewayError } from '@mbiling/shared'
 
 import type { ClientSessionState } from '@/app/types'
-import { PROMPT_SUBMIT_REQUEST_TIMEOUT_MS } from '@/hermes'
 import {
   branchGroupForUser,
   type ChatMessage,
@@ -23,6 +22,7 @@ import {
   hasUnresolvedToolCall,
   textPart
 } from '@/lib/chat-messages'
+import { PROMPT_SUBMIT_REQUEST_TIMEOUT_MS } from '@/mbiling'
 import type { ConfirmRequest } from '@/store/confirm'
 
 import {

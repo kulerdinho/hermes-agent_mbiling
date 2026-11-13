@@ -5,16 +5,16 @@ import {
   graftRefreshedTailOntoBackfill,
   olderPageReader
 } from '@/app/chat/transcript-backfill'
+import { translateNow } from '@/i18n/runtime'
+import { type ChatMessage, chatMessageText, toChatMessages } from '@/lib/chat-messages'
+import { markReasoningEffortPending } from '@/lib/chat-runtime'
+import { type GuardedModelSwitchResult, surfaceModelSwitchConfirm } from '@/lib/guarded-model-switch'
 import {
   fetchStoredTranscriptAcrossBackends,
   getLatestSessionMessages,
   getSession,
   PROMPT_SUBMIT_REQUEST_TIMEOUT_MS
-} from '@/hermes'
-import { translateNow } from '@/i18n/runtime'
-import { type ChatMessage, chatMessageText, toChatMessages } from '@/lib/chat-messages'
-import { markReasoningEffortPending } from '@/lib/chat-runtime'
-import { type GuardedModelSwitchResult, surfaceModelSwitchConfirm } from '@/lib/guarded-model-switch'
+} from '@/mbiling'
 import { noteMessageSent } from '@/store/desktop-metrics'
 import { notify } from '@/store/notifications'
 import {
@@ -36,7 +36,7 @@ import {
   sessionTileOwnerRoute,
   setSessionTileDelegate
 } from '@/store/session-states'
-import type { SessionResumeResult } from '@/types/hermes'
+import type { SessionResumeResult } from '@/types/mbiling'
 
 import { refreshCronRunWriteGate } from '../../cron/open-cron-run'
 import type { usePromptActions } from '../../session/hooks/use-prompt-actions'

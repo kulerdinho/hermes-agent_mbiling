@@ -1,14 +1,14 @@
-# Sourced, never executed: how a POSIX shell gets the Hermes dev environment.
-# `activate` (interactive, reversible) and `scripts/run-in-hermes-env` (a child
+# Sourced, never executed: how a POSIX shell gets the Mbiling dev environment.
+# `activate` (interactive, reversible) and `scripts/run-in-mbiling-env` (a child
 # process, one-way) both build on it; neither owns any of it.
 #
-#   hermes_sync REPO [FLAG]         bring the install up to date (setup-hermes.sh)
-#   hermes_compose_env REPO DIALECT print the composed environment, `sh` or `fish`
-#   hermes_apply_env SCRIPT         evaluate a composed `sh` script into this shell
-#   hermes_activation_current REPO  is the inherited environment still REPO's?
-#   hermes_ensure_env REPO          sync, compose and apply unless it is current
+#   mbiling_sync REPO [FLAG]         bring the install up to date (setup-mbiling.sh)
+#   mbiling_compose_env REPO DIALECT print the composed environment, `sh` or `fish`
+#   mbiling_apply_env SCRIPT         evaluate a composed `sh` script into this shell
+#   mbiling_activation_current REPO  is the inherited environment still REPO's?
+#   mbiling_ensure_env REPO          sync, compose and apply unless it is current
 #
-# pm records, beside the installed-state file named by __HERMES_ACTIVATED, one
+# pm records, beside the installed-state file named by __MBILING_ACTIVATED, one
 # stamp per dependency input carrying the exact mtime that input had when the
 # install was last verified against it (pm.environments.record_activation_inputs).
 # Any input whose mtime DIFFERS from its stamp (newer or older, since a branch
@@ -19,26 +19,26 @@
 # stale, and so does an install that did not build the test environment:
 # every environment this library composes includes it.
 
-# hermes_sync REPO [--test-environment[=EXTRAS]]: run setup in a child, so a
+# mbiling_sync REPO [--test-environment[=EXTRAS]]: run setup in a child, so a
 # failure cannot exit or half-change the caller's shell and setup never
 # republishes launchers or shell config. Progress goes to stderr.
-hermes_sync() {
+mbiling_sync() {
     local repo="$1" test_environment="${2:---test-environment}"
     (
         unset PYTHONHOME PYTHONPATH VIRTUAL_ENV
-        bash "$repo/setup-hermes.sh" --runtime-only "$test_environment"
+        bash "$repo/setup-mbiling.sh" --runtime-only "$test_environment"
     ) >&2
 }
 
-# hermes_bootstrap_python REPO: print the interpreter that can run pm before
+# mbiling_bootstrap_python REPO: print the interpreter that can run pm before
 # any dependency is importable. It only emits the environment; it installs nothing.
-hermes_bootstrap_python() {
+mbiling_bootstrap_python() {
     local repo="$1" store candidate
     for candidate in "$repo/.venv/bin/python" "$repo/.venv/Scripts/python.exe" \
                      "$repo/venv/bin/python" "$repo/venv/Scripts/python.exe"; do
         [ -x "$candidate" ] && { printf '%s\n' "$candidate"; return 0; }
     done
-    for store in "${HERMES_RUNTIME_DIR:-}" "$repo/../tools" "${HERMES_HOME:-$HOME/.hermes}/tools"; do
+    for store in "${MBILING_RUNTIME_DIR:-}" "$repo/../tools" "${MBILING_HOME:-$HOME/.mbiling}/tools"; do
         [ -n "$store" ] || continue
         for candidate in "$store"/python-*/bin/python3 "$store"/python-*/python.exe \
                          "$store"/python-*/bin/python "$store"/python-*/bin/python.exe; do
@@ -48,24 +48,24 @@ hermes_bootstrap_python() {
     return 1
 }
 
-# hermes_compose_env REPO DIALECT: print the environment of the installed state
+# mbiling_compose_env REPO DIALECT: print the environment of the installed state
 # as a script for a shell of DIALECT (`sh` or `fish`).
-hermes_compose_env() {
+mbiling_compose_env() {
     local repo="$1" dialect="$2" python script
-    python="$(hermes_bootstrap_python "$repo")" || {
-        echo "no bootstrap Python found; run setup-hermes.sh" >&2
+    python="$(mbiling_bootstrap_python "$repo")" || {
+        echo "no bootstrap Python found; run setup-mbiling.sh" >&2
         return 1
     }
     script="$(PYTHONHOME= PYTHONPATH="$repo" "$python" -m pm.environments --format "$dialect")" &&
         [ -n "$script" ] || {
-        echo "could not read pm env (run ./setup-hermes.sh first)" >&2
+        echo "could not read pm env (run ./setup-mbiling.sh first)" >&2
         return 1
     }
     printf '%s\n' "$script"
 }
 
-# hermes_apply_env SCRIPT: evaluate a script from `hermes_compose_env REPO sh`.
-hermes_apply_env() {
+# mbiling_apply_env SCRIPT: evaluate a script from `mbiling_compose_env REPO sh`.
+mbiling_apply_env() {
     # Resolved before the eval replaces PATH.
     local cygpath name
     cygpath="$(command -v cygpath 2>/dev/null || :)"
@@ -83,13 +83,13 @@ hermes_apply_env() {
     fi
 }
 
-# hermes_activation_current REPO: status 0 when the inherited environment
+# mbiling_activation_current REPO: status 0 when the inherited environment
 # matches REPO's current inputs.
-hermes_activation_current() {
+mbiling_activation_current() {
     local repo="$1" sentinel stamps stamp input stamped=0
-    [ -n "${__HERMES_ACTIVATED:-}" ] && [ -e "${__HERMES_ACTIVATED}" ] || return 1
+    [ -n "${__MBILING_ACTIVATED:-}" ] && [ -e "${__MBILING_ACTIVATED}" ] || return 1
     # activate.ps1 records a Windows path; Git Bash accepts it with slashes.
-    sentinel="${__HERMES_ACTIVATED//\\//}"
+    sentinel="${__MBILING_ACTIVATED//\\//}"
     stamps="${sentinel%/*}/inputs"
     [ -f "$stamps/.project-root" ] && [ -f "$stamps/.test-environment" ] || return 1
     local owner="$repo" recorded
@@ -112,15 +112,15 @@ hermes_activation_current() {
     [ "$stamped" = 1 ]
 }
 
-# hermes_ensure_env REPO: leave this shell with REPO's environment, doing
+# mbiling_ensure_env REPO: leave this shell with REPO's environment, doing
 # nothing when the inherited one is current.
-hermes_ensure_env() {
+mbiling_ensure_env() {
     local repo="$1" script
-    hermes_activation_current "$repo" && return 0
-    hermes_sync "$repo" || {
+    mbiling_activation_current "$repo" && return 0
+    mbiling_sync "$repo" || {
         echo "setup failed" >&2
         return 1
     }
-    script="$(hermes_compose_env "$repo" sh)" || return 1
-    hermes_apply_env "$script"
+    script="$(mbiling_compose_env "$repo" sh)" || return 1
+    mbiling_apply_env "$script"
 }

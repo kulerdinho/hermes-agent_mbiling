@@ -128,7 +128,7 @@ export const arCommandCenter = {
     noSessions: 'لا توجد جلسات',
     gatewayRunning: 'البوابة تعمل',
     gatewayStopped: 'البوابة متوقفة',
-    hermesActiveSessions: (version, count) => `Mbiling ${version} لديه ${count} جلسة نشطة`,
+    mbilingActiveSessions: (version, count) => `Mbiling ${version} لديه ${count} جلسة نشطة`,
     restartGateway: 'إعادة تشغيل البوابة',
     openBrowser: 'تبديل المتصفح',
     toggleBrowser: 'تبديل المتصفح',
@@ -137,7 +137,7 @@ export const arCommandCenter = {
     sharedGatewayRestartDescription: bots => `تتم إعادة اتصال جميع البوتات على هذا الجهاز: ${bots}`,
     sharedGatewayRestartConfirm: 'إعادة تشغيل الكل',
     sharedGatewayRestarted: count => `تمت إعادة تشغيل البوابة المشتركة (${count} بوت)`,
-    updateHermes: 'تحديث Mbiling',
+    updateMbiling: 'تحديث Mbiling',
     reloadWindow: 'إعادة تحميل النافذة',
     actionRunning: 'الإجراء قيد التشغيل',
     actionDone: 'اكتمل الإجراء',
@@ -377,7 +377,7 @@ export const arCommandCenter = {
       },
       MATRIX_USER_ID: {
         label: 'معرّف مستخدم البوت',
-        placeholder: '@hermes:example.org'
+        placeholder: '@mbiling:example.org'
       },
       MATRIX_ALLOWED_USERS: {
         label: 'معرّفات مستخدمي Matrix المسموح بهم',
@@ -424,7 +424,7 @@ export const arCommandCenter = {
     exported: 'تم تصدير الملف الشخصي',
     failedImport: 'فشل استيراد الملف الشخصي',
     failedExport: 'فشل تصدير الملف الشخصي',
-    exportNeedsHost: name => `لا يمكن للمتصفح حفظ أرشيف الملف الشخصي. على مضيف Mbiling، شغّل: hermes profile export ${name}`,
+    exportNeedsHost: name => `لا يمكن للمتصفح حفظ أرشيف الملف الشخصي. على مضيف Mbiling، شغّل: mbiling profile export ${name}`,
     allProfiles: 'كل الملفات الشخصية',
     showAllProfiles: 'إظهار كل الملفات الشخصية',
     notServedHere: 'غير متاح هنا',
@@ -445,7 +445,7 @@ export const arCommandCenter = {
       title: (profile: string) => `ربط ${profile} بمضيف بعيد`,
       description: 'ستعمل جلسات هذا الملف الشخصي على خادم Mbiling البعيد الذي تحدده، بدلاً من هذا الجهاز.',
       urlLabel: 'العنوان البعيد',
-      urlPlaceholder: 'https://hermes.example.com',
+      urlPlaceholder: 'https://mbiling.example.com',
       urlInvalid: 'أدخل عنواناً كاملاً يبدأ بـ http:// أو https://',
       tokenLabel: 'رمز الوصول',
       tokenPlaceholder: 'الصق رمز الجلسة البعيد',

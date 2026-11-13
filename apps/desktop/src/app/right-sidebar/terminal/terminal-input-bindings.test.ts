@@ -52,7 +52,7 @@ it('keeps a plain Alt chord Mbiling ran off the PTY and leaves shared Ctrl keys 
   }
 
   expect(passToPty(ran({ altKey: true, key: 't' }))).toBe(false)
-  // Ctrl+D is EOF in the shell even though it is also a Hermes chord.
+  // Ctrl+D is EOF in the shell even though it is also a Mbiling chord.
   expect(passToPty(ran({ ctrlKey: true, key: 'd' }))).toBe(true)
   expect(passToPty(new KeyboardEvent('keydown', { altKey: true, key: 'b' }))).toBe(true)
 

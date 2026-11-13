@@ -1,4 +1,4 @@
-import { REASONING_EFFORTS } from '@hermes/shared'
+import { REASONING_EFFORTS } from '@mbiling/shared'
 
 import {
   Box,
@@ -17,8 +17,10 @@ import {
 import type { ThemeMode } from '@/themes/context'
 
 // Single source of truth for built-in personality names lives in
-// lib/personalities (mirrors hermes_cli/personality.py BUILTIN_PERSONALITIES).
+// lib/personalities (mirrors mbiling_cli/personality.py BUILTIN_PERSONALITIES).
 export { BUILTIN_PERSONALITIES } from '@/lib/personalities'
+
+import { NOUS_ENABLED } from '@/lib/nous'
 
 import { defineFieldCopy } from './field-copy'
 import type { DesktopConfigSection } from './types'
@@ -41,10 +43,10 @@ interface ProviderPrefix {
   priority: number
 }
 
-export const EMPTY_SELECT_VALUE = '__hermes_empty__'
+export const EMPTY_SELECT_VALUE = '__mbiling_empty__'
 export const CONTROL_TEXT = 'text-xs'
 
-export const PROVIDER_GROUPS: ProviderPrefix[] = [
+const ALL_PROVIDER_GROUPS: ProviderPrefix[] = [
   {
     prefix: 'NOUS_',
     name: 'Nous Portal',
@@ -104,7 +106,7 @@ export const PROVIDER_GROUPS: ProviderPrefix[] = [
     docsUrl: 'https://modelstudio.console.alibabacloud.com/',
     priority: 6
   },
-  { prefix: 'HERMES_QWEN_', name: 'DashScope (Qwen)', priority: 6 },
+  { prefix: 'MBILING_QWEN_', name: 'DashScope (Qwen)', priority: 6 },
   {
     prefix: 'GLM_',
     name: 'GLM / Z.AI',
@@ -229,6 +231,9 @@ export const PROVIDER_GROUPS: ProviderPrefix[] = [
   }
 ]
 
+// Nous Portal is not offered by Mbiling unless the build enables it (lib/nous.ts).
+export const PROVIDER_GROUPS: ProviderPrefix[] = ALL_PROVIDER_GROUPS.filter(g => NOUS_ENABLED || g.prefix !== 'NOUS_')
+
 // Schema-side select overrides for desktop-relevant enum fields whose
 // backend schema only declares a string type.
 export const ENUM_OPTIONS: Record<string, string[]> = {
@@ -253,7 +258,7 @@ export const ENUM_OPTIONS: Record<string, string[]> = {
   // tools/transcription_common.py (local_command is auto-detected, not picked).
   'stt.provider': ['local', 'groq', 'openai', 'mistral', 'xai', 'elevenlabs', 'deepinfra'],
   // How the desktop voice conversation is wired — tools/voice_live.py owns the
-  // gpt-live branch (one full-duplex voice model delegating to Hermes).
+  // gpt-live branch (one full-duplex voice model delegating to Mbiling).
   'voice.voice_chat_mode': ['chained', 'gpt-live'],
   'voice.gpt_live.voice': [
     'marin',

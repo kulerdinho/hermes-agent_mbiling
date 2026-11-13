@@ -5,10 +5,10 @@ import { useMemo, useState } from 'react'
 import { type NewSessionSplitHandler, startNewSessionDrag } from '@/app/chat/new-session-drag'
 import { Codicon } from '@/components/ui/codicon'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
-import type { HermesGitWorktree } from '@/global'
-import type { SessionInfo } from '@/hermes'
+import type { MbilingGitWorktree } from '@/global'
 import { useI18n } from '@/i18n'
 import { displayPath } from '@/lib/display-path'
+import type { SessionInfo } from '@/mbiling'
 import {
   $dismissedWorktreeIds,
   $removedWorktreeIds,
@@ -52,7 +52,7 @@ export function EnteredProjectContent({
   /** `owner` is set for a project another gateway owns: the session starts there. */
   onNewSession?: (path: null | string, owner?: AgentProfileRoute) => void
   onNewSessionSplit?: NewSessionSplitHandler
-  repoWorktrees?: Record<string, HermesGitWorktree[]>
+  repoWorktrees?: Record<string, MbilingGitWorktree[]>
   liveSessions?: SessionInfo[]
   removedSessionIds?: ReadonlySet<string>
 }) {
@@ -126,7 +126,7 @@ function RepoFlatSection({
   renderRows: (sessions: SessionInfo[]) => React.ReactNode
   onNewSession?: (path: null | string) => void
   onNewSessionSplit?: NewSessionSplitHandler
-  discoveredWorktrees?: HermesGitWorktree[]
+  discoveredWorktrees?: MbilingGitWorktree[]
   liveSessions?: SessionInfo[]
   /** Another gateway's project: its worktrees are removed and switched on that gateway. */
   owner?: AgentProfileRoute

@@ -51,7 +51,7 @@ def main() -> int:
     (travail / "mains.json").write_text(json.dumps(conf), encoding="utf-8")
 
     # Ce que la cellule aura dans son environnement.
-    os.environ.update(HERMES_HOME=str(foyer), TERMINAL_ENV="mbiling_mains",
+    os.environ.update(MBILING_HOME=str(foyer), TERMINAL_ENV="mbiling_mains",
                       MBILING_RELAIS_URL=f"http://127.0.0.1:{PORT}", MBILING_RELAIS_JETON=jeton_interne,
                       MBILING_ORGANISATION="org-test")
     sys.path.insert(0, str(RACINE))
@@ -79,7 +79,7 @@ def main() -> int:
                                  env=env, stdout=journal, stderr=subprocess.STDOUT)
         time.sleep(2)
 
-        from hermes_cli.plugins import discover_plugins, get_plugin_manager
+        from mbiling_cli.plugins import discover_plugins, get_plugin_manager
 
         discover_plugins(force=True)
         from agent.terminal_env_registry import plugin_backend_names

@@ -1,4 +1,4 @@
-import { JsonRpcGatewayError } from '@hermes/shared/json-rpc-channel'
+import { JsonRpcGatewayError } from '@mbiling/shared/json-rpc-channel'
 import { describe, expect, it } from 'vitest'
 
 import { describeRpcError, isVersionSkewError } from '../app/userMessages.js'
@@ -18,7 +18,7 @@ describe('a method the backend says it does not provide', () => {
     const text = describeRpcError(unavailable)
 
     expect(text).toContain('groups.no_such_verb')
-    expect(text).not.toMatch(/out of sync|different versions|\/update|hermes update/)
+    expect(text).not.toMatch(/out of sync|different versions|\/update|mbiling update/)
   })
 
   it('keeps the skew warning for a schema the backend rejects', () => {

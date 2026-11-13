@@ -1,6 +1,6 @@
 # Dashboard compilation consumes prepared icons; no npm lifecycle preparation.
-{ hermesNpmLib, generatedIcons, ... }:
-hermesNpmLib.buildNpmPackage {
+{ mbilingNpmLib, generatedIcons, ... }:
+mbilingNpmLib.buildNpmPackage {
   dirs = [
     "web"
     "apps/shared"

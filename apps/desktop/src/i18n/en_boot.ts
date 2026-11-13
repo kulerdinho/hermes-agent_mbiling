@@ -11,14 +11,14 @@ export const enBoot = {
       loadingSessions: 'Loading recent sessions',
       retryingRemoteBackend: 'Reconnecting to the remote Mbiling backend…',
       startingDesktopConnection: 'Starting desktop connection',
-      startingHermesDesktop: 'Starting Mbiling Desktop…'
+      startingMbilingDesktop: 'Starting Mbiling Desktop…'
     },
     errors: {
       backgroundExited:
         'The service that runs your chats closed unexpectedly. Restart it to keep going — your chats and settings are safe.',
       backgroundExitedDuringStartup: 'Mbiling stopped right after it started.',
       backendStopped: 'Mbiling stopped working in the background',
-      restartHermes: 'Restart Mbiling',
+      restartMbiling: 'Restart Mbiling',
       openLogs: 'Open logs',
       desktopBootFailed: "Mbiling couldn't start",
       gatewayConnectionLost: 'Mbiling lost its connection',
@@ -34,23 +34,23 @@ export const enBoot = {
     // Plain causes for a local backend boot failure (`classifyBootFailure`);
     // the raw output stays behind "Show recent logs".
     causes: {
-      exitedEarly: "Mbiling' background service stopped right after starting.",
-      timedOut: "Mbiling' background service didn't answer in time.",
+      exitedEarly: "Mbiling's background service stopped right after starting.",
+      timedOut: "Mbiling's background service didn't answer in time.",
       permission: "Mbiling couldn't write to its data folder (permission problem).",
       diskFull: 'The disk is full, so Mbiling could not start.',
       portInUse: 'Another program is using the network port Mbiling needs.',
-      installMissing: "Part of Mbiling' installation is missing. Choose Repair install to put it back."
+      installMissing: "Part of Mbiling's installation is missing. Choose Repair install to put it back."
     },
     failure: {
       title: "Mbiling couldn't start",
       description:
-        "Mbiling' background service didn't come up. Try one of the recovery steps below. Nothing here deletes your chats or settings.",
+        "Mbiling's background service didn't come up. Try one of the recovery steps below. Nothing here deletes your chats or settings.",
       details: 'Details',
       remoteTitle: 'Remote gateway sign-in required',
       remoteDescription:
         'Your remote gateway session has expired. Sign in again to reconnect. Nothing here deletes your chats or settings.',
       webappTitle: 'Sign in to Mbiling',
-      webappDescription: 'Run hermes webapp on this computer to sign this browser in.',
+      webappDescription: 'Run mbiling webapp on this computer to sign this browser in.',
       retry: 'Retry',
       repairInstall: 'Repair install',
       useLocalGateway: 'Use local gateway',
@@ -95,14 +95,14 @@ export const enBoot = {
       since: time => `Waiting since ${time}`,
       lastChecked: time => `Last checked ${time}`,
       recoveryHint:
-        'This usually clears in a few minutes. If it does not: quit Mbiling, end leftover git or hermes processes (or restart the computer), then open Mbiling again.',
+        'This usually clears in a few minutes. If it does not: quit Mbiling, end leftover git or mbiling processes (or restart the computer), then open Mbiling again.',
       checkAgain: 'Check again',
       quit: 'Quit Mbiling',
       openLogs: 'Open logs',
       startAnyway: 'Start anyway…',
       confirmTitle: 'Start Mbiling while the update still holds it?',
       confirmBody:
-        "The leftover update process may still be changing Mbiling' files. Starting now can load a half-updated install, which may not work until you run the update again. Mbiling records this choice in its log and leaves the update marker in place.",
+        "The leftover update process may still be changing Mbiling's files. Starting now can load a half-updated install, which may not work until you run the update again. Mbiling records this choice in its log and leaves the update marker in place.",
       confirmKeepWaiting: 'Keep waiting',
       confirmStart: 'Start anyway',
       startAnywayRefused: 'What holds the install changed before Mbiling could start. Review it and try again.'

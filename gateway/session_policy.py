@@ -8,7 +8,7 @@ import json
 import logging
 from pathlib import Path
 
-from hermes_state_runtime import RuntimeStoreError
+from mbiling_state_runtime import RuntimeStoreError
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +79,7 @@ SELECTION_KEYS = ('default', 'provider', 'base_url', 'api_mode', 'selection_prof
 BYPASS_FIELDS = ('safe_mode', 'ignore_user_config')
 _ACTIVE_POLICY: ContextVar = ContextVar('local_session_policy', default=None)
 _TURN_PROFILE: ContextVar = ContextVar('follow_profile_read', default=None)  # (policy, live) for a turn
-# Creation label -> agent surface. ``tool`` (third-party integrations, ``hermes chat --source tool``) and
+# Creation label -> agent surface. ``tool`` (third-party integrations, ``mbiling chat --source tool``) and
 # ``oneshot`` (finite ``chat -q`` / ``-z`` runs) run as the CLI but keep their own stored label, so human
 # pickers hide them (INTERNAL_LISTING_SOURCES).
 SURFACES = {'cli': 'cli', 'tui': 'tui', 'gui': 'desktop', 'acp': 'acp', 'tool': 'cli', 'oneshot': 'cli'}
@@ -273,7 +273,7 @@ class LocalSessionPolicy:
         if not self.follows_profile:
             return self.reasoning_config
         from gateway.session_authorities import active_authority
-        from hermes_constants import resolve_reasoning_config
+        from mbiling_constants import resolve_reasoning_config
         config, model = self.effective(active_authority(runner), secrets=False)
         return resolve_reasoning_config(config, model or '')
 
@@ -306,8 +306,8 @@ class LocalSessionPolicy:
 
     @property
     def yolo(self):
-        """`hermes chat --yolo`: this session's dangerous-command approvals are bypassed, exactly the
-        scope `/yolo` gives a messaging chat; never the process-wide HERMES_YOLO_MODE."""
+        """`mbiling chat --yolo`: this session's dangerous-command approvals are bypassed, exactly the
+        scope `/yolo` gives a messaging chat; never the process-wide MBILING_YOLO_MODE."""
         return json.loads(self.request_json).get('yolo', False)
 
     @property
@@ -323,13 +323,13 @@ class LocalSessionPolicy:
 
     @property
     def max_turns(self):
-        from hermes_cli.config import resolve_turn_limit
+        from mbiling_cli.config import resolve_turn_limit
         cfg = self.config()
         return resolve_turn_limit(cfg.get('agent', {}).get('max_turns', cfg.get('max_turns')))
 
     @property
     def verbose(self):
-        """`hermes chat -v`: the session's agent runs with quiet_mode off, so its status lines reach the
+        """`mbiling chat -v`: the session's agent runs with quiet_mode off, so its status lines reach the
         viewer (``agent.print``) as main's in-process verbose agent printed them."""
         return json.loads(self.request_json).get('verbose', False)
 
@@ -341,7 +341,7 @@ class LocalSessionPolicy:
 
     @property
     def reasoning_config(self):
-        from hermes_constants import resolve_reasoning_config
+        from mbiling_constants import resolve_reasoning_config
         return resolve_reasoning_config(self.config(), self.model or '')
 
 
@@ -356,7 +356,7 @@ def profile_target(config):
 
 def model_route(block):
     """``(provider, endpoint)`` identity of a ``model:`` block: what an endpoint-bound credential belongs to."""
-    from hermes_cli.route_identity import normalize_route_base_url
+    from mbiling_cli.route_identity import normalize_route_base_url
     block = block if isinstance(block, dict) else {}
     return str(block.get('provider') or '').strip().lower(), normalize_route_base_url(block.get('base_url'))
 
@@ -379,7 +379,7 @@ def entry_serves(block, config):
     serves in *config*: its named provider (``providers:`` / ``custom_providers:``), or the alias its
     ``api_key_from`` points into. That entry's key (inline, ``key_env``, ``key_cmd``) authenticates the
     entry's own endpoint, so a pick held on the old one ends rather than carry the new key there."""
-    from hermes_cli.route_identity import normalize_route_base_url
+    from mbiling_cli.route_identity import normalize_route_base_url
     block = block if isinstance(block, dict) else {}
     url = normalize_route_base_url(block.get('base_url'))
     if not url:
@@ -420,7 +420,7 @@ def build_policy(params, config, *, private_secrets=None, profile_terminal=True,
                  client_local=False):
     from agent.runtime_cwd import resolve_agent_cwd
     from tools.terminal_scope import build_profile_terminal_scope, default_terminal_scope
-    from hermes_constants import get_hermes_home
+    from mbiling_constants import get_mbiling_home
 
     source = params.get('source', 'cli')
     if source == 'a2a':
@@ -447,7 +447,7 @@ def build_policy(params, config, *, private_secrets=None, profile_terminal=True,
     if 'row_cwd' in params and (not isinstance(row_cwd, str) or (row_cwd and not Path(row_cwd).is_absolute())):
         _refuse('row_cwd', 'must be an absolute path when set')
     if params.get('cwd_explicit') is False and 'cwd' in params:
-        cwd = _profile_workspace_cwd(get_hermes_home()) or cwd
+        cwd = _profile_workspace_cwd(get_mbiling_home()) or cwd
     from gateway.session_local_editor import validate_editor
     validate_editor(source, params.get('editor'))
     launch_skills(params)
@@ -465,7 +465,7 @@ def build_policy(params, config, *, private_secrets=None, profile_terminal=True,
     named = workspace_posture and source != 'tool' and 'cwd' in params and 'toolsets' not in params
     coding_posture = named and _in_coding_workspace(config, source, cwd)
     enabled = _resolve_toolsets(params, config, source, safe_mode, coding_posture, bypass=ignore_user_config)
-    terminal = build_profile_terminal_scope(get_hermes_home()) if profile_terminal else default_terminal_scope()
+    terminal = build_profile_terminal_scope(get_mbiling_home()) if profile_terminal else default_terminal_scope()
     # The client's launch folder is a path on THIS host: a remote or container backend keeps its own
     # configured cwd unless the user picked this folder for the session.
     if params.get('cwd_explicit') is True or terminal_uses_host_cwd(terminal):
@@ -506,10 +506,10 @@ def _profile_workspace_cwd(home):
     """A NAMED profile's configured ``terminal.cwd``, which beats a client cwd the Desktop only inherited
     (``cwd_explicit: false``; main's ``_completion_cwd``). Placeholders and missing dirs are unset."""
     import os
-    from hermes_constants import profile_name_for_home
+    from mbiling_constants import profile_name_for_home
     if profile_name_for_home(home) in {None, 'default'}:
         return None
-    from hermes_cli.config import read_user_config_raw
+    from mbiling_cli.config import read_user_config_raw
     terminal = read_user_config_raw(Path(home) / 'config.yaml').get('terminal')
     raw = str((terminal if isinstance(terminal, dict) else {}).get('cwd') or '').strip()
     configured = os.path.abspath(os.path.expanduser(raw)) if raw not in {'', '.', 'auto', 'cwd'} else None
@@ -557,7 +557,7 @@ def _with_entry_pick(params, config):
         return params
     identity = profile_route_identity(config)
     if picked.strip().lower() == 'custom':
-        from hermes_cli.runtime_provider_custom import _route_key, routed_custom_identity
+        from mbiling_cli.runtime_provider_custom import _route_key, routed_custom_identity
         url, model = params.get('base_url'), str(params.get('model') or '')
         own_url = _route_key(model_route(config.get('model'))[1])
         if identity == 'custom' and own_url and (
@@ -580,8 +580,8 @@ def _with_entry_pick(params, config):
 def _apply_launch_overrides(params, config):
     """Validate the explicit model/agent launch overrides and fold them into *config*."""
     from urllib.parse import urlsplit
-    from hermes_cli.config import resolve_turn_limit
-    from hermes_constants import parse_reasoning_effort
+    from mbiling_cli.config import resolve_turn_limit
+    from mbiling_constants import parse_reasoning_effort
     params = _with_entry_pick(_without_auto_pick(params), config)
     picks_profile_entry = 'provider' in params and _keeps_profile_route(params['provider'], config)
     if 'provider' in params and not picks_profile_entry:
@@ -653,8 +653,8 @@ def _resolve_toolsets(params, config, source, safe_mode, coding_posture=False, b
     """Validate explicit toolsets and return the session's enabled toolset set. Without a pick, a
     *coding_posture* session runs ``focus_toolsets`` instead of the profile default while the profile
     stays on ``focus``; the gateway decides it, never the client."""
-    from hermes_cli.tools_config import _get_platform_tools, enabled_mcp_server_names
-    from hermes_cli.toolset_validation import saved_toolset_resolver
+    from mbiling_cli.tools_config import _get_platform_tools, enabled_mcp_server_names
+    from mbiling_cli.toolset_validation import saved_toolset_resolver
     from toolsets import validate_toolset
     explicit = params.get('toolsets')
     if 'toolsets' in params:
@@ -700,7 +700,7 @@ def _resolve_toolsets(params, config, source, safe_mode, coding_posture=False, b
         enabled |= surface - (disabled - {'desktop_ui'})
     if safe_mode:
         # Plugin toolsets are user customizations; the safe worker never imports them.
-        from hermes_cli.tools_config import _get_plugin_toolset_keys
+        from mbiling_cli.tools_config import _get_plugin_toolset_keys
         enabled -= _get_plugin_toolset_keys()
     return enabled
 
@@ -719,7 +719,7 @@ def _in_coding_workspace(config, source, cwd):
 def _extract_config_secrets(value, private, path=()):
     # Reuse the configuration owner's structural classification; opaque keys need
     # not match a vendor prefix. Only the authority keeps their original values.
-    from hermes_cli.config import _SECRET_CONFIG_KEYS
+    from mbiling_cli.config import _SECRET_CONFIG_KEYS
     from agent.credential_persistence import _is_secret_payload_key
     containers = {'env', 'headers', 'extra_headers', 'docker_env', 'docker_extra_args',
                   'terminal_docker_env', 'terminal_docker_extra_args'}
@@ -768,7 +768,7 @@ def render_launch_skills(params, session_id):
 
 
 def accept_launch_hooks(policy):
-    """`--accept-hooks` / `HERMES_ACCEPT_HOOKS=1` on a launch: consent to the profile's configured
+    """`--accept-hooks` / `MBILING_ACCEPT_HOOKS=1` on a launch: consent to the profile's configured
     shell hooks in the per-user allowlist (no prompt; kept in memory if that write fails), which
     the open's ``refresh_profile_hooks`` then registers. A bypass launch has no profile hooks to
     consent to, so the flag is a no-op there rather than a refusal. Allowlist I/O: off the loop."""
@@ -843,7 +843,7 @@ def bind_launch_key(authority, session_id, policy, api_key, *, config_secrets=No
     if owners is None:
         owners = authority._local_owner_key_requests = {}
     if owner_key and api_key is not None and old is not None and ref in owners:
-        from hermes_state_local import same_create_retry
+        from mbiling_state_local import same_create_retry
         api_key = old if same_create_retry(owners[ref], policy.request_json, client_request or {}) else api_key
     # Only a key that IS being bound can conflict: binding config secrets alone (a provider
     # change drops the launch key) must not be refused by the key the session already holds.
@@ -892,7 +892,7 @@ def rebind_launch_key(authority, session, api_key):
     source = authority.sessions[session.session_id].source
     if source is None or source.platform != Platform.LOCAL:
         raise RuntimeStoreError('admission_conflict')
-    from hermes_state_local import local_receipt
+    from mbiling_state_local import local_receipt
     ref = restore_policy(local_receipt(authority.db, session.session_id)['policy']).credential_ref
     if ref is None:
         raise RuntimeStoreError('admission_conflict')
@@ -1051,7 +1051,7 @@ def local_desktop_turn(runner, source, scope):
 
 @contextmanager
 def _serving_local_desktop_within(scope):
-    from hermes_cli.process_identity import serving_local_desktop
+    from mbiling_cli.process_identity import serving_local_desktop
     with scope, serving_local_desktop(True):
         yield
 
@@ -1156,7 +1156,7 @@ def bind_turn_workspace(policy, task_id):
 
     The client's cwd (or ``--in DIR``) is frozen into the policy at admission, but the terminal tool
     mounts ``resolve_task_overrides(task_id)['cwd']`` into a per-session Docker container. Before the
-    one-gateway runtime each ``hermes chat`` was its own process with its own ``TERMINAL_CWD``; now the
+    one-gateway runtime each ``mbiling chat`` was its own process with its own ``TERMINAL_CWD``; now the
     turn runs here, so register it under the turn's own task id (inside the turn's routed scope, which
     qualifies the key). Docker mounting the host cwd only: the local backend already runs in the
     policy's ``TERMINAL_CWD``, and ssh and the other sandboxes keep their own cwd. Re-registered only

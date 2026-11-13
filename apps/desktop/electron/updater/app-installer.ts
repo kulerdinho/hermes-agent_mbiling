@@ -6,7 +6,7 @@
 //   check()  ask the OS whether an update is available (via the bundled
 //            payload python's winrt), surfacing UNKNOWN honestly;
 //   apply()  stage the descriptor, tear down, open it, and quit with
-//            a pending-relaunch marker so Hermes comes back by itself.
+//            a pending-relaunch marker so Mbiling comes back by itself.
 //
 // Pure-injectable: the impure pieces (python runner, shell, quit, relaunch
 // marker) are injected, so vitest covers the arm without a payload.

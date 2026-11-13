@@ -102,7 +102,7 @@ export const zh: Translations = {
   status: {
     actionFailed: "操作失败",
     actionFinished: "已完成",
-    actionFinishedOwed: "已更新，但仍有待完成的步骤（重新运行 `hermes update` 以完成）",
+    actionFinishedOwed: "已更新，但仍有待完成的步骤（重新运行 `mbiling update` 以完成）",
     actions: "操作",
     agent: "代理",
     activeSessions: "活跃会话",
@@ -128,8 +128,8 @@ export const zh: Translations = {
     starting: "启动中",
     startedInBackground: "已在后台启动 — 请查看日志",
     stopped: "已停止",
-    updateHermes: "更新 Mbiling",
-    updatingHermes: "正在更新 Mbiling…",
+    updateMbiling: "更新 Mbiling",
+    updatingMbiling: "正在更新 Mbiling…",
     waitingForOutput: "等待输出…",
   },
 
@@ -337,7 +337,7 @@ export const zh: Translations = {
     toggleTakesEffectAfterRestart:
       "已保存 — 重启网关以应用更改。",
     forceReinstall: "强制重装（先删除已有目录）",
-    headline: "发现、安装、启用和更新 Mbiling 插件（对齐 `hermes plugins` CLI）。",
+    headline: "发现、安装、启用和更新 Mbiling 插件（对齐 `mbiling plugins` CLI）。",
     identifierLabel: "Git 地址或 owner/repo",
     inactive: "未启用",
     installBtn: "安装",
@@ -354,8 +354,8 @@ export const zh: Translations = {
     providersHint:
       "写入 config.yaml：memory.provider（留空为内置）、context.engine。下次会话生效。",
     refreshDashboard: "重新扫描仪表盘扩展",
-    removeConfirm: "从 ~/.hermes/plugins/ 删除此插件？",
-    removeHint: "仅可移除用户安装在 ~/.hermes/plugins 下的插件。",
+    removeConfirm: "从 ~/.mbiling/plugins/ 删除此插件？",
+    removeHint: "仅可移除用户安装在 ~/.mbiling/plugins 下的插件。",
     rescanHeading: "SPA 插件注册表",
     rescanHint: "在磁盘新增文件后扫描，使侧边栏载入新 manifest。",
     runtimeHeading: "网关运行时（YAML 插件）",
@@ -377,7 +377,7 @@ export const zh: Translations = {
     all: "全部",
     categories: "分类",
     filters: "筛选",
-    noSkills: "未找到技能。技能从 ~/.hermes/skills/ 加载",
+    noSkills: "未找到技能。技能从 ~/.mbiling/skills/ 加载",
     noSkillsMatch: "没有匹配的技能。",
     skillCount: "{count} 个技能",
     resultCount: "{count} 个结果",
@@ -391,7 +391,7 @@ export const zh: Translations = {
   },
 
   config: {
-    configPath: "~/.hermes/config.yaml",
+    configPath: "~/.mbiling/config.yaml",
     filters: "筛选",
     sections: "分类",
     exportConfig: "导出配置为 JSON",
@@ -615,7 +615,7 @@ export const zh: Translations = {
         "「在 X 上分享」会在新标签页中打开预填好的帖子。如果想附上 1200×630 的徽章，请先点击「复制图片」—— X 允许你直接粘贴到推文编辑器中。「下载 PNG」会将文件保存下来，可在任意位置使用。",
       clipboard_unsupported:
         "此浏览器不支持复制剪贴板图片 —— 请改用「下载」。",
-      tweet_text: "Just unlocked {tier_part}\"{name}\" in Mbiling ☤",
+      tweet_text: "Just unlocked {tier_part}\"{name}\" in Mbiling ◉",
     },
   },
 

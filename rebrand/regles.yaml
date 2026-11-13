@@ -70,9 +70,130 @@ images:
     - "apps/desktop/assets/icon.ico"
     - "apps/desktop/assets/icon-dark.ico"
     - "apps/desktop/assets/appx/*.png"
-    - "apps/desktop/public/hermes.png"
+    - "apps/desktop/public/mbiling.png"
     - "apps/desktop/public/apple-touch-icon.png"
+    # Marque affichée dans l'interface (écrans d'accueil, d'installation, de mise à jour).
+    - "apps/desktop/public/nous-girl.png"
+    - "apps/desktop/public/nous-girl-dark.png"
+    - "apps/desktop/public/mbiling-sprite.png"
+    - "apps/desktop/public/mbiling-frames/*.png"
+    - "apps/desktop/assets/icon.icon/Assets/*.png"
+    - "apps/desktop/assets/*.icns"
+    - "apps/bootstrap-installer/public/nous-girl.png"
+    - "apps/bootstrap-installer/src-tauri/icons/*.png"
+    - "apps/bootstrap-installer/src-tauri/icons/icon.ico"
+    - "apps/bootstrap-installer/src-tauri/icons/icon.icns"
+    - "apps/bootstrap-installer/src-tauri/icons/icon.icon/Assets/*.png"
+    - "web/public/favicon.ico"
+    - "website/static/img/favicon.ico"
+    - "website/static/img/favicon-16x16.png"
+    - "website/static/img/favicon-32x32.png"
+    - "website/static/img/apple-touch-icon.png"
+    - "website/static/img/logo.png"
+    - "website/static/img/logo-dark.png"
 
 # Lignes tolérées par « --verifier » (expressions régulières).
 exceptions_verification:
   - "Nous Research"
+
+# ---------------------------------------------------------------------------
+# Niveau 2 (profond) : plus AUCUNE mention « hermes », y compris dans les noms
+# de dossiers, de fichiers, de modules, de variables et d'identifiants.
+# Appliqué par rebrand/appliquer_profond.py.
+#
+# Tout est renommé SAUF ce qui appartient à quelqu'un d'autre et casserait en
+# changeant de nom (adresses de sites externes, paquets tiers, modèles d'IA,
+# identifiants enregistrés auprès de services, indicateurs de sécurité).
+# ---------------------------------------------------------------------------
+profond:
+  # Remplacements prioritaires (expressions régulières, insensibles à la casse).
+  speciaux:
+    # Le dépôt d'origine devient le dépôt Mbiling (mais pas ses dépôts voisins,
+    # par exemple NousResearch/hermes-agent-self-evolution).
+    - ['NousResearch/hermes-agent(?![A-Za-z0-9_-])', 'kulerdinho/mbiling']
+
+  # Identifiants EXTERNES laissés tels quels (expressions régulières, insensibles à la casse).
+  proteges:
+    - 'hermes-(?:estree|parser)'               # paquets npm tiers
+    # Noms de modèles d'IA : Hermes 3, hermes-4-405b, Hermes-4.3-36B, hermes3:70b, DeepHermes-3...
+    # (mais pas les numéros de version « Hermes 0.22.5 » ni « hermes-3.14.exe », « .hermes2 »).
+    - '(?<![.\w])(?:nous[-_ ]?)?(?:deep)?hermes[- ]?[2-5](?:[.][0-9])?(?![0-9A-Za-z])(?![.][0-9])'
+    - 'hermes-0day'                            # nom d'une campagne d'attaque (indicateur de compromission)
+    - '[a-z0-9.-]*hermes[a-z0-9.-]*[.]nousresearch[.]com'   # serveurs de l'éditeur d'origine
+    - 'hermesatlas[.]com'
+    - '["'']hermes-cli(?:-vps)?["'']'          # identifiant client enregistré chez Nous Portal
+
+  # Adresses (URL). Une adresse qui contient « hermes » est :
+  #   - renommée si son schéma ou son hôte est « interne » (protocoles de l'application,
+  #     exemples et hôtes de test) ;
+  #   - redirigée vers le dépôt Mbiling si elle pointe sur le dépôt d'origine (« amont ») ;
+  #   - sinon laissée intacte, octet pour octet (site externe).
+  urls:
+    schemas_internes:
+      - 'hermes(?:-[a-z]+)?'
+      - 'app'
+      - 'systemd'
+      - 'file'
+    hotes_internes:
+      - 'localhost|127[.]0[.]0[.]1|0[.]0[.]0[.]0|host|x'
+      - '(?:.+[.])?example(?:[.](?:com|org|net|test))?'
+      - '.+[.](?:test|local|lan|invalid|internal|localhost|example)'
+      - '(?:[a-z0-9-]+[.])?mbiling[.]com'   # site Mbiling
+    amont:
+      - '(?:www[.])?github[.]com/NousResearch/hermes-agent(?![A-Za-z0-9_-])'
+      - 'raw[.]githubusercontent[.]com/NousResearch/hermes-agent(?![A-Za-z0-9_-])'
+      - 'api[.]github[.]com/repos/NousResearch/hermes-agent(?![A-Za-z0-9_-])'
+      - 'codeload[.]github[.]com/NousResearch/hermes-agent(?![A-Za-z0-9_-])'
+      # Dépôt donné par une variable : l'adresse désigne nos propres fichiers.
+      - '(?:raw[.]githubusercontent|codeload[.]github|(?:api[.])?github)[.]com/(?:repos/)?[$<{%]'
+    # Hôtes externes reconnus même sans « https:// » devant.
+    hotes_sans_schema:
+      - '(?:www[.]|api[.]|gist[.])?github[.]com'
+      - 'raw[.]githubusercontent[.]com'
+      - 'ghcr[.]io'
+      - 'docker[.]io'
+      - 'hub[.]docker[.]com'
+      - 'huggingface[.]co'
+      - '(?:www[.])?npmjs[.]com'
+      - 'pypi[.]org'
+      - '(?:www[.]|old[.])?reddit[.]com'
+      - 'medium[.]com'
+      - 't[.]me'
+      - 'discord[.]gg'
+      - '(?:[a-z0-9-]+[.])*nousresearch[.](?:com|github[.]io)'
+
+  # Symboles de l'ancienne marque remplacés partout (caducée -> cercle).
+  glyphes:
+    - ['☤', '◉']
+
+  # Jamais modifiés ni renommés (mentions légales, attribution des auteurs).
+  exclusions:
+    - "LICENSE"
+    - "NOTICE"
+    - "rebrand/**"
+    - "contributors/**"
+
+# ---------------------------------------------------------------------------
+# Liens : toutes les adresses qui menaient au site de Nous Research mènent
+# désormais au site Mbiling. Le domaine est défini ICI, à un seul endroit.
+# Appliqué par rebrand/rediriger_liens.py, qui écrit aussi la liste des pages
+# que le site Mbiling devra servir : rebrand/liens-mbiling.md.
+# ---------------------------------------------------------------------------
+liens:
+  domaine: "mbiling.com"
+  # [motif (expression régulière, insensible à la casse), remplacement]
+  # {domaine} est remplacé par le domaine ci-dessus.
+  redirections:
+    - ['Docs-hermes--agent[.]nousresearch[.]com', 'Docs-{domaine}']
+    - ['setup[.]hermes-agent[.]nousresearch[.]com', 'setup.{domaine}']
+    - ['hermes-agent[.]nousresearch[.]com', '{domaine}']
+    - ['hermes-assets[.]nousresearch[.]com', 'assets.{domaine}']
+    - ['(?<![\w.-])hermes[.]nousresearch[.]com', '{domaine}']
+    - ['nousresearch[.]github[.]io/hermes-agent', '{domaine}']
+    - ['https?://(?:www[.])?nousresearch[.]com(?![\w.-])', 'https://{domaine}']
+    - ['\b(security|support|info)@nousresearch[.]com', '\1@{domaine}']
+  exclusions:
+    - "LICENSE"
+    - "NOTICE"
+    - "rebrand/**"
+    - "contributors/**"

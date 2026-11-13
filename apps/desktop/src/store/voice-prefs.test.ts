@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from 'vitest'
 
-vi.mock('@/hermes', () => ({
-  getHermesConfigRecord: vi.fn(async () => ({})),
-  saveHermesConfig: vi.fn(async () => undefined)
+vi.mock('@/mbiling', () => ({
+  getMbilingConfigRecord: vi.fn(async () => ({})),
+  saveMbilingConfig: vi.fn(async () => undefined)
 }))
 
-import { saveHermesConfig } from '@/hermes'
 import { isVoiceStopCommand } from '@/lib/voice-stop-word'
+import { saveMbilingConfig } from '@/mbiling'
 
 import {
   $bargeInEnabled,
@@ -34,14 +34,14 @@ it('keeps the desktop toggle local across config refreshes', async () => {
         })
       }
 
-      vi.mocked(saveHermesConfig).mockClear()
+      vi.mocked(saveMbilingConfig).mockClear()
 
       try {
         await prefs.setAutoSpeakReplies(enabled)
         prefs.applyAutoSpeakFromConfig({ voice: { auto_tts: !enabled } })
         expect(prefs.$autoSpeakReplies.get()).toBe(enabled)
-        expect(saveHermesConfig).not.toHaveBeenCalled()
-        expect(localStorage.getItem('hermes.desktop.autoSpeakReplies')).toBe(fails ? null : String(enabled))
+        expect(saveMbilingConfig).not.toHaveBeenCalled()
+        expect(localStorage.getItem('mbiling.desktop.autoSpeakReplies')).toBe(fails ? null : String(enabled))
       } finally {
         write.mockRestore()
       }
@@ -65,11 +65,11 @@ it('migrates the legacy preference once, not on every refresh', async () => {
 
       try {
         prefs.applyAutoSpeakFromConfig(null)
-        expect(localStorage.getItem('hermes.desktop.autoSpeakReplies')).toBeNull()
+        expect(localStorage.getItem('mbiling.desktop.autoSpeakReplies')).toBeNull()
         prefs.applyAutoSpeakFromConfig({ voice: { auto_tts: enabled } })
         prefs.applyAutoSpeakFromConfig({ voice: { auto_tts: !enabled } })
         expect(prefs.$autoSpeakReplies.get()).toBe(enabled)
-        expect(localStorage.getItem('hermes.desktop.autoSpeakReplies')).toBe(fails ? null : String(enabled))
+        expect(localStorage.getItem('mbiling.desktop.autoSpeakReplies')).toBe(fails ? null : String(enabled))
       } finally {
         write.mockRestore()
       }
@@ -89,11 +89,11 @@ describe('applyVoiceStopPhraseFromConfig', () => {
   })
 
   it('uses the first configured phrase so a custom phrase renders correctly', () => {
-    applyVoiceStopPhraseFromConfig({ voice: { stop_phrases: ['goodbye hermes', 'stop'] } })
-    expect($voiceStopPhrase.get()).toBe('goodbye hermes')
+    applyVoiceStopPhraseFromConfig({ voice: { stop_phrases: ['goodbye mbiling', 'stop'] } })
+    expect($voiceStopPhrase.get()).toBe('goodbye mbiling')
     expect($voiceStopPhraseConfig.get()).toEqual({
       mode: 'custom',
-      phrases: ['goodbye hermes', 'stop']
+      phrases: ['goodbye mbiling', 'stop']
     })
   })
 
@@ -117,7 +117,7 @@ describe('applyVoiceStopPhraseFromConfig', () => {
 })
 
 // The live matcher reads the atoms these seed, so drive it through them the way
-// `useHermesConfig` does: `/api/config` (defaults merged in) + `/api/config/defaults`.
+// `useMbilingConfig` does: `/api/config` (defaults merged in) + `/api/config/defaults`.
 describe('spoken stop follows the loaded voice.stop_phrases (#117801)', () => {
   const defaults = { voice: { stop_phrases: ['stop'] } }
 

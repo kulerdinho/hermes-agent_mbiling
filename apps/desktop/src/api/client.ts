@@ -5,10 +5,10 @@ import {
   JsonRpcGatewayClient,
   type ServerRequest,
   type ServerRequestHandler
-} from '@hermes/shared'
+} from '@mbiling/shared'
 import { map, type MapStore } from 'nanostores'
 
-import type { HermesApiRequest } from '@/global'
+import type { MbilingApiRequest } from '@/global'
 
 import { CanonicalDesktopProtocol, canonicalProfile, canonicalPromptParams, canonicalSessionKey, openGatewaySocket, recordCanonicalOwner, splitRewindSubmit } from './canonical-protocol'
 import { DialReadiness, GATEWAY_NOT_CONNECTED_MESSAGE, remainingRequestBudget } from './dial-readiness'
@@ -19,7 +19,7 @@ import { DialReadiness, GATEWAY_NOT_CONNECTED_MESSAGE, remainingRequestBudget } 
 // /api/profiles runs list_profiles(), which does a recursive skill-tree walk
 // per profile — so the 15s default (DEFAULT_FETCH_TIMEOUT_MS in hardening.ts)
 // times out a backend that is alive-but-busy, surfacing as a spurious
-// "Timed out connecting to Hermes backend" that hangs the UI (#48504).
+// "Timed out connecting to Mbiling backend" that hangs the UI (#48504).
 //
 // Give the boot burst a generous per-call timeout instead of raising the
 // global default: interactive/runtime calls and the liveness poll (/api/status)
@@ -61,7 +61,7 @@ const ATTACH_REQUIRED = new Set([
 // (`session_key`) is the same CAS mutation on a sidebar row.
 const PARENT_ATTACH_REQUIRED = new Set(['session.branch_stored', 'session.branch_whole', 'session.workspace.move'])
 
-// Canonical-only identity keys. The legacy `hermes serve` contract refuses an unknown key as
+// Canonical-only identity keys. The legacy `mbiling serve` contract refuses an unknown key as
 // version skew (4000), so they are stripped on a non-canonical dial. `prompt.submit` keeps its
 // `submission_id` on purpose: the submit path retries identityless on that exact refusal and
 // records the send as legacy-attempted, which a silent strip here would hide. A message-level
@@ -90,7 +90,7 @@ function requestDeadline(timeoutMs: number | undefined): number {
 
 export type GatewaySessionWire = 'canonical' | 'legacy'
 
-export class HermesGateway extends JsonRpcGatewayClient {
+export class MbilingGateway extends JsonRpcGatewayClient {
   private canonical = false
   private nativeDial = false
   private readonly readiness = new DialReadiness(() => super.connectionState === 'open')
@@ -642,7 +642,7 @@ export function profileScoped(profile?: null | string): { priority?: 'foreground
  *  a Bot on another connection is (its connection, its profile) — never the
  *  active connection with the Bot's profile name. Missing halves fall back to
  *  the ambient scope; an explicit connection — `'local'` included — overrides
- *  the ambient tag `hermesApi` spreads underneath (as capabilityScoped does). */
+ *  the ambient tag `mbilingApi` spreads underneath (as capabilityScoped does). */
 export interface OwnerScope {
   connectionId?: null | string
   profile?: null | string
@@ -675,12 +675,12 @@ export function resolveOwnerNow(owner?: OwnerScope): ResolvedOwner {
   }
 }
 
-/** `hermesApi` for a resolved owner: its tags are sent verbatim, with no
+/** `mbilingApi` for a resolved owner: its tags are sent verbatim, with no
  *  ambient connection spread underneath. An untagged half stays untagged. A
  *  named profile is always explicit here, so it carries the foreground
  *  priority `profileScoped` gives explicit profiles (voice is user-driven). */
-export function hermesApiAs<T>(owner: ResolvedOwner, request: HermesApiRequest): Promise<T> {
-  return window.hermesDesktop.api<T>({
+export function mbilingApiAs<T>(owner: ResolvedOwner, request: MbilingApiRequest): Promise<T> {
+  return window.mbilingDesktop.api<T>({
     ...(owner.connectionId ? { connectionId: owner.connectionId } : {}),
     ...(owner.profile ? { priority: 'foreground' as const, profile: owner.profile } : {}),
     ...request
@@ -709,7 +709,7 @@ export function setApiRequestConnection(connectionId: null | string): void {
 // Registry connection scope for a REST request. A registered remote gateway
 // owns its own state.db — cron jobs and their run sessions live THERE — so
 // requests for gateway-owned data must carry the connection id for the main
-// process to route them to that host (hermes:api's registry branch). Null
+// process to route them to that host (mbiling:api's registry branch). Null
 // resolves to no tag, keeping single-source users byte-identical; explicit
 // 'local' must remain tagged when the legacy primary points elsewhere.
 export function connectionScoped(): { connectionId?: string } {
@@ -722,7 +722,7 @@ export function connectionScoped(): { connectionId?: string } {
 // store/session's setConnection (same no-store-import contract as profile scope)
 // so api/ helpers can name the backend an UNTAGGED request lands on without
 // importing the heavy session store — which would close a module cycle
-// through @/hermes.
+// through @/mbiling.
 let _apiLocalMode = false
 
 export function setApiRequestLocalMode(local: boolean): void {
@@ -746,8 +746,8 @@ export function ambientOwnerConnectionId(): string | undefined {
  *  pin — `'local'` included — so a pin always overrides the ambient tag spread
  *  underneath it. (It used to omit the key for 'local', which made the pin
  *  unable to beat the ambient tag; helpers then had to bypass this wrapper.) */
-export function hermesApi<T>(request: HermesApiRequest): Promise<T> {
-  return window.hermesDesktop.api<T>({ ...connectionScoped(), ...request })
+export function mbilingApi<T>(request: MbilingApiRequest): Promise<T> {
+  return window.mbilingDesktop.api<T>({ ...connectionScoped(), ...request })
 }
 
 // ── Capability scope: (connection, profile) routing for the Capabilities

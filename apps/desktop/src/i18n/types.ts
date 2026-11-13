@@ -442,7 +442,7 @@ export interface Translations extends NoticeTranslations {
     desktopOutOfDateMessage: string
     updateDesktopApp: string
     installMethodUnsupportedTitle: string
-    updateHermes: string
+    updateMbiling: string
     updateReadyTitle: string
     updateReadyMessage: (count: number) => string
     updateReadyMessageUnknown: string
@@ -471,10 +471,10 @@ export interface Translations extends NoticeTranslations {
       openaiTtsNeedsKey: string
       codeSkewRestartRequired: string
       rpcOutOfSync: string
-      restartHermesFailed: string
+      restartMbilingFailed: string
     }
     actions: {
-      restartHermes: string
+      restartMbiling: string
       openKeys: string
       openGateways: string
       openMaintenance: string
@@ -611,6 +611,7 @@ export interface Translations extends NoticeTranslations {
     pluginPages: Record<'agentSettings' | 'blurb' | 'empty' | 'manage' | 'missing', string> & {
       pageCount: (n: number) => string
     }
+    mains: Record<'tokenAuto' | 'tokenEnrolling' | 'manualToken' | 'title' | 'intro' | 'enabled' | 'statusOff' | 'statusNoToken' | 'statusConnecting' | 'statusConnected' | 'relay' | 'token' | 'tokenPlaceholder' | 'tokenSet' | 'tokenMissing' | 'saveToken' | 'removeToken' | 'folders' | 'noFolders' | 'editPolicy' | 'bash' | 'bashMissing' | 'lastProblem' | 'noProblem' | 'openLog' | 'editSettings' | 'restart', string>
     nav: {
       providers: string
       providerAccounts: string
@@ -628,6 +629,7 @@ export interface Translations extends NoticeTranslations {
       about: string
       billing: string
       notifications: string
+      mains: string
       vault: string
       plugins: string
     }
@@ -1252,9 +1254,9 @@ export interface Translations extends NoticeTranslations {
       sshPortDesc: string
       sshKeyTitle: string
       sshKeyDesc: string
-      sshHermesPathTitle: string
-      sshHermesPathDesc: string
-      sshHermesPathPlaceholder: string
+      sshMbilingPathTitle: string
+      sshMbilingPathDesc: string
+      sshMbilingPathPlaceholder: string
       sshTestConnection: string
       sshConnect: string
       sshButtonsHint: string
@@ -1935,7 +1937,7 @@ export interface Translations extends NoticeTranslations {
         serverStates: {
           connected: string
           app_not_running: string
-          hermes_not_connected: string
+          mbiling_not_connected: string
           endpoint_unavailable: string
           no_interactive_session: string
           version_too_old: string
@@ -2190,7 +2192,7 @@ export interface Translations extends NoticeTranslations {
     noSessions: string
     gatewayRunning: string
     gatewayStopped: string
-    hermesActiveSessions: (version: string, count: number) => string
+    mbilingActiveSessions: (version: string, count: number) => string
     restartGateway: string
     openBrowser: string
     toggleBrowser: string
@@ -2199,7 +2201,7 @@ export interface Translations extends NoticeTranslations {
     sharedGatewayRestartDescription: (bots: string) => string
     sharedGatewayRestartConfirm: string
     sharedGatewayRestarted: (count: number) => string
-    updateHermes: string
+    updateMbiling: string
     reloadWindow: string
     actionRunning: string
     actionDone: string
@@ -3324,6 +3326,7 @@ export interface Translations extends NoticeTranslations {
   }
 
   install: {
+    mbilingSignIn: Record<'title' | 'desc' | 'button' | 'waiting' | 'connecting' | 'allowPc' | 'allowPcHint' | 'unreachable' | 'noSignIn' | 'cancelled' | 'failed' | 'advanced' | 'retry', string>
     stageStates: Record<string, string>
     oneTimeTitle: string
     unsupportedDesc: (platform: string) => string
@@ -3454,7 +3457,7 @@ export interface Translations extends NoticeTranslations {
       notNow: string
     }
     // First-launch set-up failure notice: the free tier could not be created at boot.
-    // One sentence per backend code (`hermes_cli/anon_auth.py::ANON_*`); the copy never says
+    // One sentence per backend code (`mbiling_cli/anon_auth.py::ANON_*`); the copy never says
     // the free MODEL is off — what is unavailable is using Mbiling without signing in.
     setupFailed: {
       gateClosed: string
@@ -3987,8 +3990,8 @@ export interface Translations extends NoticeTranslations {
       /** Error card body when a Nous account is out of credits (its button opens Settings → Billing). */
       errorCompressConversation: string
       errorCompressFailed: string
-      errorOpenHermesFolder: string
-      errorOpenHermesFolderFailed: string
+      errorOpenMbilingFolder: string
+      errorOpenMbilingFolderFailed: string
       errorUpdateApiKey: string
       /** One-click recovery for an expired/revoked OAuth grant: re-runs that
        *  provider's sign-in flow (auth layer, authKind 'oauth'). */

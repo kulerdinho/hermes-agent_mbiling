@@ -19,7 +19,7 @@ export const zhHantDiagnostics = {
     desktopOutOfDateMessage: '此 Mbiling 應用程式早於所連接的後端，可能無法正常運作。請更新應用程式以保持一致。',
     updateDesktopApp: '更新應用程式',
     installMethodUnsupportedTitle: '不受支援的安裝方式',
-    updateHermes: '更新 Mbiling',
+    updateMbiling: '更新 Mbiling',
     updateReadyTitle: '有可用更新',
     updateReadyMessage: count => `有 ${count} 項新變更可用。`,
     updateReadyMessageUnknown: '有新更新可用。',
@@ -98,7 +98,7 @@ export const zhHantDiagnostics = {
     doneDescription: '偵錯套件已私密上傳。在您的支援討論串中分享以下連結，團隊即可檢視您的日誌。',
     failedTitle: '上傳失敗',
     failedHint:
-      '您也可以在終端機執行 `hermes debug share --nous`，或執行 `hermes debug share --local` 在不上傳的情況下檢視報告。',
+      '您也可以在終端機執行 `mbiling debug share --nous`，或執行 `mbiling debug share --local` 在不上傳的情況下檢視報告。',
     handoffLead: '在以下位置繼續討論:',
     links: {
       github: 'GitHub Issues',

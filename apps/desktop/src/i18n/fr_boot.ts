@@ -11,13 +11,13 @@ export const frBoot = {
       loadingSessions: 'Chargement des sessions récentes',
       retryingRemoteBackend: 'Reconnexion au backend Mbiling distant…',
       startingDesktopConnection: 'Démarrage de la connexion desktop',
-      startingHermesDesktop: 'Démarrage de Mbiling Desktop…'
+      startingMbilingDesktop: 'Démarrage de Mbiling Desktop…'
     },
     errors: {
       backgroundExited: "Le processus en arrière-plan de Mbiling s'est arrêté.",
       backgroundExitedDuringStartup: "Le processus en arrière-plan de Mbiling s'est arrêté pendant le démarrage.",
       backendStopped: 'Backend arrêté',
-      restartHermes: 'Redémarrer Mbiling',
+      restartMbiling: 'Redémarrer Mbiling',
       openLogs: 'Ouvrir les journaux',
       desktopBootFailed: 'Échec du démarrage',
       gatewayConnectionLost: 'Connexion au gateway perdue',
@@ -92,7 +92,7 @@ export const frBoot = {
       since: time => `En attente depuis ${time}`,
       lastChecked: time => `Dernière vérification ${time}`,
       recoveryHint:
-        "Cela se règle généralement en quelques minutes. Sinon : quittez Mbiling, arrêtez les processus git ou hermes restants (ou redémarrez l'ordinateur), puis rouvrez Mbiling.",
+        "Cela se règle généralement en quelques minutes. Sinon : quittez Mbiling, arrêtez les processus git ou mbiling restants (ou redémarrez l'ordinateur), puis rouvrez Mbiling.",
       checkAgain: 'Vérifier à nouveau',
       quit: 'Quitter Mbiling',
       openLogs: 'Ouvrir les journaux',

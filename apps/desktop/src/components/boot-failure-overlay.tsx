@@ -98,7 +98,7 @@ export function StartupOverlay() {
 }
 
 /** A Webapp tab without a valid sign-in. The service is running, so there is nothing to recover or
- * dismiss: only hermes webapp signs the tab in. */
+ * dismiss: only mbiling webapp signs the tab in. */
 function WebappSignInOverlay() {
   const copy = useI18n().t.boot.failure
 
@@ -131,6 +131,23 @@ export function BootFailureOverlay() {
   // A remote/cloud backend that failed to boot is fixable from gateway settings,
   // so the escape hatch earns emphasis (local failures keep it as a quiet ghost).
   const [remoteFailure, setRemoteFailure] = useState(false)
+  // Mbiling user builds (connexion_avancee off): only "Sign in" and "Retry" are offered. Safe
+  // default while the setting loads; a bridge without Mbiling settings keeps every action.
+  const [accountOnly, setAccountOnly] = useState(true)
+
+  useEffect(() => {
+    const getDefaults = window.mbilingDesktop?.getDefaultConnection
+
+    if (typeof getDefaults !== 'function') {
+      setAccountOnly(false)
+
+      return
+    }
+
+    void getDefaults()
+      .then(value => setAccountOnly(!value.connexionAvancee))
+      .catch(() => undefined)
+  }, [])
   // A bundled install (payload ships in-app) has no installer to repair with.
   // Read from the bootstrap state snapshot so Repair is never offered there;
   // "Reinstall the app" replaces it only when the payload itself is damaged.
@@ -158,7 +175,7 @@ export function BootFailureOverlay() {
       return
     }
 
-    void window.hermesDesktop
+    void window.mbilingDesktop
       ?.getRecentLogs()
       .then(res => setLogs(res.lines ?? []))
       .catch(() => undefined)
@@ -174,7 +191,7 @@ export function BootFailureOverlay() {
 
     let cancelled = false
 
-    void window.hermesDesktop
+    void window.mbilingDesktop
       ?.getBootstrapState()
       .then(snapshot => {
         if (!cancelled && snapshot) {
@@ -204,7 +221,7 @@ export function BootFailureOverlay() {
     let cancelled = false
 
     void (async () => {
-      const desktop = window.hermesDesktop
+      const desktop = window.mbilingDesktop
 
       if (!desktop?.getConnectionConfig) {
         return
@@ -257,7 +274,7 @@ export function BootFailureOverlay() {
 
   const retry = async () => {
     setBusy('retry')
-    await window.hermesDesktop?.resetBootstrap().catch(() => undefined)
+    await window.mbilingDesktop?.resetBootstrap().catch(() => undefined)
     window.location.reload()
   }
 
@@ -265,11 +282,11 @@ export function BootFailureOverlay() {
     setBusy('repair')
 
     try {
-      if (!window.hermesDesktop?.repairBootstrap) {
+      if (!window.mbilingDesktop?.repairBootstrap) {
         throw new Error(t.boot.errors.ipcBridgeUnavailable)
       }
 
-      const result = await window.hermesDesktop.repairBootstrap()
+      const result = await window.mbilingDesktop.repairBootstrap()
 
       // Main refuses repair on a bundled install (its stamp is authoritative;
       // our snapshot may be stale) — say what to do instead of the raw code.
@@ -292,12 +309,12 @@ export function BootFailureOverlay() {
   const switchToLocalGateway = async () => {
     setBusy('local')
     // Soft apply: tears down the primary and re-dials in place (shell stays).
-    await window.hermesDesktop?.applyConnectionConfig({ mode: 'local' }).catch(() => undefined)
+    await window.mbilingDesktop?.applyConnectionConfig({ mode: 'local' }).catch(() => undefined)
     setBusy(null)
   }
 
   // Clear this gateway's stale auth first, then re-establish it through the
-  // connection's owning login flow. Hermes Cloud must reuse its portal session
+  // connection's owning login flow. Mbiling Cloud must reuse its portal session
   // and per-agent cascade; generic remote gateways use native/embedded OAuth.
   // Reload after success so boot mints a fresh ticket against the new session.
   // The cloud ladder is shared with Settings (reestablishCloudAgentSession) so
@@ -310,7 +327,7 @@ export function BootFailureOverlay() {
     setBusy('signin')
 
     try {
-      const desktop = window.hermesDesktop
+      const desktop = window.mbilingDesktop
 
       let connected: boolean
       // Only the oauth arm reports a reason (DesktopOauthLoginResult.error);
@@ -365,7 +382,7 @@ export function BootFailureOverlay() {
     }
   }
 
-  const openLogs = () => void window.hermesDesktop?.revealLogs().catch(() => undefined)
+  const openLogs = () => void window.mbilingDesktop?.revealLogs().catch(() => undefined)
 
   const dismiss = () => setDismissedError(boot.error)
 
@@ -501,6 +518,19 @@ export function BootFailureOverlay() {
 
     actions = [retryAction, ...(fixAction ? [fixAction] : []), { ...settingsAction, variant: 'ghost' }]
     hint = damagedPayload ? copy.bundledReinstallHint : bundled ? '' : copy.repairHint
+  }
+
+  if (accountOnly) {
+    // Mbiling user builds only work signed in to the cloud account: no local engine to repair or
+    // switch to, no manual gateway settings, no former publisher's portal or community links.
+    // What is left: sign in again (lapsed session) and retry (server back up).
+    actions = actions.filter(action => action.key === 'signin' || action.key === 'retry')
+
+    if (!actions.some(action => action.key === 'retry')) {
+      actions.push({ ...retryAction, variant: actions.length ? 'secondary' : undefined })
+    }
+
+    hint = remoteReauth ? hint : ''
   }
 
   if (view === 'connect') {

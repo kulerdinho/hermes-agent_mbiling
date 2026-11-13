@@ -46,7 +46,7 @@ function installDesktopMock(state: DesktopBootstrapState) {
     }
   }
 
-  Object.defineProperty(window, 'hermesDesktop', {
+  Object.defineProperty(window, 'mbilingDesktop', {
     configurable: true,
     value: desktop
   })
@@ -88,7 +88,7 @@ beforeEach(() => {
 afterEach(() => {
   cleanup()
   vi.useRealTimers()
-  Reflect.deleteProperty(window, 'hermesDesktop')
+  Reflect.deleteProperty(window, 'mbilingDesktop')
 })
 
 describe('DesktopInstallOverlay first-run setup', () => {
@@ -97,7 +97,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
       bootstrapState({
         setupChoice: {
           platform: 'win32',
-          activeRoot: 'C:\\Users\\me\\AppData\\Local\\hermes\\hermes-agent',
+          activeRoot: 'C://Users//me//AppData//Local//mbiling//mbiling-agent',
           local: 'none',
           bundled: false
         }
@@ -119,7 +119,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
       bootstrapState({
         setupChoice: {
           platform: 'win32',
-          activeRoot: 'C:\\Users\\me\\AppData\\Local\\hermes\\hermes-agent',
+          activeRoot: 'C://Users//me//AppData//Local//mbiling//mbiling-agent',
           local: 'none',
           bundled: false
         }
@@ -146,7 +146,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
       bootstrapState({
         setupChoice: {
           platform: 'win32',
-          activeRoot: 'C:\\Users\\me\\AppData\\Local\\hermes\\hermes-agent',
+          activeRoot: 'C://Users//me//AppData//Local//mbiling//mbiling-agent',
           local: 'none',
           bundled: false
         }
@@ -170,7 +170,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
       bootstrapState({
         setupChoice: {
           platform: 'win32',
-          activeRoot: 'C:\\Users\\me\\AppData\\Local\\hermes\\hermes-agent',
+          activeRoot: 'C://Users//me//AppData//Local//mbiling//mbiling-agent',
           local: 'none',
           bundled: false
         }
@@ -198,7 +198,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
       bootstrapState({
         setupChoice: {
           platform: 'win32',
-          activeRoot: 'C:\\Users\\me\\AppData\\Local\\hermes\\hermes-agent',
+          activeRoot: 'C://Users//me//AppData//Local//mbiling//mbiling-agent',
           local: 'none',
           bundled: false
         }
@@ -218,7 +218,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
         type: 'setup-choice',
         active: false,
         platform: 'win32',
-        activeRoot: 'C:\\Users\\me\\AppData\\Local\\hermes\\hermes-agent-repaired'
+        activeRoot: 'C://Users//me//AppData//Local//mbiling//mbiling-agent-repaired'
       })
     })
 
@@ -228,7 +228,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
   it('opens the remote connection form from the first-run choice', async () => {
     installDesktopMock(
       bootstrapState({
-        setupChoice: { platform: 'linux', activeRoot: '/home/me/.hermes/hermes-agent', local: 'none', bundled: false }
+        setupChoice: { platform: 'linux', activeRoot: '/home/me/.mbiling/mbiling-agent', local: 'none', bundled: false }
       })
     )
 
@@ -244,7 +244,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
   it('returns from the remote connection form to the first-run choice', async () => {
     installDesktopMock(
       bootstrapState({
-        setupChoice: { platform: 'linux', activeRoot: '/home/me/.hermes/hermes-agent', local: 'none', bundled: false }
+        setupChoice: { platform: 'linux', activeRoot: '/home/me/.mbiling/mbiling-agent', local: 'none', bundled: false }
       })
     )
 
@@ -262,20 +262,20 @@ describe('DesktopInstallOverlay first-run setup', () => {
   it('requires a successful token connection test before applying remote config', async () => {
     const desktop = installDesktopMock(
       bootstrapState({
-        setupChoice: { platform: 'linux', activeRoot: '/home/me/.hermes/hermes-agent', local: 'none', bundled: false }
+        setupChoice: { platform: 'linux', activeRoot: '/home/me/.mbiling/mbiling-agent', local: 'none', bundled: false }
       })
     )
 
     desktop.probeConnectionConfig.mockResolvedValue({
       authMode: 'token',
-      baseUrl: 'https://gateway.example.com/hermes',
+      baseUrl: 'https://gateway.example.com/mbiling',
       error: null,
       providers: [],
       reachable: true,
       version: '0.17.0'
     })
     desktop.testConnectionConfig.mockResolvedValue({
-      baseUrl: 'https://gateway.example.com/hermes',
+      baseUrl: 'https://gateway.example.com/mbiling',
       ok: true,
       version: '0.17.0'
     })
@@ -288,8 +288,8 @@ describe('DesktopInstallOverlay first-run setup', () => {
     render(<DesktopInstallOverlay />)
 
     fireEvent.click(await screen.findByText('Connect to existing Mbiling'))
-    fireEvent.change(await screen.findByPlaceholderText('https://gateway.example.com/hermes'), {
-      target: { value: 'https://gateway.example.com/hermes' }
+    fireEvent.change(await screen.findByPlaceholderText('https://gateway.example.com/mbiling'), {
+      target: { value: 'https://gateway.example.com/mbiling' }
     })
 
     const apply = screen.getByText('Apply and reconnect').closest('button') as HTMLButtonElement
@@ -309,11 +309,11 @@ describe('DesktopInstallOverlay first-run setup', () => {
         mode: 'remote',
         remoteAuthMode: 'token',
         remoteToken: 'session-secret',
-        remoteUrl: 'https://gateway.example.com/hermes'
+        remoteUrl: 'https://gateway.example.com/mbiling'
       })
     })
 
-    await screen.findByText('Connected to https://gateway.example.com/hermes (0.17.0).')
+    await screen.findByText('Connected to https://gateway.example.com/mbiling (0.17.0).')
     expect(apply.disabled).toBe(false)
 
     fireEvent.click(screen.getByText('Apply and reconnect'))
@@ -323,7 +323,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
         mode: 'remote',
         remoteAuthMode: 'token',
         remoteToken: 'session-secret',
-        remoteUrl: 'https://gateway.example.com/hermes'
+        remoteUrl: 'https://gateway.example.com/mbiling'
       })
     })
     await waitFor(() => expect(screen.queryByText('Gateway URL')).toBeNull())
@@ -332,20 +332,20 @@ describe('DesktopInstallOverlay first-run setup', () => {
   it('restores remote apply controls when applying the tested connection fails', async () => {
     const desktop = installDesktopMock(
       bootstrapState({
-        setupChoice: { platform: 'linux', activeRoot: '/home/me/.hermes/hermes-agent', local: 'none', bundled: false }
+        setupChoice: { platform: 'linux', activeRoot: '/home/me/.mbiling/mbiling-agent', local: 'none', bundled: false }
       })
     )
 
     desktop.probeConnectionConfig.mockResolvedValue({
       authMode: 'token',
-      baseUrl: 'https://gateway.example.com/hermes',
+      baseUrl: 'https://gateway.example.com/mbiling',
       error: null,
       providers: [],
       reachable: true,
       version: '0.17.0'
     })
     desktop.testConnectionConfig.mockResolvedValue({
-      baseUrl: 'https://gateway.example.com/hermes',
+      baseUrl: 'https://gateway.example.com/mbiling',
       ok: true,
       version: '0.17.0'
     })
@@ -354,8 +354,8 @@ describe('DesktopInstallOverlay first-run setup', () => {
     render(<DesktopInstallOverlay />)
 
     fireEvent.click(await screen.findByText('Connect to existing Mbiling'))
-    fireEvent.change(await screen.findByPlaceholderText('https://gateway.example.com/hermes'), {
-      target: { value: 'https://gateway.example.com/hermes' }
+    fireEvent.change(await screen.findByPlaceholderText('https://gateway.example.com/mbiling'), {
+      target: { value: 'https://gateway.example.com/mbiling' }
     })
 
     await act(async () => {
@@ -366,7 +366,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
       target: { value: 'session-secret' }
     })
     fireEvent.click(screen.getByText('Test connection'))
-    await screen.findByText('Connected to https://gateway.example.com/hermes (0.17.0).')
+    await screen.findByText('Connected to https://gateway.example.com/mbiling (0.17.0).')
 
     const apply = screen.getByText('Apply and reconnect').closest('button') as HTMLButtonElement
     fireEvent.click(apply)
@@ -379,25 +379,25 @@ describe('DesktopInstallOverlay first-run setup', () => {
   it('signs in, tests, and applies a password-style remote gateway', async () => {
     const desktop = installDesktopMock(
       bootstrapState({
-        setupChoice: { platform: 'linux', activeRoot: '/home/me/.hermes/hermes-agent', local: 'none', bundled: false }
+        setupChoice: { platform: 'linux', activeRoot: '/home/me/.mbiling/mbiling-agent', local: 'none', bundled: false }
       })
     )
 
     desktop.probeConnectionConfig.mockResolvedValue({
       authMode: 'oauth',
-      baseUrl: 'https://gateway.example.com/hermes',
+      baseUrl: 'https://gateway.example.com/mbiling',
       error: null,
       providers: [{ displayName: 'Username & Password', name: 'password', supportsPassword: true }],
       reachable: true,
       version: '0.17.0'
     })
     desktop.oauthLoginConnectionConfig.mockResolvedValue({
-      baseUrl: 'https://gateway.example.com/hermes',
+      baseUrl: 'https://gateway.example.com/mbiling',
       connected: true,
       ok: true
     })
     desktop.testConnectionConfig.mockResolvedValue({
-      baseUrl: 'https://gateway.example.com/hermes',
+      baseUrl: 'https://gateway.example.com/mbiling',
       ok: true,
       version: null
     })
@@ -406,8 +406,8 @@ describe('DesktopInstallOverlay first-run setup', () => {
     render(<DesktopInstallOverlay />)
 
     fireEvent.click(await screen.findByText('Connect to existing Mbiling'))
-    fireEvent.change(await screen.findByPlaceholderText('https://gateway.example.com/hermes'), {
-      target: { value: 'https://gateway.example.com/hermes' }
+    fireEvent.change(await screen.findByPlaceholderText('https://gateway.example.com/mbiling'), {
+      target: { value: 'https://gateway.example.com/mbiling' }
     })
 
     await act(async () => {
@@ -418,7 +418,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
     fireEvent.click(await screen.findByText('Sign in'))
 
     await waitFor(() => {
-      expect(desktop.oauthLoginConnectionConfig).toHaveBeenCalledWith('https://gateway.example.com/hermes')
+      expect(desktop.oauthLoginConnectionConfig).toHaveBeenCalledWith('https://gateway.example.com/mbiling')
     })
 
     fireEvent.click(screen.getByText('Test connection'))
@@ -428,11 +428,11 @@ describe('DesktopInstallOverlay first-run setup', () => {
         mode: 'remote',
         remoteAuthMode: 'oauth',
         remoteToken: undefined,
-        remoteUrl: 'https://gateway.example.com/hermes'
+        remoteUrl: 'https://gateway.example.com/mbiling'
       })
     })
 
-    await screen.findByText('Connected to https://gateway.example.com/hermes.')
+    await screen.findByText('Connected to https://gateway.example.com/mbiling.')
     const apply = screen.getByText('Apply and reconnect').closest('button') as HTMLButtonElement
     expect(apply.disabled).toBe(false)
     fireEvent.click(apply)
@@ -442,7 +442,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
         mode: 'remote',
         remoteAuthMode: 'oauth',
         remoteToken: undefined,
-        remoteUrl: 'https://gateway.example.com/hermes'
+        remoteUrl: 'https://gateway.example.com/mbiling'
       })
     })
   })
@@ -450,7 +450,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
   it('does not authorize a new URL with an old login result or save before Apply', async () => {
     const desktop = installDesktopMock(
       bootstrapState({
-        setupChoice: { platform: 'linux', activeRoot: '/tmp/hermes', local: 'none', bundled: false }
+        setupChoice: { platform: 'linux', activeRoot: '/tmp/mbiling', local: 'none', bundled: false }
       })
     )
 
@@ -472,7 +472,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
     )
     render(<DesktopInstallOverlay />)
     fireEvent.click(await screen.findByText('Connect to existing Mbiling'))
-    const url = screen.getByPlaceholderText('https://gateway.example.com/hermes')
+    const url = screen.getByPlaceholderText('https://gateway.example.com/mbiling')
     fireEvent.change(url, { target: { value: 'https://a.example' } })
     fireEvent.click(await screen.findByRole('button', { name: /Sign in with/ }))
     await waitFor(() => expect(desktop.oauthLoginConnectionConfig).toHaveBeenCalledWith('https://a.example'))
@@ -494,7 +494,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
       bootstrapState({
         unsupportedPlatform: {
           platform: 'darwin',
-          activeRoot: '/Users/me/.hermes/hermes-agent',
+          activeRoot: '/Users/me/.mbiling/mbiling-agent',
           installCommand: 'curl -fsSL https://example.invalid/install.sh | sh',
           docsUrl: 'https://example.invalid/docs'
         }
@@ -511,14 +511,14 @@ describe('DesktopInstallOverlay first-run setup', () => {
 
     desktop.probeConnectionConfig.mockResolvedValue({
       authMode: 'token',
-      baseUrl: 'https://gateway.example.com/hermes',
+      baseUrl: 'https://gateway.example.com/mbiling',
       error: null,
       providers: [],
       reachable: true,
       version: '0.17.0'
     })
     desktop.testConnectionConfig.mockResolvedValue({
-      baseUrl: 'https://gateway.example.com/hermes',
+      baseUrl: 'https://gateway.example.com/mbiling',
       ok: true,
       version: '0.17.0'
     })
@@ -528,8 +528,8 @@ describe('DesktopInstallOverlay first-run setup', () => {
       return { mode: 'remote' }
     })
 
-    fireEvent.change(screen.getByPlaceholderText('https://gateway.example.com/hermes'), {
-      target: { value: 'https://gateway.example.com/hermes' }
+    fireEvent.change(screen.getByPlaceholderText('https://gateway.example.com/mbiling'), {
+      target: { value: 'https://gateway.example.com/mbiling' }
     })
 
     await act(async () => {
@@ -540,7 +540,7 @@ describe('DesktopInstallOverlay first-run setup', () => {
       target: { value: 'session-secret' }
     })
     fireEvent.click(screen.getByText('Test connection'))
-    await screen.findByText('Connected to https://gateway.example.com/hermes (0.17.0).')
+    await screen.findByText('Connected to https://gateway.example.com/mbiling (0.17.0).')
     fireEvent.click(screen.getByText('Apply and reconnect'))
 
     await waitFor(() => expect(screen.queryByText('Gateway URL')).toBeNull())
@@ -590,7 +590,7 @@ it.each([
     footer: boolean
   ): Promise<void> => {
     const state: DesktopBootstrapState = bootstrapState({
-      setupChoice: { platform: 'win32', activeRoot: 'C:\\Mbiling', local: local ?? 'none', bundled }
+      setupChoice: { platform: 'win32', activeRoot: 'C://Mbiling', local: local ?? 'none', bundled }
     })
 
     if (local === undefined && state.setupChoice) {
@@ -608,3 +608,155 @@ it.each([
     }
   }
 )
+
+describe('DesktopInstallOverlay Mbiling first launch (sign-in only)', () => {
+  const choice = { platform: 'win32', activeRoot: 'C:/Users/me/.mbiling', local: 'none', bundled: false } as const
+  const BASE = 'https://api.mbiling.test'
+
+  function signInMock(
+    options: {
+      clientLeger?: boolean
+      connexionAvancee?: boolean
+      reachable?: boolean
+      authMode?: 'oauth' | 'token'
+      connected?: boolean
+    } = {}
+  ) {
+    const desktop = installDesktopMock(bootstrapState({ setupChoice: choice }))
+    const calls = {
+      getDefaultConnection: vi.fn().mockResolvedValue({
+        adresse: BASE,
+        clientLeger: options.clientLeger ?? false,
+        connexionAvancee: options.connexionAvancee ?? false
+      }),
+      consent: vi.fn().mockResolvedValue({}),
+      apply: vi.fn().mockResolvedValue({})
+    }
+    Object.assign(desktop, {
+      getDefaultConnection: calls.getDefaultConnection,
+      probeConnectionConfig: vi.fn().mockResolvedValue({
+        baseUrl: BASE,
+        reachable: options.reachable ?? true,
+        authMode: options.authMode ?? 'oauth',
+        providers: [],
+        version: null,
+        error: null
+      }),
+      oauthLoginConnectionConfig: vi.fn().mockResolvedValue({ ok: true, baseUrl: BASE, connected: options.connected ?? true }),
+      applyConnectionConfig: calls.apply,
+      mains: { consent: calls.consent }
+    })
+
+    return { desktop, calls }
+  }
+
+  it('shows a single sign-in button, with no address or token field', async () => {
+    signInMock()
+    render(<DesktopInstallOverlay />)
+
+    expect(await screen.findByText('Sign in to Mbiling')).toBeTruthy()
+    expect(screen.queryByText('Gateway URL')).toBeNull()
+    expect(screen.queryByText('Install Mbiling locally')).toBeNull()
+    expect(document.querySelector('input[type="text"], input[type="password"], input:not([type])')).toBeNull()
+  })
+
+  it('signs in through the browser, records the PC consent, then applies the connection', async () => {
+    const { desktop, calls } = signInMock()
+    render(<DesktopInstallOverlay />)
+
+    fireEvent.click(await screen.findByText('Sign in to Mbiling'))
+
+    await waitFor(() => expect(calls.apply).toHaveBeenCalledTimes(1))
+    expect(desktop.probeConnectionConfig).toHaveBeenCalledWith(BASE)
+    expect(desktop.oauthLoginConnectionConfig).toHaveBeenCalledWith(BASE)
+    expect(calls.consent).toHaveBeenCalledWith(true)
+    expect(calls.apply).toHaveBeenCalledWith({ mode: 'remote', remoteAuthMode: 'oauth', remoteUrl: BASE })
+    expect(calls.consent.mock.invocationCallOrder[0]).toBeLessThan(calls.apply.mock.invocationCallOrder[0])
+  })
+
+  it('respects an unticked "allow this PC" box', async () => {
+    const { calls } = signInMock()
+    render(<DesktopInstallOverlay />)
+
+    fireEvent.click(await screen.findByRole('checkbox'))
+    fireEvent.click(screen.getByText('Sign in to Mbiling'))
+
+    await waitFor(() => expect(calls.apply).toHaveBeenCalledTimes(1))
+    expect(calls.consent).toHaveBeenCalledWith(false)
+  })
+
+  it('explains an unreachable server and applies nothing', async () => {
+    const { calls } = signInMock({ reachable: false })
+    render(<DesktopInstallOverlay />)
+
+    fireEvent.click(await screen.findByText('Sign in to Mbiling'))
+
+    expect(await screen.findByText(/can't be reached right now/)).toBeTruthy()
+    expect(calls.apply).not.toHaveBeenCalled()
+  })
+
+  it('does not apply anything when the browser sign-in is not completed', async () => {
+    const { calls } = signInMock({ connected: false })
+    render(<DesktopInstallOverlay />)
+
+    fireEvent.click(await screen.findByText('Sign in to Mbiling'))
+
+    expect(await screen.findByText("Sign-in wasn't completed. Try again.")).toBeTruthy()
+    expect(calls.apply).not.toHaveBeenCalled()
+    expect(calls.consent).not.toHaveBeenCalled()
+  })
+
+  it('says so when the server offers no account sign-in', async () => {
+    const { calls } = signInMock({ authMode: 'token' })
+    render(<DesktopInstallOverlay />)
+
+    fireEvent.click(await screen.findByText('Sign in to Mbiling'))
+
+    expect(await screen.findByText("This Mbiling server doesn't offer account sign-in yet.")).toBeTruthy()
+    expect(calls.apply).not.toHaveBeenCalled()
+  })
+
+  it('offers no manual connection and no local install to users', async () => {
+    signInMock()
+    render(<DesktopInstallOverlay />)
+
+    expect(await screen.findByText('Sign in to Mbiling')).toBeTruthy()
+    expect(screen.queryByText('Advanced connection settings')).toBeNull()
+    expect(screen.queryByText('Install Mbiling locally')).toBeNull()
+  })
+
+  it('stays on sign-in even with no address configured, when manual connection is off', async () => {
+    const desktop = installDesktopMock(bootstrapState({ setupChoice: choice }))
+    Object.assign(desktop, {
+      getDefaultConnection: vi.fn().mockResolvedValue({ adresse: '', clientLeger: false, connexionAvancee: false })
+    })
+    render(<DesktopInstallOverlay />)
+
+    fireEvent.click(await screen.findByText('Sign in to Mbiling'))
+    expect(await screen.findByText("This Mbiling server doesn't offer account sign-in yet.")).toBeTruthy()
+    expect(screen.queryByText('Install Mbiling locally')).toBeNull()
+  })
+
+  it('team builds keep the address form behind Advanced, prefilled, and come back to sign-in (light build)', async () => {
+    signInMock({ clientLeger: true, connexionAvancee: true })
+    render(<DesktopInstallOverlay />)
+
+    fireEvent.click(await screen.findByText('Advanced connection settings'))
+    expect(await screen.findByDisplayValue(BASE)).toBeTruthy()
+    expect(screen.queryByText('Install Mbiling locally')).toBeNull()
+
+    fireEvent.click(screen.getByText('Back'))
+    expect(await screen.findByText('Sign in to Mbiling')).toBeTruthy()
+  })
+
+  it('team builds with no address configured keep the original setup choice', async () => {
+    const desktop = installDesktopMock(bootstrapState({ setupChoice: choice }))
+    Object.assign(desktop, {
+      getDefaultConnection: vi.fn().mockResolvedValue({ adresse: '', clientLeger: false, connexionAvancee: true })
+    })
+    render(<DesktopInstallOverlay />)
+
+    expect(await screen.findByText('Install Mbiling locally')).toBeTruthy()
+    expect(screen.queryByText('Sign in to Mbiling')).toBeNull()
+  })
+})

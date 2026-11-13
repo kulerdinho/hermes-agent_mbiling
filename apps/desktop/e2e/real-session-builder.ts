@@ -51,7 +51,7 @@ export interface RealSession {
 
 /**
  * Creates durable desktop session history through the real TUI gateway and
- * AIAgent loop, using the E2E mock provider configured in `hermesHome`.
+ * AIAgent loop, using the E2E mock provider configured in `mbilingHome`.
  *
  * This intentionally uses the shipped stdio JSON-RPC transport instead of
  * importing SessionDB or launching Electron. The desktop's WebSocket backend
@@ -70,12 +70,12 @@ export class RealSessionBuilder {
   private readonly stderr: string[] = []
   private closed = false
 
-  private constructor(hermesHome: string) {
+  private constructor(mbilingHome: string) {
     this.child = spawn('uv', ['run', '--active', '--no-sync', 'python', '-m', 'tui_gateway.entry'], {
       cwd: REPO_ROOT,
       env: {
         ...process.env,
-        HERMES_HOME: hermesHome,
+        MBILING_HOME: mbilingHome,
         PYTHONPATH: REPO_ROOT,
       },
       stdio: 'pipe',
@@ -84,7 +84,7 @@ export class RealSessionBuilder {
     createInterface({ input: this.child.stdout }).on('line', line => this.handleLine(line))
     createInterface({ input: this.child.stderr }).on('line', line => {
       this.stderr.push(line)
-      if (this.stderr.length > 80) this.stderr.shift()
+      if (this.stderr.length > 80) {this.stderr.shift()}
     })
     this.child.once('error', error => this.failAll(new Error(`real-session gateway failed to start: ${error.message}`)))
     this.child.once('exit', (code, signal) => {
@@ -94,8 +94,8 @@ export class RealSessionBuilder {
     })
   }
 
-  static async start(hermesHome: string): Promise<RealSessionBuilder> {
-    const builder = new RealSessionBuilder(hermesHome)
+  static async start(mbilingHome: string): Promise<RealSessionBuilder> {
+    const builder = new RealSessionBuilder(mbilingHome)
     await builder.waitForEvent(frame => frame.params?.type === 'gateway.ready')
     return builder
   }
@@ -137,7 +137,7 @@ export class RealSessionBuilder {
   }
 
   async close(): Promise<void> {
-    if (this.closed) return
+    if (this.closed) {return}
     this.closed = true
     this.child.stdin.end()
     await new Promise<void>(resolve => {
@@ -185,7 +185,7 @@ export class RealSessionBuilder {
 
     if (typeof frame.id === 'number') {
       const pending = this.pending.get(frame.id)
-      if (!pending) return
+      if (!pending) {return}
       this.pending.delete(frame.id)
       if (frame.error) {
         pending.reject(new Error(`JSON-RPC error ${frame.error.code ?? 'unknown'}: ${frame.error.message ?? 'unknown error'}`))
@@ -195,7 +195,7 @@ export class RealSessionBuilder {
       return
     }
 
-    if (frame.method !== 'event') return
+    if (frame.method !== 'event') {return}
     const waiter = this.eventWaiters.find(candidate => candidate.predicate(frame))
     if (!waiter) {
       this.events.push(frame)
@@ -219,21 +219,21 @@ export class RealSessionBuilder {
   }
 
   private failAll(error: Error): void {
-    for (const pending of this.pending.values()) pending.reject(error)
+    for (const pending of this.pending.values()) {pending.reject(error)}
     this.pending.clear()
-    for (const waiter of this.eventWaiters) waiter.reject(error)
+    for (const waiter of this.eventWaiters) {waiter.reject(error)}
     this.eventWaiters.length = 0
   }
 }
 
 function readString(value: unknown, key: string): string | undefined {
-  if (!value || typeof value !== 'object') return undefined
+  if (!value || typeof value !== 'object') {return undefined}
   const candidate = (value as Record<string, unknown>)[key]
   return typeof candidate === 'string' ? candidate : undefined
 }
 
 function requireString(value: unknown, key: string): string {
   const candidate = readString(value, key)
-  if (!candidate) throw new Error(`Gateway response omitted required ${key}: ${JSON.stringify(value)}`)
+  if (!candidate) {throw new Error(`Gateway response omitted required ${key}: ${JSON.stringify(value)}`)}
   return candidate
 }

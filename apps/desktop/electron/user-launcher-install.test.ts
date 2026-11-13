@@ -13,15 +13,15 @@ afterEach((): void => {
 })
 
 function sourceTree(root: string): void {
-  fs.mkdirSync(path.join(root, 'hermes_cli'), { recursive: true })
+  fs.mkdirSync(path.join(root, 'mbiling_cli'), { recursive: true })
   fs.mkdirSync(path.join(root, 'pm'))
-  fs.writeFileSync(path.join(root, 'hermes_cli', 'main.py'), '')
-  fs.writeFileSync(path.join(root, 'hermes_cli', '_launchers.py'), '')
+  fs.writeFileSync(path.join(root, 'mbiling_cli', 'main.py'), '')
+  fs.writeFileSync(path.join(root, 'mbiling_cli', '_launchers.py'), '')
 }
 
 function publishLauncher(dir: string, reported: string): string {
   fs.mkdirSync(dir, { recursive: true })
-  const launcher: string = path.join(dir, process.platform === 'win32' ? 'hermes.cmd' : 'hermes')
+  const launcher: string = path.join(dir, process.platform === 'win32' ? 'mbiling.cmd' : 'mbiling')
 
   const body: string =
     process.platform === 'win32'
@@ -33,8 +33,8 @@ function publishLauncher(dir: string, reported: string): string {
   return launcher
 }
 
-// The reported machine: setup-hermes.sh published ~/.local/bin/hermes for a
-// clone outside ~/.hermes/hermes-agent, and a Finder/Dock launch inherited
+// The reported machine: setup-mbiling.sh published ~/.local/bin/mbiling for a
+// clone outside ~/.mbiling/mbiling-agent, and a Finder/Dock launch inherited
 // launchd's PATH, which has no ~/.local/bin. Desktop must still find it.
 test.skipIf(process.platform === 'win32')(
   'a ~/.local/bin launcher resolves its non-canonical install on a GUI PATH without ~/.local/bin',
@@ -43,18 +43,18 @@ test.skipIf(process.platform === 'win32')(
 
     try {
       const home: string = path.join(base, 'home')
-      const root: string = path.join(home, 'src', 'hermes-agent')
+      const root: string = path.join(home, 'src', 'mbiling-agent')
       sourceTree(root)
       const launcher: string = publishLauncher(path.join(home, '.local', 'bin'), root)
       vi.stubEnv('HOME', home)
       vi.stubEnv('PATH', '/usr/bin:/bin:/usr/sbin:/sbin')
 
-      const found = userLauncherInstallRoot(false, path.join(home, '.hermes'))
+      const found = userLauncherInstallRoot(false, path.join(home, '.mbiling'))
       assert.deepEqual(found, { launcher, root })
 
       const backend = await resolveSourceInstallationBackend(root, ['serve'], {
         isWindows: false,
-        hermesHome: path.join(home, '.hermes')
+        mbilingHome: path.join(home, '.mbiling')
       })
 
       assert.equal(backend?.command, launcher)
@@ -71,18 +71,18 @@ test('a user-bin launcher is ignored when it reports no Mbiling source tree', ()
 
   try {
     const home: string = path.join(base, 'home')
-    const hermesHome: string = path.join(home, '.hermes')
+    const mbilingHome: string = path.join(home, '.mbiling')
     const notSource: string = path.join(base, 'elsewhere')
     fs.mkdirSync(notSource)
-    publishLauncher(path.join(hermesHome, 'bin'), notSource)
+    publishLauncher(path.join(mbilingHome, 'bin'), notSource)
     vi.stubEnv('HOME', home)
     vi.stubEnv('USERPROFILE', home)
     vi.stubEnv('LOCALAPPDATA', path.join(home, 'AppData', 'Local'))
 
-    assert.equal(userLauncherInstallRoot(process.platform === 'win32', hermesHome), null)
+    assert.equal(userLauncherInstallRoot(process.platform === 'win32', mbilingHome), null)
 
     sourceTree(notSource)
-    assert.equal(userLauncherInstallRoot(process.platform === 'win32', hermesHome)?.root, notSource)
+    assert.equal(userLauncherInstallRoot(process.platform === 'win32', mbilingHome)?.root, notSource)
   } finally {
     fs.rmSync(base, { recursive: true, force: true })
   }

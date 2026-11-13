@@ -1,7 +1,6 @@
-import { type PromptSubmitResult, randomUuid } from '@hermes/shared'
+import { type PromptSubmitResult, randomUuid } from '@mbiling/shared'
 import { type MutableRefObject, useCallback } from 'react'
 
-import { getSession, PROMPT_SUBMIT_REQUEST_TIMEOUT_MS } from '@/hermes'
 import { translateNow, type Translations } from '@/i18n'
 import { type ChatMessage, finalizeInterruptedMessages, textPart } from '@/lib/chat-messages'
 import { optimisticAttachmentRef } from '@/lib/chat-runtime'
@@ -13,6 +12,7 @@ import {
   stopVoicePlayback,
   takeVoicePlaybackInterrupted
 } from '@/lib/voice-playback'
+import { getSession, PROMPT_SUBMIT_REQUEST_TIMEOUT_MS } from '@/mbiling'
 import {
   $composerAttachments,
   type ComposerAttachment,
@@ -41,7 +41,7 @@ import {
 } from '@/store/session'
 import { profileScopeForSessionOwner } from '@/store/session-request-router'
 import { $sessionStates, $sessionTiles } from '@/store/session-states'
-import type { SessionInfo } from '@/types/hermes'
+import type { SessionInfo } from '@/types/mbiling'
 
 import { cronRunWriteGateApplies, refreshCronRunWriteGate } from '../../../cron/open-cron-run'
 import type { ClientSessionState } from '../../../types'
@@ -1091,7 +1091,7 @@ export function useSubmitPrompt(deps: SubmitPromptDeps) {
           // row display_kind=hidden so no client renders it as a bubble.
           ...(options?.displayKind === 'hidden' && { display_kind: 'hidden' }),
           // Typed into the floating HUD, so the user is looking at another app
-          // rather than at Hermes. The gateway turns this into a per-turn hint
+          // rather than at Mbiling. The gateway turns this into a per-turn hint
           // to read the window underneath and work in it.
           ...($hudMode.get() && { surface: 'hud' }),
           // A GPT-Live delegation: the text is a voice transcript and the reply
@@ -1166,7 +1166,7 @@ export function useSubmitPrompt(deps: SubmitPromptDeps) {
                   }
 
                   // 4094 is an explicit PRE-admission capability refusal; 4000 is the
-                  // legacy `hermes serve` contract refusing `submission_id` as an unknown
+                  // legacy `mbiling serve` contract refusing `submission_id` as an unknown
                   // key (version skew) before any handler ran. Both are pre-admission and
                   // safe to retry identityless. Never downgrade on a timeout, malformed
                   // ACK or an ambiguous retry.

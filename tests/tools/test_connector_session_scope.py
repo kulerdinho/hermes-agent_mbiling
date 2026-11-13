@@ -8,7 +8,7 @@ import pytest
 @pytest.mark.parametrize("enabled,disabled,allowed", [
     ([], [], False),
     (["safe"], [], False),
-    (["hermes-webhook"], [], False),
+    (["mbiling-webhook"], [], False),
     (["connections"], [], True),
     (["hermes-cli"], ["connections"], False),
     (["safe"], ["connections"], False),
@@ -74,7 +74,7 @@ def test_connector_scope_controls_schema_discovery_and_execution(monkeypatch, en
 
 
 def test_ordinary_platform_defaults_grant_connections_without_widening_webhook():
-    from hermes_cli.tools_config import _get_platform_tools
+    from mbiling_cli.tools_config import _get_platform_tools
     from toolsets import resolve_toolset
 
     for platform in ("cli", "telegram"):

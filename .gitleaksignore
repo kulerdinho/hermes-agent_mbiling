@@ -1,0 +1,10 @@
+# Faux secrets d exemple herites du projet d origine (valeur sentinelle, jetons de test,
+# "your-secret-key" dans la documentation), signales parce que le renommage Hermes -> Mbiling
+# a modifie ces lignes. Verifies a la main le 2026-11-13 : aucun vrai secret.
+2a58ff86986d83d42680923c67a14e3e26b76fac:apps/desktop/electron/api-expected-404.ts:generic-api-key:17
+2a58ff86986d83d42680923c67a14e3e26b76fac:apps/desktop/electron/updater/channel.test.ts:generic-api-key:142
+2a58ff86986d83d42680923c67a14e3e26b76fac:apps/desktop/scripts/side-by-side.windows.test.mjs:generic-api-key:94
+2a58ff86986d83d42680923c67a14e3e26b76fac:tests/scripts/test_release_channels.py:generic-api-key:132
+2a58ff86986d83d42680923c67a14e3e26b76fac:tests/tools/test_credential_pool_env_fallback.py:generic-api-key:120
+2a58ff86986d83d42680923c67a14e3e26b76fac:website/docs/user-guide/messaging/open-webui.md:curl-auth-header:214
+2a58ff86986d83d42680923c67a14e3e26b76fac:website/i18n/zh-Hans/docusaurus-plugin-content-docs/current/user-guide/messaging/open-webui.md:curl-auth-header:214

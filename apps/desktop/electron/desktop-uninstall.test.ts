@@ -71,24 +71,24 @@ test('nativeRemovalInstructions names the steward per kind and OS', () => {
   assert.match(nativeRemovalInstructions('nix', 'darwin'), /flake or profile/)
 
   for (const platform of ['linux', 'darwin', 'win32']) {
-    const steps = nativeRemovalInstructions('external', platform, '/usr/lib/hermes/hermes')
+    const steps = nativeRemovalInstructions('external', platform, '/usr/lib/mbiling/mbiling')
     assert.match(steps, /with that package manager/)
     assert.doesNotMatch(steps, /Delete|Trash/)
   }
 
   assert.match(nativeRemovalInstructions('bundled', 'win32'), /Installed apps/)
   assert.equal(
-    nativeRemovalInstructions('bundled', 'darwin', '/Applications/Hermes Agent Canary.app'),
+    nativeRemovalInstructions('bundled', 'darwin', '/Applications/Mbiling Agent Canary.app'),
     'Quit the app and drag Mbiling Canary.app from /Applications to the Trash.'
   )
-  assert.match(nativeRemovalInstructions('bundled', 'darwin'), /drag the Hermes app from Applications to the Trash/)
+  assert.match(nativeRemovalInstructions('bundled', 'darwin'), /drag the Mbiling app from Applications to the Trash/)
   assert.match(
-    nativeRemovalInstructions('bundled', 'linux', '/home/x/Apps/Hermes.AppImage'),
-    /\/home\/x\/Apps\/Hermes\.AppImage/
+    nativeRemovalInstructions('bundled', 'linux', '/home/x/Apps/Mbiling.AppImage'),
+    /\/home\/x\/Apps\/Mbiling\.AppImage/
   )
   assert.match(
-    nativeRemovalInstructions('bundled', 'linux', '/opt/hermes/linux-unpacked'),
-    /app directory at \/opt\/hermes\/linux-unpacked/
+    nativeRemovalInstructions('bundled', 'linux', '/opt/mbiling/linux-unpacked'),
+    /app directory at \/opt\/mbiling\/linux-unpacked/
   )
   assert.match(nativeRemovalInstructions('bundled', 'linux'), /wherever you saved it/)
 })
@@ -111,12 +111,12 @@ test('mode predicates classify what each mode removes', () => {
 
 test('resolveRemovableAppPath finds the .app bundle on macOS', () => {
   assert.equal(
-    resolveRemovableAppPath('/Applications/Hermes.app/Contents/MacOS/Hermes', 'darwin'),
-    '/Applications/Hermes.app'
+    resolveRemovableAppPath('/Applications/Mbiling.app/Contents/MacOS/Mbiling', 'darwin'),
+    '/Applications/Mbiling.app'
   )
   assert.equal(
-    resolveRemovableAppPath('/Users/x/Applications/Hermes.app/Contents/MacOS/Hermes', 'darwin'),
-    '/Users/x/Applications/Hermes.app'
+    resolveRemovableAppPath('/Users/x/Applications/Mbiling.app/Contents/MacOS/Mbiling', 'darwin'),
+    '/Users/x/Applications/Mbiling.app'
   )
 })
 
@@ -139,8 +139,8 @@ test('resolveRemovableAppPath finds the install dir on Windows', () => {
     'C:\\Users\\x\\AppData\\Local\\Programs\\Mbiling'
   )
   assert.equal(
-    resolveRemovableAppPath('C:\\Users\\x\\AppData\\Local\\hermes-desktop\\Mbiling.exe', 'win32'),
-    'C:\\Users\\x\\AppData\\Local\\hermes-desktop'
+    resolveRemovableAppPath('C:\\Users\\x\\AppData\\Local\\mbiling-desktop\\Mbiling.exe', 'win32'),
+    'C:\\Users\\x\\AppData\\Local\\mbiling-desktop'
   )
 })
 
@@ -150,24 +150,24 @@ test('resolveRemovableAppPath returns null for an unrecognized Windows dir', () 
 
 test('resolveRemovableAppPath uses APPIMAGE on Linux when set', () => {
   assert.equal(
-    resolveRemovableAppPath('/tmp/.mount_HermesXXXX/hermes', 'linux', { APPIMAGE: '/home/x/Apps/Hermes.AppImage' }),
-    '/home/x/Apps/Hermes.AppImage'
+    resolveRemovableAppPath('/tmp/.mount_MbilingXXXX/mbiling', 'linux', { APPIMAGE: '/home/x/Apps/Mbiling.AppImage' }),
+    '/home/x/Apps/Mbiling.AppImage'
   )
 })
 
 // AppImage apps (terminals, IDEs) export APPIMAGE to everything they start;
-// uninstalling an unpacked Hermes launched from one must never rm -rf that app.
+// uninstalling an unpacked Mbiling launched from one must never rm -rf that app.
 test('resolveRemovableAppPath ignores an APPIMAGE inherited from another AppImage', () => {
   assert.equal(
-    resolveRemovableAppPath('/opt/hermes/linux-unpacked/hermes', 'linux', { APPIMAGE: '/home/x/Apps/Other.AppImage' }),
-    '/opt/hermes/linux-unpacked'
+    resolveRemovableAppPath('/opt/mbiling/linux-unpacked/mbiling', 'linux', { APPIMAGE: '/home/x/Apps/Other.AppImage' }),
+    '/opt/mbiling/linux-unpacked'
   )
 })
 
 test('resolveRemovableAppPath finds the unpacked dir on Linux', () => {
-  assert.equal(resolveRemovableAppPath('/opt/hermes/linux-unpacked/hermes', 'linux', {}), '/opt/hermes/linux-unpacked')
+  assert.equal(resolveRemovableAppPath('/opt/mbiling/linux-unpacked/mbiling', 'linux', {}), '/opt/mbiling/linux-unpacked')
   // A system-package install (/usr/bin) → null, left to apt/dnf.
-  assert.equal(resolveRemovableAppPath('/usr/bin/hermes', 'linux', {}), null)
+  assert.equal(resolveRemovableAppPath('/usr/bin/mbiling', 'linux', {}), null)
 })
 
 test('resolveRemovableAppPath returns null for an empty exe path', () => {
@@ -178,8 +178,8 @@ test('resolveRemovableAppPath returns null for an empty exe path', () => {
 // --- shouldRemoveAppBundle ---
 
 test('shouldRemoveAppBundle requires packaged AND a resolved path', () => {
-  assert.equal(shouldRemoveAppBundle(true, '/Applications/Hermes.app'), true)
-  assert.equal(shouldRemoveAppBundle(false, '/Applications/Hermes.app'), false)
+  assert.equal(shouldRemoveAppBundle(true, '/Applications/Mbiling.app'), true)
+  assert.equal(shouldRemoveAppBundle(false, '/Applications/Mbiling.app'), false)
   assert.equal(shouldRemoveAppBundle(true, null), false)
   assert.equal(shouldRemoveAppBundle(false, null), false)
 })
@@ -200,7 +200,7 @@ test.skipIf(process.platform === 'win32').each(['gui', 'lite', 'full'] as const)
       fs.mkdirSync(sibling)
       fs.writeFileSync(
         recorder,
-        `require('node:fs').writeFileSync(${JSON.stringify(resultFile)}, JSON.stringify({argv:process.argv.slice(2), home:process.env.HERMES_HOME, pythonPath:process.env.PYTHONPATH, cwd:process.cwd()}))`
+        `require('node:fs').writeFileSync(${JSON.stringify(resultFile)}, JSON.stringify({argv:process.argv.slice(2), home:process.env.MBILING_HOME, pythonPath:process.env.PYTHONPATH, cwd:process.cwd()}))`
       )
       fs.writeFileSync(
         script,
@@ -211,17 +211,17 @@ test.skipIf(process.platform === 'win32').each(['gui', 'lite', 'full'] as const)
           agentRoot: root,
           uninstallArgs: [recorder, ...uninstallArgsForMode(mode)],
           appPath: mode === 'lite' ? null : app,
-          hermesHome: root
+          mbilingHome: root
         })
       )
       child = spawn('bash', [script], {
-        env: { ...process.env, PYTHONPATH: 'inherited', HERMES_HOME: root },
+        env: { ...process.env, PYTHONPATH: 'inherited', MBILING_HOME: root },
         stdio: 'ignore'
       })
       await once(child, 'close')
       assert.equal(child.exitCode, 0)
       assert.deepEqual(JSON.parse(fs.readFileSync(resultFile, 'utf8')), {
-        argv: ['-m', 'hermes_cli.uninstall', '--mode', mode],
+        argv: ['-m', 'mbiling_cli.uninstall', '--mode', mode],
         home: root,
         pythonPath: mode === 'gui' ? 'inherited' : `${root}:inherited`,
         cwd: root
@@ -243,20 +243,20 @@ test.skipIf(process.platform === 'win32').each(['gui', 'lite', 'full'] as const)
 test('buildPosixCleanupScript waits for the PID, runs the uninstall module, removes bundle', (): void => {
   const script = buildPosixCleanupScript({
     desktopPid: 4321,
-    pythonExe: '/home/x/.hermes/hermes-agent/venv/bin/python',
+    pythonExe: '/home/x/.mbiling/mbiling-agent/venv/bin/python',
     pythonPath: null,
-    agentRoot: '/home/x/.hermes/hermes-agent',
-    uninstallArgs: ['-m', 'hermes_cli.uninstall', '--mode', 'gui'],
-    appPath: '/opt/hermes/linux-unpacked',
-    hermesHome: '/home/x/.hermes'
+    agentRoot: '/home/x/.mbiling/mbiling-agent',
+    uninstallArgs: ['-m', 'mbiling_cli.uninstall', '--mode', 'gui'],
+    appPath: '/opt/mbiling/linux-unpacked',
+    mbilingHome: '/home/x/.mbiling'
   })
 
   assert.match(script, /^#!\/usr\/bin\/env bash\n/)
   assert.match(script, /pid=4321/)
   assert.match(script, /kill -0 "\$pid"/)
-  assert.match(script, /'-m' 'hermes_cli\.uninstall' '--mode' 'gui'/)
-  assert.match(script, /rm -rf '\/opt\/hermes\/linux-unpacked'/)
-  assert.match(script, /export HERMES_HOME='\/home\/x\/\.hermes'/)
+  assert.match(script, /'-m' 'mbiling_cli\.uninstall' '--mode' 'gui'/)
+  assert.match(script, /rm -rf '\/opt\/mbiling\/linux-unpacked'/)
+  assert.match(script, /export MBILING_HOME='\/home\/x\/\.mbiling'/)
 })
 
 // --- buildWindowsCleanupScript ---
@@ -265,18 +265,18 @@ test('buildWindowsCleanupScript waits (bounded) for PID, runs uninstall, rmdir b
   const script = buildWindowsCleanupScript({
     desktopPid: 9988,
     pythonExe: 'C:\\Python313\\python.exe',
-    pythonPath: 'C:\\hermes',
-    agentRoot: 'C:\\hermes',
-    uninstallArgs: ['-m', 'hermes_cli.uninstall', '--mode', 'full'],
+    pythonPath: 'C:\\mbiling',
+    agentRoot: 'C:\\mbiling',
+    uninstallArgs: ['-m', 'mbiling_cli.uninstall', '--mode', 'full'],
     appPath: 'C:\\Users\\x\\AppData\\Local\\Programs\\Mbiling',
-    hermesHome: 'C:\\Users\\x\\AppData\\Local\\hermes'
+    mbilingHome: 'C:\\Users\\x\\AppData\\Local\\mbiling'
   })
 
   assert.match(script, /@echo off/)
   assert.match(script, /set "PID=9988"/)
-  // PYTHONPATH set so a system python can import hermes_cli from source.
-  assert.match(script, /set "PYTHONPATH=C:\\hermes;%PYTHONPATH%"/)
-  assert.match(script, /"C:\\Python313\\python.exe" "-m" "hermes_cli\.uninstall" "--mode" "full"/)
+  // PYTHONPATH set so a system python can import mbiling_cli from source.
+  assert.match(script, /set "PYTHONPATH=C:\\mbiling;%PYTHONPATH%"/)
+  assert.match(script, /"C:\\Python313\\python.exe" "-m" "mbiling_cli\.uninstall" "--mode" "full"/)
   // Bounded wait-loop (no infinite loop), whole-token PID match (no substring).
   assert.match(script, /if %waited% geq 60 goto waited_done/)
   assert.match(script, /findstr \/r \/c:" %PID% "/)
@@ -293,9 +293,9 @@ test('buildWindowsCleanupScript omits PYTHONPATH + rmdir when not needed (gui, n
     pythonExe: 'C:\\h\\venv\\Scripts\\python.exe',
     pythonPath: null,
     agentRoot: 'C:\\h',
-    uninstallArgs: ['-m', 'hermes_cli.uninstall', '--mode', 'gui'],
+    uninstallArgs: ['-m', 'mbiling_cli.uninstall', '--mode', 'gui'],
     appPath: null,
-    hermesHome: 'C:\\h'
+    mbilingHome: 'C:\\h'
   })
 
   assert.doesNotMatch(script, /rmdir/)

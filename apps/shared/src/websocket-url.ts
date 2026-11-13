@@ -121,7 +121,7 @@ function nativeDialOf(wsUrl: string): null | string {
 
 export type WebSocketAuthParam = readonly [name: string, value: string]
 
-export interface HermesWebSocketUrlOptions {
+export interface MbilingWebSocketUrlOptions {
   /** Dashboard or gateway-relative endpoint path, e.g. "/api/ws". */
   path: string
   /** Optional URL prefix when the backend is reverse-proxied below a subpath. */
@@ -158,7 +158,7 @@ function normalizeEndpointPath(path: string): string {
   return path.startsWith('/') ? path : `/${path}`
 }
 
-export function buildHermesWebSocketUrl(options: HermesWebSocketUrlOptions): string {
+export function buildMbilingWebSocketUrl(options: MbilingWebSocketUrlOptions): string {
   const loc = readWindowLocation()
   const protocol = options.protocol ?? loc.protocol
   const host = options.host ?? loc.host

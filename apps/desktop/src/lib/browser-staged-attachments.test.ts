@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { stageDroppedFilePath, useComposerActions } from '@/app/chat/hooks/use-composer-actions'
 import { uploadComposerAttachment } from '@/app/session/hooks/use-prompt-actions'
-import type { HermesStagedUpload } from '@/global'
+import type { MbilingStagedUpload } from '@/global'
 import {
   $composerAttachments, clearSessionDraft, type ComposerAttachment, stashSessionDraft, takeSessionDraft
 } from '@/store/composer'
@@ -13,14 +13,14 @@ import { clearWebappSession, seedWebappSession } from '@/test/webapp-session'
 
 import { installBrowserDesktopBridge } from './browser-desktop-bridge'
 
-const source: HermesStagedUpload = {
+const source: MbilingStagedUpload = {
   install_id: '11111111111111111111111111111111',
-  path: '/srv/hermes/profiles/owner/uploads/web-123-notes.txt',
-  profile_home: '/srv/hermes/profiles/owner'
+  path: '/srv/mbiling/profiles/owner/uploads/web-123-notes.txt',
+  profile_home: '/srv/mbiling/profiles/owner'
 }
 
 const sourceName = source.path.split('/').pop()!
-const refText = '@file:/srv/hermes/profiles/owner/attachments/web-123-notes.txt'
+const refText = '@file:/srv/mbiling/profiles/owner/attachments/web-123-notes.txt'
 const file = () => new File(['payload'], 'notes.txt', { type: 'text/plain' })
 const pastedText = 'Pasted notes\nこんにちは 🌍'
 
@@ -31,7 +31,7 @@ const rawAttachment = (path = source.path): ComposerAttachment => ({
 const attached = () => ({ attached: true, ref_text: refText, uploaded: true })
 
 async function installBrowser(withProvenance = true) {
-  Reflect.deleteProperty(window, 'hermesDesktop')
+  Reflect.deleteProperty(window, 'mbilingDesktop')
   seedWebappSession('test-token')
 
   const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -53,7 +53,7 @@ async function installBrowser(withProvenance = true) {
 
   vi.stubGlobal('fetch', fetchMock)
   expect(installBrowserDesktopBridge()).toBe(true)
-  $connection.set(await window.hermesDesktop.getConnection('owner'))
+  $connection.set(await window.mbilingDesktop.getConnection('owner'))
 
   return fetchMock
 }
@@ -65,9 +65,9 @@ afterEach(() => {
   clearSessionDraft('staged-attachment-contract')
   $sessions.set([])
   $connection.set(null)
-  Reflect.deleteProperty(window, 'hermesDesktop')
+  Reflect.deleteProperty(window, 'mbilingDesktop')
   clearWebappSession()
-  document.documentElement.removeAttribute('data-hermes-desktop-host')
+  document.documentElement.removeAttribute('data-mbiling-desktop-host')
   vi.unstubAllGlobals()
   vi.restoreAllMocks()
 })
@@ -128,7 +128,7 @@ describe('browser staged attachment transport', () => {
         // A restored draft must not rely on the browser bridge's transient map.
         stashSessionDraft('staged-attachment-contract', 'draft', $composerAttachments.get())
         attachment = takeSessionDraft('staged-attachment-contract').attachments[0]!
-        window.hermesDesktop.getStagedFileForAttach = () => undefined
+        window.mbilingDesktop.getStagedFileForAttach = () => undefined
       }
 
       // The supplied requester can be an explicitly routed tile/edit owner.
@@ -276,8 +276,8 @@ describe('browser staged attachment transport', () => {
     expect(installBrowserDesktopBridge()).toBe(true)
 
     for (const stage of [
-      () => window.hermesDesktop.stageFileForAttach!(file()),
-      () => window.hermesDesktop.savePastedText(pastedText)
+      () => window.mbilingDesktop.stageFileForAttach!(file()),
+      () => window.mbilingDesktop.savePastedText(pastedText)
     ]) {
       const failure: unknown = await stage().catch((error: unknown) => error)
       expect(failure).toBeInstanceOf(Error)
@@ -352,7 +352,7 @@ describe('browser staged attachment transport', () => {
     { remote: false, terminalBackend: 'docker', upload: true }
   ])('preserves native attachment transport: %j', async ({ remote, terminalBackend, upload }) => {
     const readFileDataUrl = vi.fn(async () => 'data:text/plain;base64,cGF5bG9hZA==')
-    Object.defineProperty(window, 'hermesDesktop', { configurable: true, value: { readFileDataUrl } })
+    Object.defineProperty(window, 'mbilingDesktop', { configurable: true, value: { readFileDataUrl } })
     const requestGateway = vi.fn(async () => attached() as never)
     const path = '/native/notes.txt'
     await uploadComposerAttachment(rawAttachment(path), {

@@ -103,7 +103,7 @@ export const pt: Translations = {
   status: {
     actionFailed: "Ação falhou",
     actionFinished: "Concluído",
-    actionFinishedOwed: "Atualizado, mas ainda pendente (execute `hermes update` novamente para concluir)",
+    actionFinishedOwed: "Atualizado, mas ainda pendente (execute `mbiling update` novamente para concluir)",
     actions: "Ações",
     agent: "Agente",
     activeSessions: "Sessões ativas",
@@ -129,8 +129,8 @@ export const pt: Translations = {
     starting: "A iniciar",
     startedInBackground: "Iniciado em segundo plano — verifique os registos para acompanhar",
     stopped: "Parado",
-    updateHermes: "Atualizar Mbiling",
-    updatingHermes: "A atualizar Mbiling…",
+    updateMbiling: "Atualizar Mbiling",
+    updatingMbiling: "A atualizar Mbiling…",
     waitingForOutput: "À espera de saída…",
   },
 
@@ -343,7 +343,7 @@ export const pt: Translations = {
       "Salvo — reinicie o gateway para aplicar a alteração.",
     forceReinstall: "Forçar reinstalação (eliminar pasta existente primeiro)",
     headline:
-      "Descobrir, instalar, ativar e atualizar plugins Mbiling (paridade com `hermes plugins`).",
+      "Descobrir, instalar, ativar e atualizar plugins Mbiling (paridade com `mbiling plugins`).",
     identifierLabel: "URL Git ou owner/repo",
     inactive: "inativo",
     installBtn: "Instalar",
@@ -360,8 +360,8 @@ export const pt: Translations = {
     providersHint:
       "Escreve memory.provider (vazio = incorporado) e context.engine no config.yaml. Aplicado na próxima sessão.",
     refreshDashboard: "Re-analisar extensões do dashboard",
-    removeConfirm: "Remover este plugin de ~/.hermes/plugins/?",
-    removeHint: "Apenas plugins instalados pelo utilizador em ~/.hermes/plugins podem ser removidos.",
+    removeConfirm: "Remover este plugin de ~/.mbiling/plugins/?",
+    removeHint: "Apenas plugins instalados pelo utilizador em ~/.mbiling/plugins podem ser removidos.",
     rescanHeading: "Registo de plugins SPA",
     rescanHint: "Re-analise depois de adicionar ficheiros em disco para que a barra lateral detete novos manifestos.",
     runtimeHeading: "Runtime do gateway (plugins YAML)",
@@ -383,7 +383,7 @@ export const pt: Translations = {
     all: "Todas",
     categories: "Categorias",
     filters: "Filtros",
-    noSkills: "Nenhuma competência encontrada. As competências são carregadas de ~/.hermes/skills/",
+    noSkills: "Nenhuma competência encontrada. As competências são carregadas de ~/.mbiling/skills/",
     noSkillsMatch: "Nenhuma competência corresponde à pesquisa ou filtro.",
     skillCount: "{count} competência{s}",
     resultCount: "{count} resultado{s}",
@@ -397,7 +397,7 @@ export const pt: Translations = {
   },
 
   config: {
-    configPath: "~/.hermes/config.yaml",
+    configPath: "~/.mbiling/config.yaml",
     filters: "Filtros",
     sections: "Secções",
     exportConfig: "Exportar configuração como JSON",
@@ -622,7 +622,7 @@ export const pt: Translations = {
         "Partilhar no X abre uma publicação pré-preenchida num novo separador. Clique primeiro em Copiar imagem se quiser anexar o distintivo 1200×630 — o X permite colá-lo diretamente no compositor da publicação. Transferir PNG guarda o ficheiro para utilização em qualquer lado.",
       clipboard_unsupported:
         "A cópia de imagens para a área de transferência não é suportada neste navegador — utilize Transferir.",
-      tweet_text: "Just unlocked {tier_part}\"{name}\" in Mbiling ☤",
+      tweet_text: "Just unlocked {tier_part}\"{name}\" in Mbiling ◉",
     },
   },
   kanban: {

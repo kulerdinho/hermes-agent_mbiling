@@ -1,5 +1,5 @@
-import { stripAnsi } from '@hermes/shared/ansi'
-import { compactNumber } from '@hermes/shared/format'
+import { stripAnsi } from '@mbiling/shared/ansi'
+import { compactNumber } from '@mbiling/shared/format'
 
 import { usageBarsText } from '../../../components/overlayPrimitives.js'
 import { introMsg, toTranscriptMessages } from '../../../domain/messages.js'
@@ -402,7 +402,7 @@ export const sessionCommands: SlashCommand[] = [
       }
 
       // T9: the shared owner holds a session's voice mode (its /voice handler, per session). The
-      // sidecar's voice.toggle flipped the owner's process-global HERMES_VOICE for every chat; run
+      // sidecar's voice.toggle flipped the owner's process-global MBILING_VOICE for every chat; run
       // the owner's handler instead and mirror the mode it reports back.
       if (ctx.gateway.gw?.isCanonical && ctx.sid) {
         const sid = ctx.sid

@@ -1,11 +1,11 @@
-import type { ModelOptionsResult } from '@hermes/shared'
+import type { ModelOptionsResult } from '@mbiling/shared'
 import { useQuery } from '@tanstack/react-query'
 import type * as React from 'react'
 import { useMemo } from 'react'
 
-import type { HermesGateway } from '@/hermes'
 import { quickModelOptions } from '@/lib/chat-runtime'
 import { currentModelCapabilities, modelOptionsQueryKey, requestModelOptions } from '@/lib/model-options'
+import type { MbilingGateway } from '@/mbiling'
 
 import type { ChatBarState } from './composer/types'
 
@@ -15,7 +15,7 @@ interface ChatBarStateOptions {
   contextSuggestions: ChatBarState['tools']['suggestions']
   currentModel: string
   currentProvider: string
-  gateway: HermesGateway | null
+  gateway: MbilingGateway | null
   gatewayOpen: boolean
   modelMenuContent?: React.ReactNode
   modelOptionsOwnerConnectionId?: string

@@ -1,8 +1,8 @@
 import { act, cleanup } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { getLatestSessionMessages } from '@/hermes'
 import { textPart } from '@/lib/chat-messages'
+import { getLatestSessionMessages } from '@/mbiling'
 import { $backgroundStatusBySession, reconcileBackgroundProcesses } from '@/store/composer-status'
 import { $gateway } from '@/store/gateway'
 import { clearNotifications } from '@/store/notifications'
@@ -18,7 +18,7 @@ beforeEach(() => {
   vi.mocked(getLatestSessionMessages).mockImplementation(async () => ({ messages: [], session_id: 'session' }))
 })
 
-vi.mock('@/hermes', () => ({
+vi.mock('@/mbiling', () => ({
   getLatestSessionMessages: vi.fn(async () => ({ messages: [], session_id: 'session' })),
   getProfiles: vi.fn(async () => ({ profiles: [] })),
   getSession: vi.fn(),

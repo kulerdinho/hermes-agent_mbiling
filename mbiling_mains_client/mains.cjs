@@ -11,16 +11,20 @@
  * que la configuration désigne.
  *
  * Utilisation autonome :  node mains.cjs chemin/vers/config.json
- * Dans Mbiling Desktop :  require('./mains.cjs').demarrer(config, { journal })
+ * Dans Mbiling Desktop :  require('./mains.cjs').demarrer(config, { journal, jeton, bashEmbarques })
+ *   jeton          : le jeton d'appareil (au lieu de la variable d'environnement) ;
+ *   bashEmbarques  : chemins de bash.exe à essayer en premier (Git portable livré avec l'application) ;
+ *   surEtat        : appelé à chaque changement d'état ({ connecte, appareil, raison }).
  */
 const { spawn, spawnSync } = require('node:child_process')
 const fs = require('node:fs')
 const os = require('node:os')
 const path = require('node:path')
 
-function trouverBash(config) {
+function trouverBash(config, autres = []) {
   const candidats = [
     config.bash,
+    ...autres,
     process.env.MBILING_BASH,
     'C:\\Program Files\\Git\\bin\\bash.exe',
     'C:\\Program Files (x86)\\Git\\bin\\bash.exe',
@@ -78,9 +82,10 @@ function tuerArbre(tache) {
 function demarrer(config, options = {}) {
   const journal = options.journal || ((...a) => console.log(new Date().toISOString(), ...a))
   const SocketWeb = options.WebSocket || globalThis.WebSocket || require('ws')
-  const jeton = process.env[config.jeton_env]
+  const jeton = options.jeton || process.env[config.jeton_env]
   if (!jeton) throw new Error(`variable ${config.jeton_env} absente : jeton d'appareil requis`)
-  const bash = trouverBash(config)
+  const bash = trouverBash(config, options.bashEmbarques || [])
+  const surEtat = options.surEtat || (() => {})
   const politique = compilerPolitique(config.politique || {})
   for (const dossier of politique.dossiers) fs.mkdirSync(dossier, { recursive: true })
   const enCours = new Map()
@@ -110,7 +115,7 @@ function demarrer(config, options = {}) {
     const args = ['-c', lanceur, versCheminBash(fichierPid), demande.login ? 'login' : 'simple', versCheminBash(fichierScript)]
     const enfant = spawn(bash, args, {
       cwd: politique.dossiers[0] || os.homedir(),
-      env: { ...process.env, [config.jeton_env]: '' },
+      env: { ...process.env, ...(config.jeton_env ? { [config.jeton_env]: '' } : {}) },
       windowsHide: true,
       detached: process.platform !== 'win32',
       stdio: ['pipe', 'pipe', 'pipe']
@@ -166,9 +171,11 @@ function demarrer(config, options = {}) {
       if (message.t === 'bienvenue') {
         attente = config.reconnexion.delai_initial_ms
         journal('CONNECTÉ', message.appareil)
+        surEtat({ connecte: true, appareil: message.appareil || null, raison: null })
         if (options.surConnexion) options.surConnexion(message)
       } else if (message.t === 'refus') {
         journal('REFUSÉ PAR LE RELAIS', message.raison)
+        surEtat({ connecte: false, appareil: null, raison: `refusé par le Relais : ${message.raison}` })
         arrete = true
       } else if (message.t === 'exec') {
         executer(message)
@@ -181,6 +188,7 @@ function demarrer(config, options = {}) {
     socket.onclose = () => {
       for (const tache of enCours.values()) tuerArbre(tache)
       if (arrete) return
+      surEtat({ connecte: false, appareil: null, raison: 'déconnecté' })
       journal('DÉCONNECTÉ', `nouvel essai dans ${attente} ms`)
       setTimeout(connecter, attente)
       attente = Math.min(attente * 2, config.reconnexion.delai_max_ms)
@@ -197,7 +205,7 @@ function demarrer(config, options = {}) {
   }
 }
 
-module.exports = { demarrer, verifierPolitique, compilerPolitique, versCheminBash }
+module.exports = { demarrer, verifierPolitique, compilerPolitique, versCheminBash, trouverBash }
 
 if (require.main === module) {
   const chemin = process.argv[2]

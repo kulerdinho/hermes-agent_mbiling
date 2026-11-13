@@ -17,7 +17,8 @@ const reactUi: TestProjectConfiguration = {
     // development build for the test worker so `act` resolves to a real
     // function, regardless of any ambient NODE_ENV (e.g. a shell that
     // inherited NODE_ENV=production from a desktop launch).
-    env: { NODE_ENV: 'development' },
+    // Mbiling builds hide Nous Portal (src/lib/nous.ts); the inherited UI tests exercise it.
+    env: { NODE_ENV: 'development', VITE_MBILING_NOUS_ENABLED: '1' },
     // The first test in each file pays jsdom env init + full module transform,
     // which can exceed vitest's 5000ms default under CI/load. 15s gives the
     // cold start headroom without masking genuinely hung tests. Hooks pay the
@@ -40,9 +41,9 @@ const electronNative: TestProjectConfiguration = {
     // case corpus; pwsh alone takes several seconds to start on a loaded CI
     // runner, so vitest's 5s default timed the Windows marker judge out.
     testTimeout: 30_000,
-    // Only these contracts need the Hermes test interpreter; resolving it may
+    // Only these contracts need the Mbiling test interpreter; resolving it may
     // sync the Python environment, which UI-only runs must not wait for.
-    globalSetup: ['./vitest.hermes-python.ts']
+    globalSetup: ['./vitest.mbiling-python.ts']
   }
 }
 

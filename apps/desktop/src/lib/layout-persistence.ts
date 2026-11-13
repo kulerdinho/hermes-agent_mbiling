@@ -11,21 +11,21 @@ interface LayoutEntry {
 }
 
 export const LAYOUT_KEYS = {
-  floating: 'hermes.desktop.floatingPanes.v1',
-  tree: 'hermes.desktop.layoutTree.v2',
-  preset: 'hermes.desktop.layoutPreset.active',
-  panes: 'hermes.desktop.paneStates.v1',
-  dismissed: 'hermes.desktop.dismissedPanes.v1',
-  shares: 'hermes.desktop.paneShare.v1',
-  sharePartners: 'hermes.desktop.paneSharePartners.v1',
-  hiddenTabs: 'hermes.desktop.hiddenStripTabs.v1',
-  placed: 'hermes.desktop.userPlacedPanes.v1',
-  flipped: 'hermes.desktop.panesFlipped',
-  collapsed: 'hermes.desktop.collapsedTreeSides.v1'
+  floating: 'mbiling.desktop.floatingPanes.v1',
+  tree: 'mbiling.desktop.layoutTree.v2',
+  preset: 'mbiling.desktop.layoutPreset.active',
+  panes: 'mbiling.desktop.paneStates.v1',
+  dismissed: 'mbiling.desktop.dismissedPanes.v1',
+  shares: 'mbiling.desktop.paneShare.v1',
+  sharePartners: 'mbiling.desktop.paneSharePartners.v1',
+  hiddenTabs: 'mbiling.desktop.hiddenStripTabs.v1',
+  placed: 'mbiling.desktop.userPlacedPanes.v1',
+  flipped: 'mbiling.desktop.panesFlipped',
+  collapsed: 'mbiling.desktop.collapsedTreeSides.v1'
 } as const
 
 function migrateLayoutScopes(initialMode: InterfaceMode) {
-  const marker = 'hermes.desktop.layoutModeScopes.v1'
+  const marker = 'mbiling.desktop.layoutModeScopes.v1'
   const legacy = new Map<string, string>()
 
   if (readKey(marker) !== null) {

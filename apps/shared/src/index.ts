@@ -134,7 +134,7 @@ export {
 export { randomUuid } from './session-http-mutations'
 export { skillInvocationText } from './skill-scaffold'
 export {
-  type HermesSkin,
+  type MbilingSkin,
   SKIN_BRANDING_TOKENS,
   SKIN_COLOR_TOKENS,
   type SkinBranding,
@@ -199,13 +199,13 @@ export { type UpdateDebt, updateDebt, type UpdateDebtReceipt, type UpdateDebtSte
 export { mergeUsage, usageFromTick, type UsageTickPayload } from './usage-tick'
 export {
   BROWSER_NATIVE_DIAL,
-  buildHermesWebSocketUrl,
+  buildMbilingWebSocketUrl,
   type GatewayAuthMode,
   GatewayReauthRequiredError,
   type GatewayWsConnection,
   type GatewayWsUrlResult,
-  type HermesWebSocketUrlOptions,
   isGatewayReauthRequired,
+  type MbilingWebSocketUrlOptions,
   normalizeBasePath,
   resolveGatewayWsUrl,
   type ResolveGatewayWsUrlDeps,

@@ -2,17 +2,17 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { host } from '@/sdk'
 
-const desktopWindow = window as unknown as { hermesDesktop?: Partial<Window['hermesDesktop']> }
+const desktopWindow = window as unknown as { mbilingDesktop?: Partial<Window['mbilingDesktop']> }
 
 afterEach(() => {
-  delete desktopWindow.hermesDesktop
+  delete desktopWindow.mbilingDesktop
 })
 
 describe('host.spellcheck dictionary verbs', () => {
   it("routes one word through the app's dictionary IPC and reports main's verdict", async () => {
     const spellcheckDictionary = vi.fn(async () => true)
 
-    desktopWindow.hermesDesktop = { spellcheckDictionary }
+    desktopWindow.mbilingDesktop = { spellcheckDictionary }
 
     expect(await host.spellcheck.addWord('Mbiling')).toBe(true)
     expect(await host.spellcheck.removeWord('Mbiling')).toBe(true)
@@ -34,7 +34,7 @@ describe('host.spellcheck dictionary verbs', () => {
       throw new Error('older shell')
     })
 
-    desktopWindow.hermesDesktop = { spellcheckDictionary }
+    desktopWindow.mbilingDesktop = { spellcheckDictionary }
 
     expect(await host.spellcheck.removeWord('Mbiling')).toBe(false)
     expect(await host.spellcheck.addWord(42 as unknown as string)).toBe(false)

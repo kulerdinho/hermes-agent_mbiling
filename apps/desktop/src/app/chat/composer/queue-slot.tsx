@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
 
-import type { HermesGateway } from '@/hermes'
 import type { Translations } from '@/i18n'
 import { useStoresSelector } from '@/lib/use-session-slice'
+import type { MbilingGateway } from '@/mbiling'
 import { type QueuedPromptEntry, removeQueuedPrompt, unparkQueuedPrompts } from '@/store/composer-queue'
 import { notifyError } from '@/store/notifications'
 import { $activeSessionId, $selectedStoredSessionId } from '@/store/session'
@@ -18,7 +18,7 @@ export interface ComposerQueueSlotInputs {
   busy: boolean
   drainNextQueued: () => Promise<unknown>
   exitQueuedEdit: (action: 'cancel' | 'save') => unknown
-  gateway: HermesGateway | null | undefined
+  gateway: MbilingGateway | null | undefined
   queueEdit: QueueEditState | null
   queueParked: boolean
   queuedPrompts: QueuedPromptEntry[]

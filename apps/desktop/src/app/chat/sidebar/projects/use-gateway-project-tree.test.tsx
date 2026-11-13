@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { HermesGateway } from '@/hermes'
+import type { MbilingGateway } from '@/mbiling'
 import { $connectionsRegistry } from '@/store/connection-registry-state'
 import { setPrimaryGateway, setPrimaryGatewayConnectionId } from '@/store/gateway'
 import { $gatewayProjectLooks } from '@/store/gateway-project-looks'
@@ -31,14 +31,14 @@ beforeEach(() => {
       { id: 'studio', label: 'Studio', kind: 'remote', tokenSet: true, tokenPreview: null }
     ]
   } as NonNullable<typeof $connectionsRegistry.value>)
-  ;(window as { hermesDesktop?: unknown }).hermesDesktop = { getConnectionFor }
+  ;(window as { mbilingDesktop?: unknown }).mbilingDesktop = { getConnectionFor }
 })
 
 afterEach(() => {
   vi.clearAllMocks()
   setPrimaryGateway(null)
   $connectionsRegistry.set(null)
-  delete (window as { hermesDesktop?: unknown }).hermesDesktop
+  delete (window as { mbilingDesktop?: unknown }).mbilingDesktop
 })
 
 const settle = () => new Promise(resolve => setTimeout(resolve, 0))
@@ -60,7 +60,7 @@ describe("another gateway's project colours", () => {
 
     const socket = { connectionState: 'open', onState: () => () => {}, request }
 
-    setPrimaryGateway(socket as unknown as HermesGateway, 'research')
+    setPrimaryGateway(socket as unknown as MbilingGateway, 'research')
     setPrimaryGatewayConnectionId('studio', 'remote')
 
     const { result } = renderHook(() => useGatewayProjectTree([], [studioChat]))

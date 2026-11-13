@@ -1,6 +1,6 @@
-import { BROWSER_NATIVE_DIAL, buildHermesWebSocketUrl, normalizeBasePath } from '@hermes/shared'
+import { BROWSER_NATIVE_DIAL, buildMbilingWebSocketUrl, normalizeBasePath } from '@mbiling/shared'
 
-import type { HermesApiRequest } from '@/global'
+import type { MbilingApiRequest } from '@/global'
 import { readWebappSession, webappSignInRequired } from '@/lib/browser-launch-session'
 import { type BrowserHostGlobals, hasBrowserHostBootstrap } from '@/lib/platform'
 
@@ -12,9 +12,9 @@ export interface BrowserBootstrap {
   token: string
 }
 
-const SESSION_HEADER = 'X-Hermes-Session-Token'
+const SESSION_HEADER = 'X-Mbiling-Session-Token'
 const DEFAULT_TIMEOUT_MS = 30_000
-const REAUTH_EVENT = 'hermes:browser-reauth-required'
+const REAUTH_EVENT = 'mbiling:browser-reauth-required'
 
 export class BrowserReauthRequiredError extends Error {
   readonly loginUrl: string
@@ -31,9 +31,9 @@ export function browserBootstrap(): BrowserBootstrap | null {
   if (!hasBrowserHostBootstrap()) {return null}
 
   const win = window as Window & BrowserHostGlobals
-  const authRequired = win.__HERMES_AUTH_REQUIRED__ === true
-  const basePath = normalizeBasePath(win.__HERMES_BASE_PATH__)
-  const privateSession = !authRequired && win.__HERMES_UI_SURFACE__ === 'webapp'
+  const authRequired = win.__MBILING_AUTH_REQUIRED__ === true
+  const basePath = normalizeBasePath(win.__MBILING_BASE_PATH__)
+  const privateSession = !authRequired && win.__MBILING_UI_SURFACE__ === 'webapp'
   const token = privateSession ? readWebappSession(basePath) : ''
 
   return {
@@ -75,7 +75,7 @@ export function websocketUrl(
   credential: { ticket?: string },
   profile?: null | string
 ): string {
-  return buildHermesWebSocketUrl({
+  return buildMbilingWebSocketUrl({
     authParam: credential.ticket ? ['ticket', credential.ticket] : undefined,
     basePath,
     params: profile ? { profile } : undefined,
@@ -179,7 +179,7 @@ export async function browserFetch(
   }
 }
 
-export async function browserApi<T>(bootstrap: BrowserBootstrap, request: HermesApiRequest): Promise<T> {
+export async function browserApi<T>(bootstrap: BrowserBootstrap, request: MbilingApiRequest): Promise<T> {
   const headers = new Headers()
   let body: BodyInit | undefined
 

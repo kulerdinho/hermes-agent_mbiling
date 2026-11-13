@@ -21,8 +21,8 @@ from contextlib import redirect_stdout
 from pathlib import Path
 from types import SimpleNamespace
 with redirect_stdout(sys.stderr):
-    from hermes_cli.gateway_client import _session_ticket
-    from hermes_cli.gateway_runtime_discovery import DiscoveryError, _private_node
+    from mbiling_cli.gateway_client import _session_ticket
+    from mbiling_cli.gateway_runtime_discovery import DiscoveryError, _private_node
 while True:
     line = sys.stdin.buffer.readline(65537)
     if not line:
@@ -276,7 +276,7 @@ export function mintGatewayTicketWithPython(
   endpoint: TicketEndpoint,
   purpose: GatewayTicketPurpose
 ): Promise<string> {
-  const env = { ...process.env, ...backend.env, HERMES_HOME: endpoint.profile_id,
+  const env = { ...process.env, ...backend.env, MBILING_HOME: endpoint.profile_id,
     PYTHONIOENCODING: 'utf-8', PYTHONUTF8: '1' }
 
   const key = JSON.stringify([backend.command, cwd, Object.entries(env).sort(([a], [b]) => a.localeCompare(b))])

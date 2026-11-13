@@ -409,7 +409,7 @@ export const en: Translations = {
       'This Mbiling app is older than the backend it is connected to and may not work correctly. Update the app to align them.',
     updateDesktopApp: 'Update app',
     installMethodUnsupportedTitle: 'Unsupported install method',
-    updateHermes: 'Update Mbiling',
+    updateMbiling: 'Update Mbiling',
     updateReadyTitle: 'Update ready',
     updateReadyMessage: count => `${count} new change${count === 1 ? '' : 's'} available.`,
     updateReadyMessageUnknown: 'A new update is available.',
@@ -434,17 +434,17 @@ export const en: Translations = {
       gatewayAuthFailed:
         'This Mbiling no longer accepts your saved sign-in. Open Gateways and sign in again (or paste a new access token), then retry.',
       methodNotAllowed:
-        "Mbiling' background service is out of step with the app, probably after an update. Restart it to fix this.",
+        "Mbiling's background service is out of step with the app, probably after an update. Restart it to fix this.",
       microphonePermission: 'Microphone permission was denied.',
       openaiRejectedApiKey: "OpenAI didn't accept your API key. Update it in Settings → Keys, then try again.",
       openaiTtsNeedsKey: 'Voice needs an OpenAI key. Add one in Settings → Keys.',
       codeSkewRestartRequired:
         'Mbiling was updated but is still running the old version. Restart it to finish the update.',
       rpcOutOfSync: 'The app and the backend are on different versions. Update both.',
-      restartHermesFailed: "Couldn't restart Mbiling"
+      restartMbilingFailed: "Couldn't restart Mbiling"
     },
     actions: {
-      restartHermes: 'Restart Mbiling',
+      restartMbiling: 'Restart Mbiling',
       openKeys: 'Open Keys',
       openGateways: 'Open Gateways',
       openMaintenance: 'Open Maintenance'
@@ -513,7 +513,7 @@ export const en: Translations = {
       'Your bundle was uploaded privately. Share the link below in your support thread so the team can see your logs.',
     failedTitle: 'Upload failed',
     failedHint:
-      'You can also run `hermes debug share --nous` from a terminal, or `hermes debug share --local` to print the report without uploading.',
+      'You can also run `mbiling debug share --nous` from a terminal, or `mbiling debug share --local` to print the report without uploading.',
     handoffLead: 'Pick up the discussion in:',
     links: {
       github: 'GitHub Issues',
@@ -752,6 +752,35 @@ export const en: Translations = {
       pageCount: (n: number) => (n === 1 ? '1 page' : `${n} pages`),
       missing: 'That plugin has no settings page. It may be disabled or uninstalled.'
     },
+    mains: {
+      tokenAuto: "This PC is linked to your Mbiling account automatically.",
+      tokenEnrolling: "Linking this PC to your account…",
+      manualToken: "Enter a token manually",
+      title: "This PC (Mains)",
+      intro: "Lets the Mbiling agent on the server run commands and work on files on this computer, only inside the folders you allow. The local policy is checked on this computer before every command, whatever the server asks.",
+      enabled: "Let the agent use this PC",
+      statusOff: "Off",
+      statusNoToken: "Waiting for a device token",
+      statusConnecting: "Connecting to the relay…",
+      statusConnected: "Connected: the agent can use this PC",
+      relay: "Relay address",
+      token: "Device token",
+      tokenPlaceholder: "Paste the device token",
+      tokenSet: "A token is saved, encrypted by Windows.",
+      tokenMissing: "No token yet: paste the one you received.",
+      saveToken: "Save",
+      removeToken: "Remove",
+      folders: "Allowed folders",
+      noFolders: "No folder allowed",
+      editPolicy: "Edit the local policy",
+      bash: "Shell used for commands",
+      bashMissing: "Not found: install Git for Windows, or set \"bash\" in the settings file.",
+      lastProblem: "Last problem",
+      noProblem: "None",
+      openLog: "Open the log",
+      editSettings: "Edit the settings file",
+      restart: "Restart",
+    },
     nav: {
       providers: 'Providers',
       providerAccounts: 'Accounts',
@@ -769,6 +798,7 @@ export const en: Translations = {
       about: 'About',
       billing: 'Billing',
       notifications: 'Notifications',
+      mains: "This PC (Mains)",
       vault: 'Passwords & Logins',
       plugins: 'Plugins'
     },
@@ -1407,7 +1437,7 @@ export const en: Translations = {
       cloudAgentProvisioning: 'Provisioning…',
       cloudStatusLabel: status => `Status: ${status}`,
       remoteUrlTitle: 'Remote URL',
-      remoteUrlDesc: 'Base URL for the remote dashboard backend. Path prefixes are supported, for example /hermes.',
+      remoteUrlDesc: 'Base URL for the remote dashboard backend. Path prefixes are supported, for example /mbiling.',
       probing: 'Checking how this gateway authenticates…',
       probeError:
         "Mbiling can't reach that address. Check the URL and that the other computer is running Mbiling — sign-in options appear once it answers.",
@@ -1480,9 +1510,9 @@ export const en: Translations = {
       sshPortDesc: 'Blank = 22 or the ~/.ssh/config port.',
       sshKeyTitle: 'Identity file',
       sshKeyDesc: 'Private key path. Blank = ssh-agent or ~/.ssh/config.',
-      sshHermesPathTitle: 'Mbiling path (optional)',
-      sshHermesPathDesc: 'Full path to the remote hermes binary. Blank = auto-detect.',
-      sshHermesPathPlaceholder: 'auto-detect',
+      sshMbilingPathTitle: 'Mbiling path (optional)',
+      sshMbilingPathDesc: 'Full path to the remote mbiling binary. Blank = auto-detect.',
+      sshMbilingPathPlaceholder: 'auto-detect',
       sshTestConnection: 'Test SSH',
       sshConnect: 'Connect',
       sshButtonsHint: 'Save applies on the next launch. Connect reconnects now.',
@@ -1494,7 +1524,7 @@ export const en: Translations = {
       sshErrHostKey:
         'The host key has CHANGED since you last connected. Verify this is expected, then run ssh-keygen -R <host> and reconnect.',
       sshErrNotInstalled:
-        'Mbiling is not installed on the remote host. Install it there (curl -fsSL https://hermes-agent.nousresearch.com/install.sh | sh) or set the Mbiling path.',
+        'Mbiling is not installed on the remote host. Install it there (curl -fsSL https://mbiling.com/install.sh | sh) or set the Mbiling path.',
       sshErrPlatform:
         'Unsupported remote platform. Mbiling Desktop SSH mode supports Linux, macOS, and Windows remote hosts.',
       sshErrTimeout: 'SSH connection timed out. The host may be unreachable or asleep.',
@@ -2100,7 +2130,7 @@ export const en: Translations = {
     locked: 'Locked',
     lockHint: "The agent can't change this skill while it's locked. You can still edit it yourself.",
     unlockedHint: 'Lock to stop the agent from changing this skill. You can still edit it yourself.',
-    skillArchivedMessage: 'Restorable via hermes curator restore.',
+    skillArchivedMessage: 'Restorable via mbiling curator restore.',
     tabPlugins: 'Plugins',
     plugins: {
       agentTitle: 'Agent plugins',
@@ -2140,7 +2170,7 @@ export const en: Translations = {
       serverStates: {
         connected: 'connected',
         app_not_running: 'app not running',
-        hermes_not_connected: 'MCP connection missing',
+        mbiling_not_connected: 'MCP connection missing',
         endpoint_unavailable: 'endpoint unavailable',
         no_interactive_session: 'no interactive session',
         version_too_old: 'version too old',
@@ -2422,7 +2452,7 @@ export const en: Translations = {
     noSessions: 'No sessions yet.',
     gatewayRunning: 'Messaging gateway running',
     gatewayStopped: 'Messaging gateway stopped',
-    hermesActiveSessions: (version, count) => `Mbiling ${version} · Active sessions ${count}`,
+    mbilingActiveSessions: (version, count) => `Mbiling ${version} · Active sessions ${count}`,
     restartGateway: 'Restart gateway',
     openBrowser: 'Toggle browser',
     toggleBrowser: 'Toggle browser',
@@ -2431,7 +2461,7 @@ export const en: Translations = {
     sharedGatewayRestartDescription: bots => `All bots on this device reconnect: ${bots}`,
     sharedGatewayRestartConfirm: 'Restart all',
     sharedGatewayRestarted: count => `Shared gateway restarted (${count} ${count === 1 ? 'bot' : 'bots'})`,
-    updateHermes: 'Update Mbiling',
+    updateMbiling: 'Update Mbiling',
     reloadWindow: 'Reload window',
     actionRunning: 'running',
     actionDone: 'done',
@@ -2705,7 +2735,7 @@ export const en: Translations = {
       },
       MATRIX_HOMESERVER: { label: 'Homeserver URL', placeholder: 'https://matrix.org' },
       MATRIX_ACCESS_TOKEN: { label: 'Access token' },
-      MATRIX_USER_ID: { label: 'Bot user ID', placeholder: '@hermes:example.org' },
+      MATRIX_USER_ID: { label: 'Bot user ID', placeholder: '@mbiling:example.org' },
       MATRIX_ALLOWED_USERS: {
         label: 'Allowed Matrix user IDs',
         help: 'Recommended. User IDs in @user:server format, one per box.'
@@ -2811,7 +2841,7 @@ export const en: Translations = {
     failedImport: 'Failed to import profile',
     failedExport: 'Failed to export profile',
     exportNeedsHost: name =>
-      `The browser can't save a profile archive. On the Mbiling host, run: hermes profile export ${name}`,
+      `The browser can't save a profile archive. On the Mbiling host, run: mbiling profile export ${name}`,
     allProfiles: 'All profiles',
     showAllProfiles: 'Show all profiles',
     notServedHere: 'Not served here',
@@ -2846,7 +2876,7 @@ export const en: Translations = {
       title: (profile: string) => `Connect ${profile} to a remote host`,
       description: 'Sessions in this profile will run on the remote Mbiling you point it at, instead of this computer.',
       urlLabel: 'Remote address',
-      urlPlaceholder: 'https://hermes.example.com',
+      urlPlaceholder: 'https://mbiling.example.com',
       urlInvalid: 'Enter a full address starting with http:// or https://',
       tokenLabel: 'Access token',
       tokenPlaceholder: 'Paste the remote session token',
@@ -3379,7 +3409,7 @@ export const en: Translations = {
       '/resume': 'Resume a saved session',
       '/details': 'control transcript detail level',
       '/copy': 'copy selection or last assistant message',
-      '/quit': 'exit hermes',
+      '/quit': 'exit mbiling',
       '/start': 'Acknowledge platform start pings without a reply',
       '/new': 'Start a new desktop chat',
       '/topic': 'Enable or inspect Telegram DM topic sessions',
@@ -3408,7 +3438,7 @@ export const en: Translations = {
       '/refine': 'Review this conversation now and save lessons to memory/skills',
       '/review': 'Spawn an independent subagent to review the work just discussed (PR, code, docs)',
       '/loop': 'Re-run a prompt on a recurring interval in this session',
-      '/plan': 'Write a markdown implementation plan to .hermes/plans/ without executing anything',
+      '/plan': 'Write a markdown implementation plan to .mbiling/plans/ without executing anything',
       '/moa': 'Run one prompt through the default Mixture of Agents preset, then restore your model',
       '/subgoal': 'Add or manage extra criteria on the active goal',
       '/status': 'Show current session status',
@@ -3805,7 +3835,7 @@ export const en: Translations = {
       notAvailable: 'Update not available for this backend.',
       failed: 'Backend update failed.',
       noReturn: 'Backend didn’t come back online. The update may not have completed — check the backend host.',
-      owed: steps => `Backend updated, but still owed: ${steps}. Re-run \`hermes update\` to finish them.`
+      owed: steps => `Backend updated, but still owed: ${steps}. Re-run \`mbiling update\` to finish them.`
     },
     appName: 'Mbiling', // Update-status overlay + version-details (mechanism-aware update UI).
     version: (value: string) => `Version ${value}`,
@@ -3845,9 +3875,9 @@ export const en: Translations = {
     versionDetailsDistributionDesktopMsix: 'Desktop app (MSIX)',
     versionDetailsDistributionDesktopInstaller: 'Desktop app (installer)',
     versionDetailsDistributionSourceInstaller: 'Source (install script)',
-    versionDetailsDistributionSourceInstallerDesktop: 'Source (install script) + hermes desktop',
+    versionDetailsDistributionSourceInstallerDesktop: 'Source (install script) + mbiling desktop',
     versionDetailsDistributionSource: 'Source',
-    versionDetailsDistributionSourceDesktop: 'Source + hermes desktop',
+    versionDetailsDistributionSourceDesktop: 'Source + mbiling desktop',
     versionDetailsDistributionStore: 'Microsoft Store',
     versionDetailsRuntime: 'Runtime',
     versionDetailsRuntimeEmbedded: 'Embedded runtime',
@@ -3857,6 +3887,21 @@ export const en: Translations = {
   },
 
   install: {
+    mbilingSignIn: {
+      title: "Welcome to Mbiling",
+      desc: "Sign in with your Mbiling account to connect this app.",
+      button: "Sign in to Mbiling",
+      waiting: "Finish signing in in your browser…",
+      connecting: "Connecting…",
+      allowPc: "Allow the Mbiling agent to work on this PC",
+      allowPcHint: "Only inside the folders you allow (by default, Mbiling-Test in your Documents). You can change this anytime in Settings, This PC.",
+      unreachable: "Mbiling can't be reached right now. Check your internet connection and try again.",
+      noSignIn: "This Mbiling server doesn't offer account sign-in yet.",
+      cancelled: "Sign-in wasn't completed. Try again.",
+      failed: "Connection failed:",
+      advanced: "Advanced connection settings",
+      retry: "Try again",
+    },
     stageStates: {
       pending: 'Pending',
       running: 'Installing',
@@ -3889,7 +3934,7 @@ export const en: Translations = {
     remoteSetupDesc: 'Enter your gateway URL. Mbiling Desktop will detect whether it needs a token or browser sign-in.',
     remoteUrlTitle: 'Gateway URL',
     remoteUrlDesc: 'Use the base URL of the Mbiling gateway, including https:// when remote.',
-    remoteUrlPlaceholder: 'https://gateway.example.com/hermes',
+    remoteUrlPlaceholder: 'https://gateway.example.com/mbiling',
     probing: 'Detecting gateway authentication...',
     probeError:
       "Mbiling can't reach that address. Check the URL and that the other computer is running Mbiling — sign-in options appear once it answers.",
@@ -4509,8 +4554,8 @@ export const en: Translations = {
       errorOpenBillingSettings: 'Open billing settings',
       errorCompressConversation: 'Compress conversation',
       errorCompressFailed: 'Could not compress the conversation',
-      errorOpenHermesFolder: 'Open Mbiling folder',
-      errorOpenHermesFolderFailed: 'Could not open the Mbiling folder',
+      errorOpenMbilingFolder: 'Open Mbiling folder',
+      errorOpenMbilingFolderFailed: 'Could not open the Mbiling folder',
       errorUpdateApiKey: 'Update API key',
       errorSignInAgain: provider => `Sign in to ${provider} again`,
       errorSignInFreeTier: 'Sign in with a Nous account',
@@ -4561,7 +4606,7 @@ export const en: Translations = {
       reject: 'Reject',
       alwaysTitle: 'Always allow this command?',
       alwaysDescription: pattern =>
-        `This adds the “${pattern}” pattern to your permanent allowlist (~/.hermes/config.yaml). Mbiling won’t ask again for commands like this — in this session or any future one.`,
+        `This adds the “${pattern}” pattern to your permanent allowlist (~/.mbiling/config.yaml). Mbiling won’t ask again for commands like this — in this session or any future one.`,
       alwaysAllow: 'Always allow'
     },
     clarify: enClarify,

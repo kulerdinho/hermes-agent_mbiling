@@ -1,4 +1,4 @@
-import { contrastRatio } from '@hermes/shared/color'
+import { contrastRatio } from '@mbiling/shared/color'
 import { act, cleanup, render } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -13,17 +13,17 @@ const stockDefaultSkin = {
   colors: { banner_text: '#FFF8DC', status_bar_bg: '#1a1a2e', ui_accent: '#FFBF00', banner_border: '#CD7F32' }
 }
 
-const BACKEND_THEMES_KEY = 'hermes-desktop-backend-themes-v1'
+const BACKEND_THEMES_KEY = 'mbiling-desktop-backend-themes-v1'
 
 const cssVar = (name: string) => window.document.documentElement.style.getPropertyValue(name)
-const paintedSkin = () => window.document.documentElement.dataset.hermesTheme
+const paintedSkin = () => window.document.documentElement.dataset.mbilingTheme
 
 type ThemeApi = ReturnType<typeof useTheme>
 
 /** A fresh renderer launch: module state reloads, localStorage survives. */
 async function launch(localSkin: typeof stockDefaultSkin | null) {
   cleanup()
-  Object.defineProperty(window, 'hermesDesktop', {
+  Object.defineProperty(window, 'mbilingDesktop', {
     configurable: true,
     value: localSkin ? { localSkin: { profile: 'default', skin: localSkin } } : {}
   })
@@ -64,7 +64,7 @@ describe('Classic Mbiling is an explicit Desktop pick, never inferred from stock
   afterEach(() => {
     cleanup()
     window.localStorage.clear()
-    Reflect.deleteProperty(window, 'hermesDesktop')
+    Reflect.deleteProperty(window, 'mbilingDesktop')
     vi.resetModules()
   })
 
@@ -112,14 +112,14 @@ describe('Classic Mbiling is an explicit Desktop pick, never inferred from stock
     expect(paintedSkin()).toBe('nous')
   })
 
-  it('/skin gold and /skin hermes select Classic; /skin default stays the Desktop default (Nous)', async () => {
+  it('/skin gold and /skin mbiling select Classic; /skin default stays the Desktop default (Nous)', async () => {
     const run = await launch(stockDefaultSkin)
 
     act(() => void run.api.skin?.('gold'))
     expect(run.api.theme?.themeName).toBe('classic')
 
     act(() => void run.api.skin?.('nous'))
-    act(() => void run.api.skin?.('hermes'))
+    act(() => void run.api.skin?.('mbiling'))
     expect(run.api.theme?.themeName).toBe('classic')
 
     act(() => void run.api.skin?.('default'))
@@ -145,7 +145,7 @@ describe('Classic Mbiling is an explicit Desktop pick, never inferred from stock
     const themes = run.api.theme?.availableThemes ?? []
     expect(themes.filter(t => t.label === 'Classic Mbiling').map(t => t.name)).toEqual(['classic'])
     expect(themes.some(t => t.name === 'default')).toBe(false)
-    expect(run.api.skin?.('list').match(/Classic Hermes/g)).toHaveLength(1)
+    expect(run.api.skin?.('list').match(/Classic Mbiling/g)).toHaveLength(1)
     expect(JSON.parse(window.localStorage.getItem(BACKEND_THEMES_KEY) ?? '{}')).not.toHaveProperty('default')
   })
 
@@ -154,13 +154,13 @@ describe('Classic Mbiling is an explicit Desktop pick, never inferred from stock
     act(() => run.api.theme?.setTheme('classic'))
 
     act(() => run.api.theme?.setMode('light'))
-    expect(window.document.documentElement.dataset.hermesMode).toBe('light')
+    expect(window.document.documentElement.dataset.mbilingMode).toBe('light')
     expect(cssVar('--theme-background-seed').toLowerCase()).toBe('#f5f5f5')
     expect(contrastRatio(cssVar('--theme-foreground'), cssVar('--theme-background-seed'))).toBeGreaterThanOrEqual(4.5)
     expect(contrastRatio(cssVar('--theme-primary'), cssVar('--theme-sidebar-seed'))).toBeGreaterThanOrEqual(4.5)
 
     act(() => run.api.theme?.setMode('dark'))
-    expect(window.document.documentElement.dataset.hermesMode).toBe('dark')
+    expect(window.document.documentElement.dataset.mbilingMode).toBe('dark')
     expect(cssVar('--theme-background-seed')).toBe('#1a1a2e')
     expect(contrastRatio(cssVar('--theme-foreground'), cssVar('--theme-background-seed'))).toBeGreaterThanOrEqual(4.5)
   })

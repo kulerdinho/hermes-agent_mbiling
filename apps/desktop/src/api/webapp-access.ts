@@ -1,4 +1,4 @@
-import { hermesApi, profileScoped } from './client'
+import { mbilingApi, profileScoped } from './client'
 
 // Web access: turn on the Webapp the gateway on THIS machine serves, for other devices, behind Nous
 // sign-in. The backend owns every fact here; the pane renders /status and asks for changes.
@@ -40,16 +40,16 @@ export interface WebAccessChange extends WebAccessStatus {
   restart_started: boolean
 }
 
-/** Start builds the Webapp bundle first, as `hermes webapp` does; that build waits up to 30 minutes
+/** Start builds the Webapp bundle first, as `mbiling webapp` does; that build waits up to 30 minutes
  *  for another build of it. */
 const START_REQUEST_TIMEOUT_MS = 35 * 60_000
 
 export function getWebAccessStatus(): Promise<WebAccessStatus> {
-  return hermesApi<WebAccessStatus>({ ...profileScoped(), path: '/api/webapp-access/status' })
+  return mbilingApi<WebAccessStatus>({ ...profileScoped(), path: '/api/webapp-access/status' })
 }
 
 export function startWebAccess(mode: WebAccessMode, publicUrl?: string): Promise<WebAccessChange> {
-  return hermesApi<WebAccessChange>({
+  return mbilingApi<WebAccessChange>({
     ...profileScoped(),
     body: { mode, public_url: publicUrl },
     method: 'POST',
@@ -59,10 +59,10 @@ export function startWebAccess(mode: WebAccessMode, publicUrl?: string): Promise
 }
 
 export function stopWebAccess(): Promise<WebAccessChange> {
-  return hermesApi<WebAccessChange>({ ...profileScoped(), method: 'POST', path: '/api/webapp-access/stop' })
+  return mbilingApi<WebAccessChange>({ ...profileScoped(), method: 'POST', path: '/api/webapp-access/stop' })
 }
 
 /** Restart the gateway onto the saved config, and nothing else. */
 export function restartWebAccess(): Promise<WebAccessChange> {
-  return hermesApi<WebAccessChange>({ ...profileScoped(), method: 'POST', path: '/api/webapp-access/restart' })
+  return mbilingApi<WebAccessChange>({ ...profileScoped(), method: 'POST', path: '/api/webapp-access/restart' })
 }

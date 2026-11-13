@@ -1,11 +1,11 @@
 /**
- * Hermes skin → DesktopTheme converter.
+ * Mbiling skin → DesktopTheme converter.
  *
- * A "skin" is the CLI/TUI theme unit: a YAML file in `$HERMES_HOME/skins/` (or a
- * built-in) resolved by `hermes_cli/skin_engine.py` and pushed to every surface
+ * A "skin" is the CLI/TUI theme unit: a YAML file in `$MBILING_HOME/skins/` (or a
+ * built-in) resolved by `mbiling_cli/skin_engine.py` and pushed to every surface
  * over JSON-RPC (`gateway.ready`, `skin.changed`, `config.get skin`). This is the
  * one place the desktop turns that CLI-shaped palette into a `DesktopTheme`, so a
- * skin Hermes authors from a prompt lights up all three surfaces from one file.
+ * skin Mbiling authors from a prompt lights up all three surfaces from one file.
  *
  * Skins carry terminal-oriented keys (banner/status/completion). We seed the
  * desktop model from the load-bearing few (background, foreground, accent, error)
@@ -15,8 +15,8 @@
  * still picks `.dark` from the real background luminance.
  */
 
-import { ensureContrast, mix } from '@hermes/shared/color'
-import type { HermesSkin, SkinColors } from '@hermes/shared/skin'
+import { ensureContrast, mix } from '@mbiling/shared/color'
+import type { MbilingSkin, SkinColors } from '@mbiling/shared/skin'
 
 import { luminance, normalizeHex, readableInk } from './color'
 import type { DesktopTheme, DesktopThemeColors } from './types'
@@ -44,7 +44,7 @@ const titleCase = (name: string): string => name.charAt(0).toUpperCase() + name.
  * Convert a resolved skin into a `DesktopTheme`, or null when it carries no
  * usable colors (so a broken/empty skin never registers junk).
  */
-export function skinToDesktopTheme(skin: HermesSkin): DesktopTheme | null {
+export function skinToDesktopTheme(skin: MbilingSkin): DesktopTheme | null {
   const name = (skin.name ?? '').trim()
   const colors = skin.colors
 

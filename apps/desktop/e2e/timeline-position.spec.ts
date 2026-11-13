@@ -8,8 +8,9 @@ import { resolveElectronBinary } from './electron-binary'
 import { _electron, expect, test } from './test'
 
 /** Native Chromium geometry, without a backend or the app's other scroll observers. */
+// eslint-disable-next-line no-empty-pattern -- pre-existing upstream pattern
 test('timeline reads stay logarithmic with real skipped tool-heavy groups', async ({}, testInfo) => {
-  const temporary = mkdtempSync(path.join(tmpdir(), 'hermes-timeline-position-'))
+  const temporary = mkdtempSync(path.join(tmpdir(), 'mbiling-timeline-position-'))
   const main = path.join(temporary, 'main.cjs')
   writeFileSync(
     main,

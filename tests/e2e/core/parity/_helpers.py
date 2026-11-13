@@ -1,4 +1,4 @@
-"""Shared fixture HERMES_HOME + invariant checks for the entrypoint-parity suite.
+"""Shared fixture MBILING_HOME + invariant checks for the entrypoint-parity suite.
 
 One fixture home carries every feature that has historically been wired into
 some entrypoints and forgotten in others (issue class C19): a shell hook and a
@@ -28,9 +28,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Callable, Iterable
 
-import hermes_yaml as yaml
+import mbiling_yaml as yaml
 
-from tests.fakes.fake_llm_provider import FakeLLMServer, Text, ToolCall, write_hermes_home
+from tests.fakes.fake_llm_provider import FakeLLMServer, Text, ToolCall, write_mbiling_home
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 FIXTURE_MCP_SERVER = Path(__file__).with_name("fixture_mcp_server.py")
@@ -50,7 +50,7 @@ _PASSTHROUGH_ENV = frozenset({
 
 
 TURN_TIMEOUT = 240.0
-# `hermes gateway stop` waits for the daemon's planned exit (MCP teardown included).
+# `mbiling gateway stop` waits for the daemon's planned exit (MCP teardown included).
 STOP_TIMEOUT = 120.0
 
 
@@ -71,7 +71,7 @@ class ParityHome:
 
     root: Path
     home: Path
-    hermes_home: Path
+    mbiling_home: Path
     project: Path
     markers: Path
     pid_log: Path
@@ -79,45 +79,45 @@ class ParityHome:
     canaries: dict[str, str] = field(default_factory=dict)
 
     def env(self, extra: dict[str, str] | None = None) -> dict[str, str]:
-        """Hermetic env for a subprocess Hermes: fake HOME, no real credentials."""
+        """Hermetic env for a subprocess Mbiling: fake HOME, no real credentials."""
         import pwd  # POSIX-only; the suite is Linux-gated
 
         # Refuse only a home the real install would read as live state (its root or a profile).
-        # A tmp_path under ``~/.hermes/cache/scratch`` (TMPDIR when Hermes itself runs the suite)
-        # is fine: the child's HOME is the fixture home, so its ``~/.hermes`` never resolves there.
-        real_root = Path(pwd.getpwuid(os.getuid()).pw_dir, ".hermes").resolve()
-        fixture = self.hermes_home.resolve()
+        # A tmp_path under ``~/.mbiling/cache/scratch`` (TMPDIR when Mbiling itself runs the suite)
+        # is fine: the child's HOME is the fixture home, so its ``~/.mbiling`` never resolves there.
+        real_root = Path(pwd.getpwuid(os.getuid()).pw_dir, ".mbiling").resolve()
+        fixture = self.mbiling_home.resolve()
         assert fixture != real_root and fixture.parent != real_root / "profiles", (
-            f"fixture HERMES_HOME {self.hermes_home} is the real install's live home")
-        assert fixture == (self.home / ".hermes").resolve(), (
-            f"fixture HERMES_HOME {self.hermes_home} is not <fixture HOME>/.hermes")
-        # Allowlist, not denylist: the runner may itself be a Hermes process whose
-        # TERMINAL_CWD / HERMES_* / credential env would silently reroute the child.
+            f"fixture MBILING_HOME {self.mbiling_home} is the real install's live home")
+        assert fixture == (self.home / ".mbiling").resolve(), (
+            f"fixture MBILING_HOME {self.mbiling_home} is not <fixture HOME>/.mbiling")
+        # Allowlist, not denylist: the runner may itself be a Mbiling process whose
+        # TERMINAL_CWD / MBILING_* / credential env would silently reroute the child.
         env = {
             k: v for k, v in os.environ.items()
             if (k in _PASSTHROUGH_ENV or k.startswith("LC_")) and not k.endswith(_SECRET_ENV_SUFFIXES)
         }
         env.update({
             "HOME": str(self.home),
-            "HERMES_HOME": str(self.hermes_home),
+            "MBILING_HOME": str(self.mbiling_home),
             "PYTHONPATH": str(REPO_ROOT),
             "PYTHONUNBUFFERED": "1",
             "NO_COLOR": "1",
             "TERM": "dumb",
             # Orphan-scan tag: every process in the spawned tree inherits it.
             "PARITY_TREE_TAG": self.tag,
-            # The child's HOME is the fixture home, so its ``~/.hermes/state.db`` IS
-            # the tmp HERMES_HOME's db; under a pytest ancestor the live-DB guard
-            # (hermes_state_guard) would refuse it. This is the guard's documented
+            # The child's HOME is the fixture home, so its ``~/.mbiling/state.db`` IS
+            # the tmp MBILING_HOME's db; under a pytest ancestor the live-DB guard
+            # (mbiling_state_guard) would refuse it. This is the guard's documented
             # child-process escape hatch; the path is tmp_path by construction.
-            "HERMES_STATE_DB_GUARD_BYPASS": "1",
+            "MBILING_STATE_DB_GUARD_BYPASS": "1",
         })
         env.update(extra or {})
         return env
 
     def update_config(self, mutate: Callable[[dict], None]) -> None:
         """Apply ``mutate`` to config.yaml (for surfaces with a documented config-only channel)."""
-        path = self.hermes_home / "config.yaml"
+        path = self.mbiling_home / "config.yaml"
         cfg = yaml.safe_load(path.read_text(encoding="utf-8"))
         mutate(cfg)
         path.write_text(yaml.safe_dump(cfg, sort_keys=False), encoding="utf-8")
@@ -131,22 +131,22 @@ def build_parity_home(root: Path, base_url: str, *, grandchild: bool = True,
                       death_tool: bool = False, mcp_timeout: int = 60) -> ParityHome:
     """Write the full fixture home under ``root`` (a tmp_path)."""
     home = root / "home"
-    hermes_home = home / ".hermes"
+    mbiling_home = home / ".mbiling"
     project = root / "project"
     markers = root / "markers"
-    for d in (hermes_home, project, markers):
+    for d in (mbiling_home, project, markers):
         d.mkdir(parents=True, exist_ok=True)
     tag = uuid.uuid4().hex
     c = {name: f"{name.upper()}-{uuid.uuid4().hex[:12]}" for name in (
         "context", "skill", "memory", "shell_hook", "plugin_hook", "mcp")}
-    ph = ParityHome(root=root, home=home, hermes_home=hermes_home, project=project,
+    ph = ParityHome(root=root, home=home, mbiling_home=mbiling_home, project=project,
                     markers=markers, pid_log=root / "mcp_pids.log", tag=tag, canaries=c)
 
-    write_hermes_home(hermes_home, base_url)
-    cfg = yaml.safe_load((hermes_home / "config.yaml").read_text(encoding="utf-8"))
+    write_mbiling_home(mbiling_home, base_url)
+    cfg = yaml.safe_load((mbiling_home / "config.yaml").read_text(encoding="utf-8"))
     cfg["agent"]["disabled_toolsets"] = [DISABLED_TOOLSET]
     cfg["hooks"] = {"pre_llm_call": [{
-        "command": f"{sys.executable} {hermes_home / 'agent-hooks' / 'shell_hook.py'}",
+        "command": f"{sys.executable} {mbiling_home / 'agent-hooks' / 'shell_hook.py'}",
         "timeout": 30,
     }]}
     cfg["hooks_auto_accept"] = True
@@ -177,9 +177,9 @@ def build_parity_home(root: Path, base_url: str, *, grandchild: bool = True,
     # Keep turns hermetic and short: no title/aux model chatter decides anything here.
     cfg.setdefault("display", {})["compact"] = True
     cfg["updates"] = {"check": False}  # offline: no GitHub round-trip or git lazy fetch
-    (hermes_home / "config.yaml").write_text(yaml.safe_dump(cfg, sort_keys=False), encoding="utf-8")
+    (mbiling_home / "config.yaml").write_text(yaml.safe_dump(cfg, sort_keys=False), encoding="utf-8")
 
-    hooks_dir = hermes_home / "agent-hooks"
+    hooks_dir = mbiling_home / "agent-hooks"
     hooks_dir.mkdir()
     (hooks_dir / "shell_hook.py").write_text(
         "import json, os, sys\n"
@@ -191,7 +191,7 @@ def build_parity_home(root: Path, base_url: str, *, grandchild: bool = True,
         encoding="utf-8",
     )
 
-    plugin_dir = hermes_home / "plugins" / PLUGIN_NAME
+    plugin_dir = mbiling_home / "plugins" / PLUGIN_NAME
     plugin_dir.mkdir(parents=True)
     (plugin_dir / "plugin.yaml").write_text(
         f"name: {PLUGIN_NAME}\nversion: 1.0.0\ndescription: parity suite marker plugin\n",
@@ -209,7 +209,7 @@ def build_parity_home(root: Path, base_url: str, *, grandchild: bool = True,
         encoding="utf-8",
     )
 
-    skill_dir = hermes_home / "skills" / "parity-skill"
+    skill_dir = mbiling_home / "skills" / "parity-skill"
     skill_dir.mkdir(parents=True)
     (skill_dir / "SKILL.md").write_text(
         "---\nname: parity-skill\n"
@@ -218,7 +218,7 @@ def build_parity_home(root: Path, base_url: str, *, grandchild: bool = True,
         encoding="utf-8",
     )
 
-    mem_dir = hermes_home / "memories"
+    mem_dir = mbiling_home / "memories"
     mem_dir.mkdir()
     (mem_dir / "MEMORY.md").write_text(f"The parity memory canary is {c['memory']}.", encoding="utf-8")
 
@@ -443,8 +443,8 @@ def kill_tagged(ph: ParityHome) -> None:
             pass
 
 
-def hermes_argv(*args: str) -> list[str]:
-    return [sys.executable, "-m", "hermes_cli.main", *args]
+def mbiling_argv(*args: str) -> list[str]:
+    return [sys.executable, "-m", "mbiling_cli.main", *args]
 
 
 def terminate(proc: subprocess.Popen, timeout: float = 30.0) -> int | None:
@@ -460,9 +460,9 @@ def terminate(proc: subprocess.Popen, timeout: float = 30.0) -> int | None:
 
 
 def stop_profile_gateway(ph: ParityHome, timeout: float = STOP_TIMEOUT) -> bool:
-    """The normal stop for the profile's ``gateway run`` daemon: ``hermes gateway stop``.
+    """The normal stop for the profile's ``gateway run`` daemon: ``mbiling gateway stop``.
 
-    ``hermes -z``, ``hermes chat -q``, ``hermes acp`` and ``hermes cron run`` are clients of the
+    ``mbiling -z``, ``mbiling chat -q``, ``mbiling acp`` and ``mbiling cron run`` are clients of the
     unified gateway runtime: their first connect spawns the profile's daemon (``ensure_gateway_runtime``
     → ``spawn_unmanaged_gateway``), the daemon owns the agent — and with it the MCP server tree — and it
     keeps serving after the client exits (cron, messaging, the next client). So the surface's
@@ -471,10 +471,10 @@ def stop_profile_gateway(ph: ParityHome, timeout: float = STOP_TIMEOUT) -> bool:
     none was running, e.g. a client that never reached the daemon).
     """
     proc = subprocess.run(
-        hermes_argv("gateway", "stop"), cwd=ph.project, env=ph.env(), capture_output=True, text=True,
+        mbiling_argv("gateway", "stop"), cwd=ph.project, env=ph.env(), capture_output=True, text=True,
         timeout=timeout, stdin=subprocess.DEVNULL, check=False
     )
-    assert proc.returncode == 0, f"hermes gateway stop exited {proc.returncode}: {proc.stderr[-2000:]}"
+    assert proc.returncode == 0, f"mbiling gateway stop exited {proc.returncode}: {proc.stderr[-2000:]}"
     return "Stopped gateway" in proc.stdout
 
 

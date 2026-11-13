@@ -1,6 +1,6 @@
-import { type ProfileScope, profileScopeKey } from '@/hermes'
 import { queryClient } from '@/lib/query-client'
 import { readJson, writeJson } from '@/lib/storage'
+import { type ProfileScope, profileScopeKey } from '@/mbiling'
 import { $freeTierStatus } from '@/store/free-tier'
 
 import { MCP_CATALOG_KEY } from '../../mcp/mcp-status'
@@ -13,9 +13,9 @@ export type PersistedRead = 'bundled' | 'servers' | ConnectorRead
 const persists = (read: PersistedRead): boolean =>
   read === 'bundled' || read === 'servers' || CONNECTOR_LIFETIMES[read].persist
 
-const STORAGE_PREFIX = 'hermes.connectors.v4.'
+const STORAGE_PREFIX = 'mbiling.connectors.v4.'
 
-const IDENTITY_KEY = 'hermes.connectors.identity.v4'
+const IDENTITY_KEY = 'mbiling.connectors.identity.v4'
 
 const PERSIST_MAX_BYTES = 256 * 1024
 

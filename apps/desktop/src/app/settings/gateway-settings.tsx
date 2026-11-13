@@ -1,4 +1,4 @@
-import { isGatewayReauthRequired } from '@hermes/shared'
+import { isGatewayReauthRequired } from '@mbiling/shared'
 import { useStore } from '@nanostores/react'
 import { useEffect, useRef, useState } from 'react'
 
@@ -32,6 +32,7 @@ import {
   RefreshCw,
   Terminal
 } from '@/lib/icons'
+import { NOUS_ENABLED } from '@/lib/nous'
 import { coerceRemoteUrlScheme } from '@/lib/remote-url'
 import { selectableCardClass } from '@/lib/selectable-card'
 import { cn } from '@/lib/utils'
@@ -57,7 +58,7 @@ import { WebappGatewaySettings } from './webapp-gateway-settings'
 
 type Mode = 'local' | 'remote' | 'cloud' | 'ssh'
 type AuthMode = 'oauth' | 'token'
-// Hermes Cloud discovery lifecycle for the cloud-mode panel.
+// Mbiling Cloud discovery lifecycle for the cloud-mode panel.
 type CloudDiscoverStatus = 'idle' | 'loading' | 'done' | 'error'
 
 export interface GatewaySettingsState {
@@ -79,7 +80,7 @@ export interface GatewaySettingsState {
   sshUser: string
   sshPort: number | null
   sshKeyPath: string
-  sshRemoteHermesPath: string
+  sshRemoteMbilingPath: string
   sshRemoteProfile: string
 }
 
@@ -100,7 +101,7 @@ const EMPTY_STATE: GatewaySettingsState = {
   sshUser: '',
   sshPort: null,
   sshKeyPath: '',
-  sshRemoteHermesPath: '',
+  sshRemoteMbilingPath: '',
   sshRemoteProfile: ''
 }
 
@@ -270,7 +271,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
     host: 'settings',
     enabled: !loading && state.mode === 'remote',
     beforeOAuthLogin: async (payload: DesktopConnectionConfigInput): Promise<void> => {
-      await window.hermesDesktop.saveConnectionConfig(payload)
+      await window.mbilingDesktop.saveConnectionConfig(payload)
     },
     onNotice: notify
   })
@@ -315,7 +316,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
   // so confirm resumes the right one.
   const [plainTextConfirm, setPlainTextConfirm] = useState<null | { apply: boolean }>(null)
 
-  // --- Hermes Cloud (cloud mode) state ---
+  // --- Mbiling Cloud (cloud mode) state ---
   // One portal session powers discovery + the silent per-agent cascade. These
   // track the cloud panel: whether we're signed in, the discovered agent list,
   // and which agent is mid-connect.
@@ -343,7 +344,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
 
   useEffect(() => {
     let cancelled = false
-    const desktop = window.hermesDesktop
+    const desktop = window.mbilingDesktop
 
     if (!desktop?.getConnectionConfig) {
       setLoading(false)
@@ -414,7 +415,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
         throw error
       }
 
-      const desktop = window.hermesDesktop
+      const desktop = window.mbilingDesktop
 
       // Cloud registry URLs are the persisted agent dashboardUrl. Keep saved
       // rows usable without discovery, but never run the cascade against ''.
@@ -462,12 +463,12 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
   }, [state.sshHost, sshHostSuggestions])
 
   useEffect(() => {
-    if (state.mode !== 'ssh' || !window.hermesDesktop?.sshConfigHosts) {
+    if (state.mode !== 'ssh' || !window.mbilingDesktop?.sshConfigHosts) {
       return
     }
 
     let cancelled = false
-    void window.hermesDesktop
+    void window.mbilingDesktop
       .sshConfigHosts()
       .then(result => {
         if (!cancelled) {
@@ -500,7 +501,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
     state.sshUser,
     state.sshPort,
     state.sshKeyPath,
-    state.sshRemoteHermesPath,
+    state.sshRemoteMbilingPath,
     state.sshRemoteProfile
   ])
 
@@ -521,7 +522,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
           sshUser: state.sshUser.trim(),
           sshPort: state.sshPort,
           sshKeyPath: state.sshKeyPath.trim(),
-          sshRemoteHermesPath: state.sshRemoteHermesPath.trim(),
+          sshRemoteMbilingPath: state.sshRemoteMbilingPath.trim(),
           // A blank clears an existing remote-profile mapping.
           sshRemoteProfile: state.sshRemoteProfile.trim()
         }),
@@ -545,8 +546,8 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
 
     try {
       const next = apply
-        ? await window.hermesDesktop.applyConnectionConfig(payload(allowPlainTextToken))
-        : await window.hermesDesktop.saveConnectionConfig(payload(allowPlainTextToken))
+        ? await window.mbilingDesktop.applyConnectionConfig(payload(allowPlainTextToken))
+        : await window.mbilingDesktop.saveConnectionConfig(payload(allowPlainTextToken))
 
       if (seq !== saveSeq.current) {
         return
@@ -574,7 +575,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
 
       const errors = {
         'auth-failed': g.sshErrAuth,
-        'hermes-not-found': g.sshErrNotInstalled,
+        'mbiling-not-found': g.sshErrNotInstalled,
         'host-key-changed': g.sshErrHostKey,
         'interactive-auth': g.sshErrInteractiveAuth,
         timeout: g.sshErrTimeout,
@@ -622,14 +623,14 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
     await performSave(apply, false)
   }
 
-  // --- Hermes Cloud handlers ---
+  // --- Mbiling Cloud handlers ---
 
   // Pull the discovered agent list over the shared portal session. Tolerant of
   // a lapsed session: a needsCloudLogin error flips us back to signed-out.
   // `org` scopes discovery for multi-org users; when discovery comes back with
   // needsOrgSelection we surface the org list and show a picker instead.
   const discoverCloud = async (org?: string) => {
-    const desktop = window.hermesDesktop
+    const desktop = window.mbilingDesktop
     const seq = contextSeq.current
 
     if (!desktop?.cloud) {
@@ -714,7 +715,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
       return
     }
 
-    const desktop = window.hermesDesktop
+    const desktop = window.mbilingDesktop
 
     if (!desktop?.cloud) {
       return
@@ -760,7 +761,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
   }, [state.mode])
 
   const cloudSignIn = async () => {
-    const desktop = window.hermesDesktop
+    const desktop = window.mbilingDesktop
     const seq = ++signingSeq.current
 
     if (!desktop?.cloud) {
@@ -793,7 +794,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
   }
 
   const cloudSignOut = async () => {
-    const desktop = window.hermesDesktop
+    const desktop = window.mbilingDesktop
     const seq = ++signingSeq.current
 
     if (!desktop?.cloud) {
@@ -836,7 +837,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
       return
     }
 
-    const desktop = window.hermesDesktop
+    const desktop = window.mbilingDesktop
 
     if (!desktop?.cloud) {
       return
@@ -929,14 +930,14 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
   }
 
   const resolveSshHost = async (host: string) => {
-    if (!host || !window.hermesDesktop?.sshResolveHost) {
+    if (!host || !window.mbilingDesktop?.sshResolveHost) {
       return
     }
 
     const seq = ++sshResolveSeq.current
 
     try {
-      const resolved = await window.hermesDesktop.sshResolveHost(host)
+      const resolved = await window.mbilingDesktop.sshResolveHost(host)
 
       if (seq !== sshResolveSeq.current) {
         return
@@ -974,7 +975,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
     setLastTest(null)
 
     try {
-      const result = await window.hermesDesktop.testConnectionConfig(payload())
+      const result = await window.mbilingDesktop.testConnectionConfig(payload())
 
       if (seq !== sshTestSeq.current) {
         return
@@ -983,7 +984,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
       if (!result.reachable) {
         const errors = {
           'auth-failed': g.sshErrAuth,
-          'hermes-not-found': g.sshErrNotInstalled,
+          'mbiling-not-found': g.sshErrNotInstalled,
           'host-key-changed': g.sshErrHostKey,
           'interactive-auth': g.sshErrInteractiveAuth,
           timeout: g.sshErrTimeout,
@@ -1026,7 +1027,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
     )
   }
 
-  if (!window.hermesDesktop?.getConnectionConfig) {
+  if (!window.mbilingDesktop?.getConnectionConfig) {
     return <EmptyState description={g.unavailableDesc} title={g.unavailableTitle} />
   }
 
@@ -1068,14 +1069,16 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
             onSelect={() => setState(current => ({ ...current, mode: 'local' }))}
             title={g.localTitle}
           />
-          <ModeCard
-            active={state.mode === 'cloud'}
-            description={g.cloudDesc}
-            disabled={state.envOverride}
-            icon={Cloud}
-            onSelect={() => setState(current => ({ ...current, mode: 'cloud' }))}
-            title={g.cloudTitle}
-          />
+          {NOUS_ENABLED || state.mode === 'cloud' ? (
+            <ModeCard
+              active={state.mode === 'cloud'}
+              description={g.cloudDesc}
+              disabled={state.envOverride}
+              icon={Cloud}
+              onSelect={() => setState(current => ({ ...current, mode: 'cloud' }))}
+              title={g.cloudTitle}
+            />
+          ) : null}
           <ModeCard
             active={state.mode === 'remote'}
             description={g.remoteDesc}
@@ -1097,7 +1100,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
         </div>
       </div>
 
-      {/* Hermes Cloud panel: one portal sign-in, then a discovered-agent picker
+      {/* Mbiling Cloud panel: one portal sign-in, then a discovered-agent picker
           whose selection drives the silent per-agent cascade + a cloud
           connection. Replaces the URL/token form while in cloud mode. */}
       {state.mode === 'cloud' && !state.envOverride ? (
@@ -1280,7 +1283,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
         </div>
       ) : null}
 
-      {/* An env-pinned remote (HERMES_DESKTOP_REMOTE_URL) still renders this
+      {/* An env-pinned remote (MBILING_DESKTOP_REMOTE_URL) still renders this
           block: the override pins the URL/mode, but the browser SESSION is not
           env-owned — docs promise "you still sign in from the Gateway settings
           panel" (user-guide/desktop.md). Hiding it left a lapsed session with
@@ -1398,13 +1401,13 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
             action={
               <Input
                 className={cn('h-8 font-mono', CONTROL_TEXT)}
-                onChange={event => setState(current => ({ ...current, sshRemoteHermesPath: event.target.value }))}
-                placeholder={g.sshHermesPathPlaceholder}
-                value={state.sshRemoteHermesPath}
+                onChange={event => setState(current => ({ ...current, sshRemoteMbilingPath: event.target.value }))}
+                placeholder={g.sshMbilingPathPlaceholder}
+                value={state.sshRemoteMbilingPath}
               />
             }
-            description={g.sshHermesPathDesc}
-            title={g.sshHermesPathTitle}
+            description={g.sshMbilingPathDesc}
+            title={g.sshMbilingPathTitle}
           />
         </div>
       ) : null}
@@ -1461,7 +1464,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
           <KeychainEncryptionSetting keychain={keychainEncryption} />
           <ListRow
             action={
-              <Button onClick={() => void window.hermesDesktop?.revealLogs()} size="sm" variant="textStrong">
+              <Button onClick={() => void window.mbilingDesktop?.revealLogs()} size="sm" variant="textStrong">
                 <FileText />
                 {g.openLogs}
               </Button>

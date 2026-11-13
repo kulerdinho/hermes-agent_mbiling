@@ -77,7 +77,7 @@ function Harness() {
     handleServerRequest: () => false,
     onConnectionReady: () => undefined,
     onGatewayReady: () => undefined,
-    refreshHermesConfig: async () => undefined,
+    refreshMbilingConfig: async () => undefined,
     refreshSessions: async () => undefined
   })
 
@@ -124,7 +124,7 @@ afterEach(() => {
   $connection.set(null)
   vi.useRealTimers()
   ;(globalThis as { WebSocket: unknown }).WebSocket = originalWebSocket
-  delete (window as { hermesDesktop?: unknown }).hermesDesktop
+  delete (window as { mbilingDesktop?: unknown }).mbilingDesktop
 })
 
 async function flushAsync() {
@@ -136,7 +136,7 @@ async function flushAsync() {
 it('a hold published after boot (a pool/profile backend) still reaches the blocked screen (R8 M6)', async () => {
   const desktop = fakeDesktop()
 
-  ;(window as { hermesDesktop?: unknown }).hermesDesktop = desktop
+  ;(window as { mbilingDesktop?: unknown }).mbilingDesktop = desktop
   render(<Harness />)
   await flushAsync()
   expect($gatewayState.get()).toBe('open')

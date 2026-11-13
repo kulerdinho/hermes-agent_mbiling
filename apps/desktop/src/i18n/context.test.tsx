@@ -1,7 +1,7 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import type { HermesConfigRecord } from '@/hermes'
+import type { MbilingConfigRecord } from '@/mbiling'
 
 import { TRANSLATIONS } from './catalog'
 import { type I18nConfigClient, I18nProvider, useI18n } from './context'
@@ -185,7 +185,7 @@ describe('I18nProvider', () => {
   })
 
   it('mirrors a registered language’s direction onto the document', async () => {
-    const dispose = registerAppLocale('he', { endonym: 'עברית', rtl: true }, 'plugin:hermes-lang-he')
+    const dispose = registerAppLocale('he', { endonym: 'עברית', rtl: true }, 'plugin:mbiling-lang-he')
 
     try {
       render(
@@ -204,7 +204,7 @@ describe('I18nProvider', () => {
   it('reads latest config before saving language and preserves unrelated values', async () => {
     const saveConfig = vi.fn().mockResolvedValue({ ok: true })
 
-    const latestConfig: HermesConfigRecord = {
+    const latestConfig: MbilingConfigRecord = {
       display: { language: 'en', skin: 'slate' },
       terminal: { cwd: '/new' }
     }
@@ -404,5 +404,81 @@ describe('I18nProvider', () => {
     expect(screen.getByTestId('locale').textContent).toBe('ja')
 
     vi.useRealTimers()
+  })
+})
+
+describe('I18nProvider before sign-in (no server config yet)', () => {
+  afterEach(() => {
+    cleanup()
+    Reflect.deleteProperty(window, 'mbilingDesktop')
+  })
+
+  it('follows the Windows display language instead of English', async () => {
+    Object.defineProperty(window, 'mbilingDesktop', {
+      configurable: true,
+      value: { getMachineProfile: vi.fn().mockResolvedValue({ locale: 'fr-FR' }) }
+    })
+    const configClient: I18nConfigClient = {
+      getConfig: vi.fn().mockRejectedValue(new Error('not signed in yet')),
+      saveConfig: vi.fn()
+    }
+
+    render(
+      <I18nProvider configClient={configClient}>
+        <LanguageProbe />
+      </I18nProvider>
+    )
+
+    await waitFor(() => expect(screen.getByTestId('locale').textContent).toBe('fr'))
+  })
+
+  it('stays in English for a Windows language Mbiling does not ship', async () => {
+    Object.defineProperty(window, 'mbilingDesktop', {
+      configurable: true,
+      value: { getMachineProfile: vi.fn().mockResolvedValue({ locale: 'sw-KE' }) }
+    })
+    const configClient: I18nConfigClient = {
+      getConfig: vi.fn().mockRejectedValue(new Error('not signed in yet')),
+      saveConfig: vi.fn()
+    }
+
+    render(
+      <I18nProvider configClient={configClient}>
+        <LanguageProbe />
+      </I18nProvider>
+    )
+
+    await act(async () => {})
+    expect(screen.getByTestId('locale').textContent).toBe('en')
+  })
+})
+
+describe('I18nProvider while the config request is still pending (not signed in)', () => {
+  afterEach(() => {
+    cleanup()
+    Reflect.deleteProperty(window, 'mbilingDesktop')
+  })
+
+  it('shows the Windows language right away, then a saved choice wins', async () => {
+    Object.defineProperty(window, 'mbilingDesktop', {
+      configurable: true,
+      value: { getMachineProfile: vi.fn().mockResolvedValue({ locale: 'fr' }) }
+    })
+    let answer: (config: MbilingConfigRecord) => void = () => {}
+    const configClient: I18nConfigClient = {
+      getConfig: vi.fn(() => new Promise<MbilingConfigRecord>(resolve => (answer = resolve))),
+      saveConfig: vi.fn()
+    }
+
+    render(
+      <I18nProvider configClient={configClient}>
+        <LanguageProbe />
+      </I18nProvider>
+    )
+
+    await waitFor(() => expect(screen.getByTestId('locale').textContent).toBe('fr'))
+
+    await act(async () => answer({ display: { language: 'de' } } as MbilingConfigRecord))
+    await waitFor(() => expect(screen.getByTestId('locale').textContent).toBe('de'))
   })
 })

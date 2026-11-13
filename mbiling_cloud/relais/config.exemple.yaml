@@ -8,7 +8,11 @@
 # Jeton que la cellule (plugin mbiling_mains) présente au Relais.
 jeton_interne_env: MBILING_RELAIS_JETON_INTERNE
 
-# Appareils autorisés à se connecter. En phase 1, cette liste viendra de Mbiling Comptes.
+# PC inscrits automatiquement (quand l'utilisateur autorise l'agent à utiliser son PC) :
+# le Relais n'y garde que l'empreinte de chaque jeton. Mettre ce fichier sur un volume sauvegardé.
+fichier_appareils: /srv/mbiling/relais/appareils.json
+
+# Appareils déclarés à la main (essais uniquement). Peut être vide.
 appareils:
   - identifiant: pc-test-1
     organisation: org-test

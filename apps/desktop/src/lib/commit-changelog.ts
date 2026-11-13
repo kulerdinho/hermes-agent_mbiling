@@ -193,7 +193,7 @@ export function buildCommitChangelog(
 
 /** Format a full changelog text for clipboard copy.
  *
- *  Header: `=== Hermes Update Changelog ===`
+ *  Header: `=== Mbiling Update Changelog ===`
  *  Behind header: `Behind by N commits on branch X`
  *  Each commit: `type(scope)!: subject — author`
  *  Breaking commits use canonical `type(scope)!:` not `type!(scope):`.

@@ -3,7 +3,7 @@
  *
  * "This device" is the Electron-managed local backend (a multiplexing gateway
  * whose groups.capabilities reports the gateway-owned room driver). "Homelab"
- * is a REAL second `hermes serve` with its own HOME + HERMES_HOME, registered
+ * is a REAL second `mbiling serve` with its own HOME + MBILING_HOME, registered
  * as a remote connection, both answering from one mock inference server.
  *
  * New Group Chat must offer Homelab's bot beside this device's, create the
@@ -50,10 +50,10 @@ async function freePort(): Promise<number> {
 }
 
 /** A real second gateway: its own HOME (the host singleton is per HOME) and
- *  HERMES_HOME, this tree's code, the runtime venv's interpreter. */
+ *  MBILING_HOME, this tree's code, the runtime venv's interpreter. */
 async function startRemoteGateway(root: string, mockUrl: string) {
   const fakeHome = path.join(root, 'homelab-root')
-  const home = path.join(fakeHome, '.hermes')
+  const home = path.join(fakeHome, '.mbiling')
   fs.mkdirSync(home, { recursive: true })
   writeMockProviderConfig(home, mockUrl, undefined, MULTIPLEX)
   writeEnvFile(home, undefined, mockUrl)
@@ -61,10 +61,10 @@ async function startRemoteGateway(root: string, mockUrl: string) {
   const url = `http://127.0.0.1:${port}`
   const python = process.env.CROSS_GATEWAY_PYTHON || path.join(REPO_ROOT, '.venv', 'bin', 'python')
 
-  const child: ChildProcess = spawn(python, ['-m', 'hermes_cli.main', 'serve', '--host', '127.0.0.1', '--port', String(port), '--skip-build'], {
+  const child: ChildProcess = spawn(python, ['-m', 'mbiling_cli.main', 'serve', '--host', '127.0.0.1', '--port', String(port), '--skip-build'], {
     cwd: REPO_ROOT,
     detached: true,
-    env: { ...process.env, HOME: fakeHome, HERMES_HOME: home, PYTHONPATH: REPO_ROOT, HERMES_DASHBOARD_SESSION_TOKEN: REMOTE_TOKEN },
+    env: { ...process.env, HOME: fakeHome, MBILING_HOME: home, PYTHONPATH: REPO_ROOT, MBILING_DASHBOARD_SESSION_TOKEN: REMOTE_TOKEN },
     stdio: ['ignore', 'pipe', 'pipe']
   })
 
@@ -74,10 +74,10 @@ async function startRemoteGateway(root: string, mockUrl: string) {
   const deadline = Date.now() + 90_000
 
   while (Date.now() < deadline) {
-    if (child.exitCode !== null) {throw new Error(`remote hermes serve exited early (${child.exitCode}):\n${log}`)}
+    if (child.exitCode !== null) {throw new Error(`remote mbiling serve exited early (${child.exitCode}):\n${log}`)}
 
     try {
-      if ((await fetch(`${url}/api/status`, { headers: { 'X-Hermes-Session-Token': REMOTE_TOKEN } })).ok) {break}
+      if ((await fetch(`${url}/api/status`, { headers: { 'X-Mbiling-Session-Token': REMOTE_TOKEN } })).ok) {break}
     } catch {
       // not up yet
     }
@@ -146,11 +146,11 @@ test.describe('cross-gateway group chat', () => {
     test.setTimeout(300_000)
     mock = await startMockServer()
     sandbox = createSandbox('xgw')
-    writeMockProviderConfig(sandbox.hermesHome, mock.url, undefined, MULTIPLEX)
-    writeEnvFile(sandbox.hermesHome, undefined, mock.url)
+    writeMockProviderConfig(sandbox.mbilingHome, mock.url, undefined, MULTIPLEX)
+    writeEnvFile(sandbox.mbilingHome, undefined, mock.url)
     // A second bot on this device, so main's picker opens (it needs two seatable
     // bots) and shows which machines it offers.
-    const scribe = path.join(sandbox.hermesHome, 'profiles', 'scribe')
+    const scribe = path.join(sandbox.mbilingHome, 'profiles', 'scribe')
     writeMockProviderConfig(scribe, mock.url)
     writeEnvFile(scribe, undefined, mock.url)
     remote = await startRemoteGateway(sandbox.root, mock.url)
@@ -174,7 +174,7 @@ test.describe('cross-gateway group chat', () => {
 
   test('New Group Chat seats a bot from each machine and both answer in the room', async () => {
     test.setTimeout(420_000)
-    const capabilities = await page.evaluate(() => (window as any).hermesDesktop?.api?.({ method: 'GET', path: '/api/status' }).catch(() => null))
+    const capabilities = await page.evaluate(() => (window as any).mbilingDesktop?.api?.({ method: 'GET', path: '/api/status' }).catch(() => null))
     console.log('PROBE_RESULT local status', JSON.stringify(capabilities)?.slice(0, 300))
 
     await openBots(page)
@@ -228,7 +228,7 @@ test.describe('cross-gateway group chat', () => {
     await composer.press('Enter')
 
     const roomLog = () => page.evaluate(room => {
-      const rooms = JSON.parse(localStorage.getItem('hermes.plugin.hermes-bots.group-chats') || '{}')
+      const rooms = JSON.parse(localStorage.getItem('mbiling.plugin.mbiling-bots.group-chats') || '{}')
 
       return (rooms[room]?.log || []).map((entry: any) => ({ from: entry.from?.name, connection: entry.from?.connectionId, text: entry.text }))
     }, ROOM)
@@ -259,7 +259,7 @@ test.describe('cross-gateway group chat', () => {
       'print(n)'
     ].join(String.fromCharCode(10)), home, marker], { encoding: 'utf8' }).stdout.trim()
     const ownership = {
-      thisDevice: { LOCAL_OK: owner(sandbox.hermesHome, 'LOCAL_OK answered'), REMOTE_OK: owner(sandbox.hermesHome, 'REMOTE_OK answered') },
+      thisDevice: { LOCAL_OK: owner(sandbox.mbilingHome, 'LOCAL_OK answered'), REMOTE_OK: owner(sandbox.mbilingHome, 'REMOTE_OK answered') },
       homelab: { LOCAL_OK: owner(remote.home, 'LOCAL_OK answered'), REMOTE_OK: owner(remote.home, 'REMOTE_OK answered') }
     }
     console.log('PROBE_RESULT assistant rows per gateway state.db', JSON.stringify(ownership))

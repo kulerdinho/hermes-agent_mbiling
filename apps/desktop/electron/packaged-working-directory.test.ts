@@ -40,14 +40,14 @@ test('a packaged Windows app leaves a CWD inside its install folder and keeps on
     packagedWorkingDirectoryTarget({ ...app, cwd, homedir: home, ...facts })
 
   assert.equal(target('C:\\Mbiling\\win-unpacked'), home, 'the install folder (shortcut "Start in")')
-  assert.equal(target('c:\\hermes\\WIN-UNPACKED\\resources'), home, 'below it, any case')
+  assert.equal(target('c:\\mbiling\\WIN-UNPACKED\\resources'), home, 'below it, any case')
   assert.equal(target('C:\\Mbiling'), null, 'the parent folder is a workspace, not the app tree')
   assert.equal(target('D:\\work\\repo'), null, 'a workspace on another drive')
   assert.equal(target('C:\\Mbiling\\win-unpacked-old'), null, 'a sibling that shares a name prefix')
   assert.equal(target('C:\\Mbiling\\win-unpacked', { isPackaged: false }), null, 'dev runs keep their CWD')
 
   for (const platform of ['linux', 'darwin'] as const) {
-    assert.equal(target('/opt/Hermes', { platform, execPath: '/opt/Hermes/hermes' }), null, platform)
+    assert.equal(target('/opt/Mbiling', { platform, execPath: '/opt/Mbiling/mbiling' }), null, platform)
   }
 })
 
@@ -75,7 +75,7 @@ test('a home folder that cannot be entered leaves the CWD and does not crash sta
 test.skipIf(process.platform !== 'win32')(
   'packaged startup releases the install CWD before main can pass it to resident helpers',
   async () => {
-    const root = await mkdtemp(path.join(os.tmpdir(), 'hermes-entry-cwd-'))
+    const root = await mkdtemp(path.join(os.tmpdir(), 'mbiling-entry-cwd-'))
     const install = path.join(root, 'win-unpacked')
     const workspace = path.join(root, 'workspace')
     await mkdir(install)
@@ -96,7 +96,7 @@ test.skipIf(process.platform !== 'win32')(
           format: 'esm',
           define: {
             'process.execPath': JSON.stringify(path.join(install, 'Mbiling.exe')),
-            'process.env.HERMES_DESKTOP_IS_PACKAGED': 'undefined'
+            'process.env.MBILING_DESKTOP_IS_PACKAGED': 'undefined'
           },
           plugins: [
             {

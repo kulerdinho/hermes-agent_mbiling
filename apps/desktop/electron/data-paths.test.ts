@@ -4,7 +4,7 @@ import path from 'node:path'
 
 import { afterEach, test, vi } from 'vitest'
 
-import { platformDefaultHermesHome, resolveDesktopHermesHome, resolveDesktopUserData } from './data-paths'
+import { platformDefaultMbilingHome, resolveDesktopMbilingHome, resolveDesktopUserData } from './data-paths'
 import { controlSocketPath } from './ssh-connection'
 
 afterEach((): void => {
@@ -12,10 +12,10 @@ afterEach((): void => {
 })
 
 test.skipIf(process.platform === 'win32')('local SSH sockets use the suffixed default root', (): void => {
-  vi.stubEnv('HERMES_DATA_DIR_SUFFIX', 'magic-test')
+  vi.stubEnv('MBILING_DATA_DIR_SUFFIX', 'magic-test')
   const socket: string = controlSocketPath('user', 'host', 22)
 
-  assert.equal(path.dirname(socket), path.join(platformDefaultHermesHome(os.homedir()), 'desktop-ssh'))
+  assert.equal(path.dirname(socket), path.join(platformDefaultMbilingHome(os.homedir()), 'desktop-ssh'))
 })
 
 test('default data roots append the suffix literally on each platform', (): void => {
@@ -24,15 +24,15 @@ test('default data roots append the suffix literally on each platform', (): void
     const home: string = platform === 'win32' ? 'C:\\Users\\test' : '/home/test'
     const local: string = paths.join(home, 'AppData', 'Local')
     const userData: string = paths.join(home, 'app-data', 'Mbiling')
-    const base: string = platform === 'win32' ? paths.join(local, 'hermes') : paths.join(home, '.hermes')
+    const base: string = platform === 'win32' ? paths.join(local, 'mbiling') : paths.join(home, '.mbiling')
 
     for (const suffix of ['', '-asdfasdf', 'magic-test', ' spaced ']) {
-      const env: NodeJS.ProcessEnv = { LOCALAPPDATA: local, HERMES_DATA_DIR_SUFFIX: suffix }
+      const env: NodeJS.ProcessEnv = { LOCALAPPDATA: local, MBILING_DATA_DIR_SUFFIX: suffix }
 
-      assert.equal(platformDefaultHermesHome(home, env, platform), base + suffix)
+      assert.equal(platformDefaultMbilingHome(home, env, platform), base + suffix)
       assert.equal(resolveDesktopUserData(userData, env), userData + suffix)
       assert.equal(
-        resolveDesktopHermesHome({ home, env, platform, directoryExists: (): boolean => false }),
+        resolveDesktopMbilingHome({ home, env, platform, directoryExists: (): boolean => false }),
         base + suffix
       )
     }
@@ -43,22 +43,22 @@ test('explicit homes and userData retain precedence, and suffixed Windows homes 
   const home: string = '/home/test'
 
   const env: NodeJS.ProcessEnv = {
-    HERMES_DATA_DIR_SUFFIX: 'magic-test',
-    HERMES_HOME: '/explicit/home',
-    HERMES_DESKTOP_USER_DATA_DIR: '/explicit/electron'
+    MBILING_DATA_DIR_SUFFIX: 'magic-test',
+    MBILING_HOME: '/explicit/home',
+    MBILING_DESKTOP_USER_DATA_DIR: '/explicit/electron'
   }
 
-  assert.equal(resolveDesktopUserData('/default/electron', env), path.resolve(env.HERMES_DESKTOP_USER_DATA_DIR!))
-  assert.equal(resolveDesktopHermesHome({ home, env, platform: 'linux' }), env.HERMES_HOME)
-  delete env.HERMES_HOME
-  assert.equal(resolveDesktopHermesHome({ home, env, platform: 'linux' }), '/explicit/electron/hermes-home')
+  assert.equal(resolveDesktopUserData('/default/electron', env), path.resolve(env.MBILING_DESKTOP_USER_DATA_DIR!))
+  assert.equal(resolveDesktopMbilingHome({ home, env, platform: 'linux' }), env.MBILING_HOME)
+  delete env.MBILING_HOME
+  assert.equal(resolveDesktopMbilingHome({ home, env, platform: 'linux' }), '/explicit/electron/mbiling-home')
 
   const windowsHome: string = 'C:\\Users\\test'
-  const windowsEnv: NodeJS.ProcessEnv = { HERMES_DATA_DIR_SUFFIX: 'magic-test' }
-  const expected: string = path.win32.join(windowsHome, 'AppData', 'Local', 'hermesmagic-test')
+  const windowsEnv: NodeJS.ProcessEnv = { MBILING_DATA_DIR_SUFFIX: 'magic-test' }
+  const expected: string = path.win32.join(windowsHome, 'AppData', 'Local', 'mbilingmagic-test')
 
   assert.equal(
-    resolveDesktopHermesHome({
+    resolveDesktopMbilingHome({
       home: windowsHome,
       env: windowsEnv,
       platform: 'win32',
@@ -67,7 +67,7 @@ test('explicit homes and userData retain precedence, and suffixed Windows homes 
     expected
   )
   assert.equal(
-    resolveDesktopHermesHome({
+    resolveDesktopMbilingHome({
       home: windowsHome,
       env: windowsEnv,
       platform: 'win32',

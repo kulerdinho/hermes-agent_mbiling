@@ -10,7 +10,7 @@
 
 /** The dashboard's own backend could not be reached at all (fetch rejected). */
 export const API_UNREACHABLE_MESSAGE =
-  "Mbiling dashboard cannot reach the Mbiling service. Is `hermes dashboard` still running?";
+  "Mbiling dashboard cannot reach the Mbiling service. Is `mbiling dashboard` still running?";
 
 /** Status → plain sentence, used when the body carries no usable `detail`. */
 const STATUS_COPY: Record<number, string> = {

@@ -17,7 +17,7 @@ function rig() {
 
   registerSpellcheckDictionaryIpc({ handle }, { fromId: () => undefined })
 
-  const handler = handle.mock.calls.find(([channel]) => channel === 'hermes:spellcheck:dictionary')![1]
+  const handler = handle.mock.calls.find(([channel]) => channel === 'mbiling:spellcheck:dictionary')![1]
   const call = (payload: unknown) => handler(event, payload)
 
   return { call, session }
@@ -43,9 +43,9 @@ describe('normalizeDictionaryWord', () => {
       '1234',
       '--',
       '<script>',
-      '-Hermes',
+      '-Mbiling',
       "'Mbiling'",
-      'Hermes-',
+      'Mbiling-',
       'a/b',
       'x'.repeat(65),
       42,
@@ -58,7 +58,7 @@ describe('normalizeDictionaryWord', () => {
   })
 })
 
-describe('hermes:spellcheck:dictionary', () => {
+describe('mbiling:spellcheck:dictionary', () => {
   it("adds and removes a word on the sender's own session", async () => {
     const { call, session } = rig()
 

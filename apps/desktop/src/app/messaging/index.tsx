@@ -13,6 +13,12 @@ import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { ResponsiveTabs } from '@/components/ui/tab-dropdown'
 import { Tip } from '@/components/ui/tooltip'
+import { type Translations, useI18n } from '@/i18n'
+import { openExternalLink } from '@/lib/external-link'
+import { AlertTriangle, ExternalLink, RefreshCw, Save, Trash2 } from '@/lib/icons'
+import { platformStatusTone } from '@/lib/platform-status'
+import { normalize } from '@/lib/text'
+import { cn } from '@/lib/utils'
 import {
   approvePairing,
   getMessagingPlatforms,
@@ -24,13 +30,7 @@ import {
   revokePairing,
   type TelegramOnboardingApplyResponse,
   updateMessagingPlatform
-} from '@/hermes'
-import { type Translations, useI18n } from '@/i18n'
-import { openExternalLink } from '@/lib/external-link'
-import { AlertTriangle, ExternalLink, RefreshCw, Save, Trash2 } from '@/lib/icons'
-import { platformStatusTone } from '@/lib/platform-status'
-import { normalize } from '@/lib/text'
-import { cn } from '@/lib/utils'
+} from '@/mbiling'
 import { $activeConnectionId } from '@/store/connections'
 import { $changeEventsAvailable, $pairingChangeTick, $platformsChangeTick } from '@/store/live-sync'
 import { notify, notifyError } from '@/store/notifications'
@@ -479,7 +479,7 @@ export function MessagingView({ setStatusbarItemGroup: _setStatusbarItemGroup, .
           action: { label: m.restartAgain, onClick: () => void runGatewayRestart() },
           secondaryAction: {
             label: m.openLogs,
-            onClick: () => void window.hermesDesktop?.revealLogs?.().catch(() => undefined)
+            onClick: () => void window.mbilingDesktop?.revealLogs?.().catch(() => undefined)
           }
         })
       }
@@ -1085,7 +1085,7 @@ const PLATFORM_INTRO: Record<string, string> = {
   wecom_callback:
     'Set up a WeCom self-built app, expose its callback URL, and provide the corp ID, secret, agent ID, and AES key.',
   weixin:
-    "Run `hermes gateway setup`, select Weixin, then scan and confirm the QR code with a personal WeChat account. Mbiling connects through Tencent's iLink Bot API and saves the credentials.",
+    "Run `mbiling gateway setup`, select Weixin, then scan and confirm the QR code with a personal WeChat account. Mbiling connects through Tencent's iLink Bot API and saves the credentials.",
   qqbot: 'Register an app on the QQ Open Platform (q.qq.com) and copy the App ID and Client Secret.',
   api_server:
     'Expose Mbiling as an OpenAI-compatible API. Set an auth key, then point Open WebUI / LobeChat / etc. at the host:port.',

@@ -3,7 +3,7 @@ interface ResolvedPrimaryRemote {
   baseUrl: string
   connectionId?: string
   headers?: Record<string, string>
-  remoteHermesVersion?: string
+  remoteMbilingVersion?: string
   remoteHost?: string
   remoteKind?: 'cloud' | 'ssh' | 'url'
   source?: string
@@ -12,7 +12,7 @@ interface ResolvedPrimaryRemote {
     host?: string
     keyPath?: string
     port?: number
-    remoteHermesPath?: string
+    remoteMbilingPath?: string
     remoteProfile?: string
     user?: string
   }
@@ -37,7 +37,7 @@ export function createPrimaryRemoteConnection<State extends object>(
     authMode: remote.authMode || 'token',
     remoteHost: remote.remoteHost,
     remoteKind: remote.remoteKind,
-    remoteHermesVersion: remote.remoteHermesVersion,
+    remoteMbilingVersion: remote.remoteMbilingVersion,
     ...(remote.connectionId ? { connectionId: remote.connectionId } : {}),
     ...(remote.ssh ? { ssh: remote.ssh } : {}),
     // fetchJsonForBackend reads descriptor.headers for every REST call; the

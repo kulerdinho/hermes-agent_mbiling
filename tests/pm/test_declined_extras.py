@@ -1,4 +1,4 @@
-"""`hermes pm install --without EXTRA` drops a recorded extra, and nothing that carries a
+"""`mbiling pm install --without EXTRA` drops a recorded extra, and nothing that carries a
 selection forward (recorded extras, the main-era venv scan, a lazy first use) re-adds it
 until the user asks for it again with `--extra EXTRA`."""
 
@@ -202,7 +202,7 @@ def test_without_after_a_failed_first_migration_keeps_the_other_legacy_extras(mo
     monkeypatch.setattr(install, "sync_venv", lambda extras=None, **kwargs: calls.append(list(extras or [])))
     monkeypatch.setattr(pm.cli, "_install_defaults", lambda names, *, verify: None)
     monkeypatch.setattr(pm.cli, "repo_root", lambda: root)
-    root = Path(os.environ["HERMES_HOME"]) / "checkout"
+    root = Path(os.environ["MBILING_HOME"]) / "checkout"
     (root / "pyproject.toml").parent.mkdir(parents=True)
     (root / "pyproject.toml").write_bytes((repo_root() / "pyproject.toml").read_bytes())
     site = root / "venv" / "lib" / "python3.11" / "site-packages"
@@ -219,16 +219,16 @@ def test_without_after_a_failed_first_migration_keeps_the_other_legacy_extras(mo
 def test_automatic_repair_never_undoes_a_without_that_landed_after_its_read(monkeypatch):
     """Configured-platform repair reads the declines, then asks PM for the configured extra. A
     `--without matrix` completing between that read and PM's lock wins: repair's request was
-    Hermes's choice, not the user's, so it neither re-adds matrix nor clears the new decline."""
+    Mbiling's choice, not the user's, so it neither re-adds matrix nor clears the new decline."""
     import pm.client
-    from hermes_cli import main_install_repair
+    from mbiling_cli import main_install_repair
 
     monkeypatch.setattr(install, "_feature_policy", lambda extras, *, repair: (None, None))
     package = _BlockingVenv()
     monkeypatch.setattr(install, "get_package", lambda name: package)
     monkeypatch.setattr(pm.client, "is_runtime", lambda: True)
     monkeypatch.setattr(main_install_repair, "_configured_features_missing_deps",
-                        lambda: [("Matrix", "Run `hermes setup`.", "matrix")])
+                        lambda: [("Matrix", "Run `mbiling setup`.", "matrix")])
     install.sync_venv(["all"], explicit=True)
 
     real_lock, opted_out = install._venv_install_lock, []

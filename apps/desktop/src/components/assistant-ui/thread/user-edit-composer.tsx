@@ -57,13 +57,13 @@ import { chipTypedUrlOnSpace, linkifyUrls } from '@/app/chat/composer/url-refs'
 import { type DropFailure, dropWarning } from '@/app/chat/hooks/drop-warning'
 import {
   extractDroppedFiles,
-  HERMES_PATHS_MIME,
   isImagePath,
+  MBILING_PATHS_MIME,
   partitionDroppedFiles,
   stageDroppedFilePath
 } from '@/app/chat/hooks/use-composer-actions'
 import { uploadComposerAttachment } from '@/app/session/hooks/use-prompt-actions'
-import { hermesDirectiveFormatter } from '@/components/assistant-ui/directive-text'
+import { mbilingDirectiveFormatter } from '@/components/assistant-ui/directive-text'
 import {
   StickyHumanMessageContainer,
   StopGlyph,
@@ -72,7 +72,6 @@ import {
   USER_BUBBLE_BASE_CLASS
 } from '@/components/assistant-ui/thread/user-message'
 import { Codicon } from '@/components/ui/codicon'
-import type { HermesGateway } from '@/hermes'
 import { useI18n } from '@/i18n'
 import { attachmentDisplayText, attachmentId, pathLabel } from '@/lib/chat-runtime'
 import { sanitizeComposerInput } from '@/lib/composer-input-sanitize'
@@ -81,6 +80,7 @@ import { triggerHaptic } from '@/lib/haptics'
 import { Loader2Icon } from '@/lib/icons'
 import { $touchPointer } from '@/lib/touch-interaction'
 import { cn } from '@/lib/utils'
+import type { MbilingGateway } from '@/mbiling'
 import type { ComposerAttachment } from '@/store/composer'
 import { notify, notifyError, readableError } from '@/store/notifications'
 import { $terminalBackend } from '@/store/session'
@@ -91,7 +91,7 @@ import { notifyThreadEditClose } from '@/store/thread-scroll'
 
 interface UserEditComposerProps {
   cwd: string | null
-  gateway: HermesGateway | null
+  gateway: MbilingGateway | null
   sessionId: string | null
 }
 
@@ -385,7 +385,7 @@ export const UserEditComposer: FC<UserEditComposerProps> = ({ cwd, gateway, sess
 
       rememberInitialDraft()
       recordUndoPoint()
-      const serialized = hermesDirectiveFormatter.serialize(item)
+      const serialized = mbilingDirectiveFormatter.serialize(item)
       const starter = serialized.endsWith(':')
       const text = starter || serialized.endsWith(' ') ? serialized : `${serialized} `
       const directive = !starter && serialized.match(/^@([^:]+):(.+)$/)
@@ -538,7 +538,7 @@ export const UserEditComposer: FC<UserEditComposerProps> = ({ cwd, gateway, sess
   }, [])
 
   const handleDragEnter = (event: ReactDragEvent<HTMLElement>) => {
-    if (!dragHasAttachments(event.dataTransfer, HERMES_PATHS_MIME)) {
+    if (!dragHasAttachments(event.dataTransfer, MBILING_PATHS_MIME)) {
       return
     }
 
@@ -551,7 +551,7 @@ export const UserEditComposer: FC<UserEditComposerProps> = ({ cwd, gateway, sess
   }
 
   const handleDragOver = (event: ReactDragEvent<HTMLElement>) => {
-    if (!dragHasAttachments(event.dataTransfer, HERMES_PATHS_MIME)) {
+    if (!dragHasAttachments(event.dataTransfer, MBILING_PATHS_MIME)) {
       return
     }
 
@@ -569,7 +569,7 @@ export const UserEditComposer: FC<UserEditComposerProps> = ({ cwd, gateway, sess
   }
 
   const handleDrop = (event: ReactDragEvent<HTMLElement>) => {
-    if (!dragHasAttachments(event.dataTransfer, HERMES_PATHS_MIME)) {
+    if (!dragHasAttachments(event.dataTransfer, MBILING_PATHS_MIME)) {
       // A plain text drag within the editor mutates the DOM without a
       // React-visible beforeinput (insertFromDrop), so the undo snapshot has
       // to be banked here — before Chromium applies the move.

@@ -5,9 +5,9 @@
 // the IPC and the dialog call.
 //
 // That's only true for a backend the app owns: an SSH-managed server the app
-// starts and stops. The local profile gateway is attached, not owned (`hermes
+// starts and stops. The local profile gateway is attached, not owned (`mbiling
 // gateway ensure`): it keeps cron, messaging adapters and the in-flight turn
-// running after the app quits, exactly like a remote URL or Hermes Cloud
+// running after the app quits, exactly like a remote URL or Mbiling Cloud
 // backend, so those prompts say so instead of warning about lost work (#79579).
 
 const MAX_LISTED = 4

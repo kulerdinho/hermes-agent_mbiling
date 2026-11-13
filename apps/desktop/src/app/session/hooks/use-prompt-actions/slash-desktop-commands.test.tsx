@@ -9,7 +9,7 @@ import { resolveDesktopCommand } from '@/lib/desktop-slash-commands'
 import { $connection } from '@/store/session'
 import { dropSessionState } from '@/store/session-states'
 
-import { useHermesConfig } from '../use-hermes-config'
+import { useMbilingConfig } from '../use-mbiling-config'
 
 import { actRender, Harness, type HarnessHandle, RUNTIME_SESSION_ID } from './index-test-utils'
 import { clearSingleFlightSessionResumeState } from './single-flight-resume'
@@ -18,11 +18,11 @@ import { formatHistory } from './slash-desktop-commands'
 // T11 (#134889): Desktop commands the shared gateway refused as `slash.exec`, or that Desktop never
 // offered, run on the owner's existing verbs instead.
 
-vi.mock('@/hermes', () => ({
+vi.mock('@/mbiling', () => ({
   getLatestSessionMessages: vi.fn(async () => ({ messages: [], session_id: 'session' })),
   getProfiles: vi.fn(async () => ({ profiles: [] })),
-  getHermesConfig: vi.fn(async () => ({ display: { timestamps: false } })),
-  getHermesConfigDefaults: vi.fn(async () => ({})),
+  getMbilingConfig: vi.fn(async () => ({ display: { timestamps: false } })),
+  getMbilingConfigDefaults: vi.fn(async () => ({})),
   getSession: vi.fn(),
   PROMPT_SUBMIT_REQUEST_TIMEOUT_MS: 1_800_000,
   setApiRequestProfile: vi.fn(),
@@ -294,7 +294,7 @@ describe('/config', () => {
   })
 
   it('fails closed on a legacy raw config: only the canonical allowlist renders', async () => {
-    // A standalone `hermes serve` answers config.get key=full with the raw effective config.
+    // A standalone `mbiling serve` answers config.get key=full with the raw effective config.
     const S = 'PROBE-SECRET'
 
     const requestGateway = gateway(method =>
@@ -399,11 +399,11 @@ describe('/save writes on the Electron side', () => {
   it('asks the owner for the rendered file (session.export) and saves it through the main process', async () => {
     const saveTextFileAs = vi.fn(async () => ({ saved: true, path: '/home/u/Documents/notes.md' }))
 
-    ;(window as unknown as { hermesDesktop: unknown }).hermesDesktop = { saveTextFileAs }
+    ;(window as unknown as { mbilingDesktop: unknown }).mbilingDesktop = { saveTextFileAs }
 
     const requestGateway = gateway(method =>
       method === 'session.export'
-        ? { format: 'md', filename: 'hermes_session_s1.md', content: '# transcript' }
+        ? { format: 'md', filename: 'mbiling_session_s1.md', content: '# transcript' }
         : undefined
     )
 
@@ -424,10 +424,10 @@ describe('/save writes on the Electron side', () => {
   it('defaults to json and the owner filename, and reports a cancelled dialog', async () => {
     const saveTextFileAs = vi.fn(async () => ({ saved: false, canceled: true }))
 
-    ;(window as unknown as { hermesDesktop: unknown }).hermesDesktop = { saveTextFileAs }
+    ;(window as unknown as { mbilingDesktop: unknown }).mbilingDesktop = { saveTextFileAs }
 
     const requestGateway = gateway(method =>
-      method === 'session.export' ? { format: 'json', filename: 'hermes_session_s1.json', content: '{}' } : undefined
+      method === 'session.export' ? { format: 'json', filename: 'mbiling_session_s1.json', content: '{}' } : undefined
     )
 
     const handle = await mount(requestGateway)
@@ -435,7 +435,7 @@ describe('/save writes on the Electron side', () => {
     await handle.submitText('/save')
 
     expect(callsOf(requestGateway, 'session.export')).toEqual([{ session_id: RUNTIME_SESSION_ID, format: 'json' }])
-    expect(saveTextFileAs).toHaveBeenCalledWith(expect.objectContaining({ defaultPath: 'hermes_session_s1.json' }))
+    expect(saveTextFileAs).toHaveBeenCalledWith(expect.objectContaining({ defaultPath: 'mbiling_session_s1.json' }))
     expect(renderedText(handle)).toContain(copy.saveCancelled)
   })
 
@@ -496,12 +496,12 @@ describe('/timestamps, /palette, /worktree, /snapshot', () => {
   it('/timestamps is a window override that survives an ordinary config refresh', async () => {
     const { $displayTimestamps } = await import('@/store/display-timestamps')
     $displayTimestamps.set(false)
-    const config = renderHook(() => useHermesConfig({ activeSessionIdRef: { current: RUNTIME_SESSION_ID } }))
+    const config = renderHook(() => useMbilingConfig({ activeSessionIdRef: { current: RUNTIME_SESSION_ID } }))
     const handle = await mount(gateway(() => undefined))
 
     await handle.submitText('/timestamps on')
     await act(async () => {
-      await config.result.current.refreshHermesConfig()
+      await config.result.current.refreshMbilingConfig()
     })
 
     expect($displayTimestamps.get()).toBe(true)

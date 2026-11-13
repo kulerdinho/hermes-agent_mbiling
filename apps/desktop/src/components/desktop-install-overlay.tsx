@@ -22,11 +22,12 @@ import { cn } from '@/lib/utils'
 
 import { localCardPresentation } from './desktop-install-local-card'
 import { FirstRunRemoteSetup } from './remote-setup/first-run'
+import { FirstRunSignIn } from './remote-setup/sign-in'
 
 /**
  * DesktopInstallOverlay
  *
- * Renders the first-launch install progress for Hermes Agent. Mounted always;
+ * Renders the first-launch install progress for Mbiling Agent. Mounted always;
  * shows itself only when main.ts reports an in-flight bootstrap (state.active)
  * OR an error from a completed-failed bootstrap (state.error). When the
  * bootstrap finishes successfully the overlay fades out and the rest of the
@@ -302,6 +303,31 @@ export function DesktopInstallOverlay({ enabled = true }: DesktopInstallOverlayP
   const [copied, setCopied] = useState(false)
   const [cancelling, setCancelling] = useState(false)
   const [remoteOpen, setRemoteOpen] = useState(false)
+  // Mbiling first launch: the app only works signed in to a Mbiling account in the cloud, so the
+  // user only gets "Sign in" (FirstRunSignIn). The manual connection (address, token) and the
+  // local install exist only in team builds (connexion_avancee in connexion-par-defaut.json).
+  const [defaults, setDefaults] = useState<{ adresse: string; clientLeger: boolean; connexionAvancee: boolean } | null>(
+    null
+  )
+  const [advanced, setAdvanced] = useState(false)
+  const remoteOnly = Boolean(defaults?.clientLeger)
+
+  useEffect(() => {
+    const getDefaults = window.mbilingDesktop?.getDefaultConnection
+
+    // A bridge without Mbiling settings (older host) keeps the original setup choice.
+    const legacy = { adresse: '', clientLeger: false, connexionAvancee: true }
+
+    if (typeof getDefaults !== 'function') {
+      setDefaults(legacy)
+
+      return
+    }
+
+    void getDefaults()
+      .then(value => setDefaults(value))
+      .catch(() => setDefaults({ ...legacy, connexionAvancee: false }))
+  }, [])
   const [now, setNow] = useState(() => Date.now())
   const logEndRef = useRef<HTMLDivElement | null>(null)
 
@@ -323,7 +349,7 @@ export function DesktopInstallOverlay({ enabled = true }: DesktopInstallOverlayP
       return
     }
 
-    const desktop = window.hermesDesktop
+    const desktop = window.mbilingDesktop
 
     if (!desktop || typeof desktop.onBootstrapEvent !== 'function') {
       return
@@ -437,8 +463,25 @@ export function DesktopInstallOverlay({ enabled = true }: DesktopInstallOverlayP
     return null
   }
 
-  if (remoteOpen) {
-    return <FirstRunRemoteSetup onBack={() => setRemoteOpen(false)} />
+  if (state.setupChoice && !defaults) {
+    // Never flash the local-install choice before knowing whether this build allows it.
+    return null
+  }
+
+  if (state.setupChoice && defaults && (defaults.adresse || !defaults.connexionAvancee) && !advanced && !remoteOpen) {
+    return <FirstRunSignIn onAdvanced={defaults.connexionAvancee ? () => setAdvanced(true) : undefined} />
+  }
+
+  if (remoteOpen || (remoteOnly && state.setupChoice)) {
+    return (
+      <FirstRunRemoteSetup
+        onBack={() => {
+          setRemoteOpen(false)
+          // The remote-only build has no setup choice: back means back to "Sign in".
+          setAdvanced(false)
+        }}
+      />
+    )
   }
 
   if (state.setupChoice) {
@@ -478,7 +521,7 @@ export function DesktopInstallOverlay({ enabled = true }: DesktopInstallOverlayP
                 setLocalStart({ root: activeRoot, starting: true, error: null })
 
                 try {
-                  const desktop = window.hermesDesktop
+                  const desktop = window.mbilingDesktop
 
                   if (!desktop || typeof desktop.continueBootstrapLocal !== 'function') {
                     throw new Error(copy.localStartUnavailable)
@@ -522,7 +565,7 @@ export function DesktopInstallOverlay({ enabled = true }: DesktopInstallOverlayP
   }
 
   // Unsupported-platform branch: macOS/Linux packaged builds hit this when
-  // there's no Hermes Agent installed yet and we can't drive install.sh
+  // there's no Mbiling Agent installed yet and we can't drive install.sh
   // (no stage protocol equivalent yet). Show a copy-paste install command
   // and the docs URL; user runs it from Terminal and relaunches the app.
   if (state.unsupportedPlatform) {
@@ -552,7 +595,7 @@ export function DesktopInstallOverlay({ enabled = true }: DesktopInstallOverlayP
               </Button>
               <Button
                 onClick={() => {
-                  window.hermesDesktop?.openExternal?.(ups.docsUrl)
+                  window.mbilingDesktop?.openExternal?.(ups.docsUrl)
                 }}
                 size="sm"
                 variant="ghost"
@@ -709,7 +752,7 @@ export function DesktopInstallOverlay({ enabled = true }: DesktopInstallOverlayP
                   setCancelling(true)
 
                   try {
-                    await window.hermesDesktop?.cancelBootstrap?.()
+                    await window.mbilingDesktop?.cancelBootstrap?.()
                   } catch {
                     // ignore -- the failed/cancelled event will surface the result
                   }
@@ -730,14 +773,14 @@ export function DesktopInstallOverlay({ enabled = true }: DesktopInstallOverlayP
             <div className="flex items-center justify-between gap-2">
               <span className="text-xs text-muted-foreground">
                 {copy.transcriptSaved}{' '}
-                <code className="font-mono text-(--ui-text-secondary)">%LOCALAPPDATA%\hermes\logs\</code>
+                <code className="font-mono text-(--ui-text-secondary)">%LOCALAPPDATA%\mbiling\logs\</code>
               </span>
               <div className="flex gap-2">
                 <Button onClick={() => setState(EMPTY_STATE)} size="sm" variant="ghost">
                   {t.common.close}
                 </Button>
                 <Button
-                  onClick={() => void window.hermesDesktop?.revealLogs?.().catch(() => undefined)}
+                  onClick={() => void window.mbilingDesktop?.revealLogs?.().catch(() => undefined)}
                   size="sm"
                   variant="ghost"
                 >
@@ -771,7 +814,7 @@ export function DesktopInstallOverlay({ enabled = true }: DesktopInstallOverlayP
                     // and main short-circuits to the latched error without
                     // re-running install.ps1.
                     try {
-                      await window.hermesDesktop?.resetBootstrap?.()
+                      await window.mbilingDesktop?.resetBootstrap?.()
                     } catch {
                       // best-effort -- continue with reload regardless
                     }

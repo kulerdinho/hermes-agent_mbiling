@@ -5,7 +5,6 @@ import { Navigate, useLocation, useNavigate } from 'react-router'
 import { codiconIcon } from '@/components/ui/codicon'
 import { KbdCombo } from '@/components/ui/kbd'
 import { Tip } from '@/components/ui/tooltip'
-import { getHermesConfigDefaults, getHermesConfigRecord, saveHermesConfig } from '@/hermes'
 import { useI18n } from '@/i18n'
 import { triggerHaptic } from '@/lib/haptics'
 import {
@@ -18,6 +17,7 @@ import {
   Info,
   Keyboard,
   KeyRound,
+  Monitor,
   Network,
   RefreshCw,
   Search,
@@ -29,7 +29,9 @@ import {
 } from '@/lib/icons'
 import { isEditableTarget } from '@/lib/keybinds/combo'
 import { typeToFocusChar } from '@/lib/keybinds/composer-focus-keys'
+import { NOUS_ENABLED } from '@/lib/nous'
 import { cn } from '@/lib/utils'
+import { getMbilingConfigDefaults, getMbilingConfigRecord, saveMbilingConfig } from '@/mbiling'
 import { $commandPaletteOpen, openCommandPalettePage } from '@/store/command-palette'
 import { confirm } from '@/store/confirm'
 import { $activeConnectionId } from '@/store/connections'
@@ -53,6 +55,7 @@ import { SECTIONS } from './constants'
 import { GatewaySettings } from './gateway-settings'
 import { KeybindSettings } from './keybind-settings'
 import { KEYS_VIEWS, KeysSettings, type KeysView } from './keys-settings'
+import { MainsSettings } from './mains-settings'
 import { movedSettingsTabRedirect } from './moved-tabs'
 import { NotificationsSettings } from './notifications-settings'
 import {
@@ -82,6 +85,7 @@ const SETTINGS_VIEWS: readonly SettingsViewId[] = [
   'keybinds',
   'keys',
   'vault',
+  'mains',
   'notifications',
   'billing',
   'sessions',
@@ -91,6 +95,7 @@ const SETTINGS_VIEWS: readonly SettingsViewId[] = [
 
 // Pages that take nothing but the resolved sub-page.
 const SUBPAGE_VIEWS: Partial<Record<SettingsViewId, ComponentType<{ subpage?: string }>>> = {
+  mains: MainsSettings,
   'config:appearance': AppearanceSettings,
   about: AboutSettings,
   // 'connections' renders the unified page too so the frame before the alias
@@ -210,12 +215,12 @@ export function SettingsView({ onClose, onConfigSaved, onMainModelChanged }: Set
 
   const exportConfig = async () => {
     try {
-      const cfg = await getHermesConfigRecord()
+      const cfg = await getMbilingConfigRecord()
       const blob = new Blob([JSON.stringify(cfg, null, 2)], { type: 'application/json' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = 'hermes-config.json'
+      a.download = 'mbiling-config.json'
       a.click()
       URL.revokeObjectURL(url)
       triggerHaptic('success')
@@ -236,7 +241,7 @@ export function SettingsView({ onClose, onConfigSaved, onMainModelChanged }: Set
     }
 
     try {
-      await saveHermesConfig(await getHermesConfigDefaults())
+      await saveMbilingConfig(await getMbilingConfigDefaults())
       triggerHaptic('success')
       onConfigSaved?.()
     } catch (err) {
@@ -286,12 +291,22 @@ export function SettingsView({ onClose, onConfigSaved, onMainModelChanged }: Set
             return [entry]
           }),
           {
+            active: activeView === 'mains',
+            icon: Monitor,
+            id: 'mains',
+            label: t.settings.nav.mains,
+            onSelect: () => setActiveView('mains')
+          },
+          {
             active: activeView === 'notifications',
             icon: Bell,
             id: 'notifications',
             label: t.settings.nav.notifications,
             onSelect: () => setActiveView('notifications')
           },
+          // Nous billing: hidden while Nous Portal is not offered (lib/nous.ts).
+          ...(NOUS_ENABLED
+            ? [
           {
             active: activeView === 'billing',
             children: [
@@ -318,7 +333,9 @@ export function SettingsView({ onClose, onConfigSaved, onMainModelChanged }: Set
             id: 'billing',
             label: t.settings.nav.billing,
             onSelect: () => setActiveView('billing')
-          },
+          }
+              ]
+            : []),
           {
             active: activeView === 'providers',
             children: [

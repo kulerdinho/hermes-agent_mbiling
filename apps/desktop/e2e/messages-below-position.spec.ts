@@ -7,8 +7,9 @@ import { build } from 'esbuild'
 import { resolveElectronBinary } from './electron-binary'
 import { _electron, expect, test } from './test'
 
+// eslint-disable-next-line no-empty-pattern -- pre-existing upstream pattern
 test('messages-below reads stay bounded with real content-visibility groups', async ({}, testInfo) => {
-  const temporary = mkdtempSync(path.join(tmpdir(), 'hermes-messages-below-'))
+  const temporary = mkdtempSync(path.join(tmpdir(), 'mbiling-messages-below-'))
   const main = path.join(temporary, 'main.cjs')
   writeFileSync(
     main,

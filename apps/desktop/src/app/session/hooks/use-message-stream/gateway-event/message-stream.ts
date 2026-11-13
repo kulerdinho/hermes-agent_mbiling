@@ -1,4 +1,4 @@
-import { type BillingBlock, mergeUsage } from '@hermes/shared'
+import { type BillingBlock, mergeUsage } from '@mbiling/shared'
 
 import { noteTurnSettled } from '@/app/session/hooks/use-session-actions/settled-turns'
 import { burstVibeHearts } from '@/components/chat/vibe-hearts'
@@ -37,7 +37,7 @@ function firstBillingLine(text: string): string {
  * gateway forwards the structured descriptor built by `agent/billing_links.py`;
  * we cache it per-session, which drives the out-of-credits banner above the
  * composer. A wall in a session that is NOT on screen also raises one sticky,
- * billing-specific toast — never the generic "Hermes error" — with a smart CTA
+ * billing-specific toast — never the generic "Mbiling error" — with a smart CTA
  * (Nous → in-app Settings → Billing, other providers → their billing page); on
  * screen the banner and the turn's card carry it, so no toast repeats them.
  */

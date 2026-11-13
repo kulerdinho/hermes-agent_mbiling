@@ -8,8 +8,8 @@
 | `staging` | Test : c'est ici qu'on valide que le code est bon pour la production. | `dev` |
 | `main` | Production : ce que les clients utilisent. | `staging` |
 
-`upstream` contient Hermes Agent tel que publié par Nous Research. On n'y travaille jamais :
-elle ne change que lorsqu'on importe une nouvelle version de Hermes.
+`upstream` contient Mbiling Agent tel que publié par Nous Research. On n'y travaille jamais :
+elle ne change que lorsqu'on importe une nouvelle version de Mbiling.
 
 ## Le chemin d'une modification
 

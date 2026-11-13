@@ -11,7 +11,7 @@ from typing import Any, Callable, Dict, Iterable, List, Optional, Union
 from urllib.parse import unquote, urlsplit
 
 import httpx
-import hermes_yaml as yaml
+import mbiling_yaml as yaml
 
 logger = logging.getLogger("tools.skills_hub")
 
@@ -185,11 +185,11 @@ def _parse_frontmatter(content: str) -> dict:
         return {}
 
 
-def _hermes_tags(fm: dict) -> Any:
-    """``metadata.hermes.tags`` from parsed frontmatter, or ``[]`` (unvalidated type)."""
+def _mbiling_tags(fm: dict) -> Any:
+    """``metadata.mbiling.tags`` from parsed frontmatter, or ``[]`` (unvalidated type)."""
     metadata = fm.get("metadata", {})
-    hermes_meta = metadata.get("hermes", {}) if isinstance(metadata, dict) else None
-    return hermes_meta.get("tags", []) if isinstance(hermes_meta, dict) else []
+    mbiling_meta = metadata.get("mbiling", {}) if isinstance(metadata, dict) else None
+    return mbiling_meta.get("tags", []) if isinstance(mbiling_meta, dict) else []
 
 
 def source_url_for_bundle(bundle: SkillBundle) -> str:

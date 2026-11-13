@@ -1,8 +1,8 @@
-import { applyDocumentLocale, isRecord } from '@hermes/shared/i18n'
+import { applyDocumentLocale, isRecord } from '@mbiling/shared/i18n'
 import { useStore } from '@nanostores/react'
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 
-import { getHermesConfigRecord, type HermesConfigRecord, retainConfigReadOrigin, saveHermesConfig } from '@/hermes'
+import { getMbilingConfigRecord, type MbilingConfigRecord, retainConfigReadOrigin, saveMbilingConfig } from '@/mbiling'
 
 import { TRANSLATIONS } from './catalog'
 import {
@@ -18,37 +18,37 @@ import { $requestedLocale, setRuntimeI18nLocale } from './runtime'
 import type { Locale, Translations } from './types'
 
 export interface I18nConfigClient {
-  getConfig: () => Promise<HermesConfigRecord>
-  saveConfig: (config: HermesConfigRecord) => Promise<{ ok: boolean }>
+  getConfig: () => Promise<MbilingConfigRecord>
+  saveConfig: (config: MbilingConfigRecord) => Promise<{ ok: boolean }>
 }
 
 const defaultConfigClient: I18nConfigClient = {
   getConfig: () => {
-    if (typeof window === 'undefined' || !window.hermesDesktop?.api) {
+    if (typeof window === 'undefined' || !window.mbilingDesktop?.api) {
       return Promise.resolve({})
     }
 
     // Merged defaults make an unset language indistinguishable from saved English.
     // Older backends ignore the option and keep returning English as before.
-    return getHermesConfigRecord(undefined, { includeDefaults: false })
+    return getMbilingConfigRecord(undefined, { includeDefaults: false })
   },
   saveConfig: config => {
-    if (typeof window === 'undefined' || !window.hermesDesktop?.api) {
+    if (typeof window === 'undefined' || !window.mbilingDesktop?.api) {
       return Promise.resolve({ ok: true })
     }
 
-    // No explicit scope: saveHermesConfig resolves the record's captured read
+    // No explicit scope: saveMbilingConfig resolves the record's captured read
     // origin itself (resolveConfigWriteScope), and withConfigDisplayLanguage
     // retains that origin onto the derived record.
-    return saveHermesConfig(config, undefined, { preserveLanguage: true })
+    return saveMbilingConfig(config, undefined, { preserveLanguage: true })
   }
 }
 
-export function getConfigDisplayLanguage(config: HermesConfigRecord): unknown {
+export function getConfigDisplayLanguage(config: MbilingConfigRecord): unknown {
   return isRecord(config.display) ? config.display.language : undefined
 }
 
-export function withConfigDisplayLanguage(config: HermesConfigRecord, locale: Locale): HermesConfigRecord {
+export function withConfigDisplayLanguage(config: MbilingConfigRecord, locale: Locale): MbilingConfigRecord {
   const display = isRecord(config.display) ? config.display : {}
 
   return retainConfigReadOrigin(
@@ -168,6 +168,20 @@ export function I18nProvider({
     const MAX_LOCALE_RETRIES = 10
     const LOCALE_RETRY_DELAY_MS = 3_000
 
+    // Mbiling: before sign-in the config request waits for a server that is not connected yet
+    // (it neither answers nor fails). Show Windows' display language right away; a language
+    // saved in the account's config replaces it as soon as the config is read.
+    let configSettled = false
+
+    void window.mbilingDesktop
+      ?.getMachineProfile?.()
+      .then(profile => {
+        if (!cancelled && !configSettled && !userLocaleRef.current) {
+          setLocaleState(resolveInitialLocale(null, profile?.locale))
+        }
+      })
+      .catch(() => undefined)
+
     const loadLocale = () => {
       setIsLoadingConfig(true)
       setConfigLoadError(null)
@@ -175,6 +189,8 @@ export function I18nProvider({
       return configClient
         .getConfig()
         .then(async config => {
+          configSettled = true
+
           if (cancelled || userLocaleRef.current) {
             return
           }
@@ -196,7 +212,7 @@ export function I18nProvider({
           // Keep inference unsaved so OS language changes apply on the next boot
           // until the user explicitly picks a language. The saved ask is checked
           // again after the probe: its pack may have arrived in the meantime.
-          const machineProfile = await window.hermesDesktop?.getMachineProfile?.().catch(() => null)
+          const machineProfile = await window.mbilingDesktop?.getMachineProfile?.().catch(() => null)
 
           if (!cancelled && !userLocaleRef.current) {
             setLocaleState(resolveInitialLocale(requestedRef.current, machineProfile?.locale))
@@ -209,6 +225,17 @@ export function I18nProvider({
 
           setConfigLoadError(toError(error))
           setLocaleState(DEFAULT_LOCALE)
+
+          // Mbiling: before the user has signed in there is no server config to read; follow
+          // Windows' display language instead of English (a saved choice still wins later).
+          void window.mbilingDesktop
+            ?.getMachineProfile?.()
+            .then(profile => {
+              if (!cancelled && !userLocaleRef.current) {
+                setLocaleState(resolveInitialLocale(null, profile?.locale))
+              }
+            })
+            .catch(() => undefined)
 
           if (retryCount < MAX_LOCALE_RETRIES) {
             retryCount += 1

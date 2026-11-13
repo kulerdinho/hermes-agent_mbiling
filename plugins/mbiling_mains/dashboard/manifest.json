@@ -1,0 +1,8 @@
+{
+  "name": "mbiling_mains",
+  "label": "Mains",
+  "description": "Inscription automatique des PC des utilisateurs connectés (aucun onglet).",
+  "version": "1.0.0",
+  "tab": { "hidden": true },
+  "api": "plugin_api.py"
+}

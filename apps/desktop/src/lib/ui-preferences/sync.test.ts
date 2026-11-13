@@ -54,9 +54,9 @@ function memoryStore(initial: null | Record<string, string>) {
   return { bridge, external, snapshot, writes }
 }
 
-const DENSITY = 'hermes.desktop.sessionListDensity'
-const MODE = 'hermes-desktop-mode-v1'
-const DRAFT = 'hermes.desktop.composerQueue.v1'
+const DENSITY = 'mbiling.desktop.sessionListDensity'
+const MODE = 'mbiling-desktop-mode-v1'
+const DRAFT = 'mbiling.desktop.composerQueue.v1'
 
 describe('machine UI preferences sync', () => {
   let stop: () => void = () => undefined

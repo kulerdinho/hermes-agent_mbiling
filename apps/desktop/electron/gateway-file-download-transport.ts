@@ -57,7 +57,7 @@ export function downloadViaTokenToFile(
         method: 'GET',
         headers: options.bearer
           ? { Authorization: `Bearer ${options.bearer}` }
-          : { 'X-Hermes-Session-Token': token ?? '' }
+          : { 'X-Mbiling-Session-Token': token ?? '' }
       },
       (response: http.IncomingMessage): void => {
         // Headers end the connection deadline, not the user's save-dialog time;

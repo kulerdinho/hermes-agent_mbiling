@@ -116,12 +116,12 @@ async function setupSeededMockBackend(): Promise<MockBackendFixture> {
 
   // 2. Create sandbox + write config
   const sandbox = createSandbox('warm-seed')
-  writeMockProviderConfig(sandbox.hermesHome, mock.url)
-  writeEnvFile(sandbox.hermesHome)
+  writeMockProviderConfig(sandbox.mbilingHome, mock.url)
+  writeEnvFile(sandbox.mbilingHome)
 
   // 3. Produce all 16 user/assistant pairs through the real TUI gateway,
   // AIAgent, mock provider, and SessionDB persistence path before desktop starts.
-  const builder = await RealSessionBuilder.start(sandbox.hermesHome)
+  const builder = await RealSessionBuilder.start(sandbox.mbilingHome)
   try {
     await builder.createSession({ title: SESSION_TITLE, turns: generateSessionTurns() })
   } finally {
@@ -169,6 +169,7 @@ test.afterAll(async () => {
  *   add/remove nodes.
  */
 async function installRenderCounter(
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports -- pre-existing upstream pattern
   page: import('@playwright/test').Page,
   transcriptText?: string,
 ): Promise<void> {
@@ -214,7 +215,7 @@ async function installRenderCounter(
     }
 
     const observer = new MutationObserver(records => {
-      if (state.stopped) return
+      if (state.stopped) {return}
       let batchAdded = 0
       for (const record of records) {
         state.mutations += 1
@@ -224,7 +225,7 @@ async function installRenderCounter(
       }
       if (batchAdded > 0) {
         currentBatch += batchAdded
-        if (flushTimer) clearTimeout(flushTimer)
+        if (flushTimer) {clearTimeout(flushTimer)}
         flushTimer = setTimeout(flush, 5)
       }
     })
@@ -266,6 +267,7 @@ async function installRenderCounter(
 
 /** Wait until the ACTIVE chat surface's transcript contains `text`. */
 async function waitForActiveTranscriptText(
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports -- pre-existing upstream pattern
   page: import('@playwright/test').Page,
   text: string,
   timeout = 30_000,
@@ -283,6 +285,7 @@ async function waitForActiveTranscriptText(
 }
 
 async function waitForActiveTranscriptWithoutText(
+  // eslint-disable-next-line @typescript-eslint/consistent-type-imports -- pre-existing upstream pattern
   page: import('@playwright/test').Page,
   text: string,
 ): Promise<void> {
@@ -299,12 +302,14 @@ async function waitForActiveTranscriptWithoutText(
 }
 
 /** Stack an empty tab while leaving the current transcript mounted and warm. */
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports -- pre-existing upstream pattern
 async function openNewSessionTab(page: import('@playwright/test').Page, priorText: string): Promise<void> {
   await page.locator('[data-slot="sidebar"] button[aria-label="New session"]').first().click()
   await waitForActiveTranscriptWithoutText(page, priorText)
 }
 
 /** Stop the render counter and return the recorded burst/reconcile counts. */
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports -- pre-existing upstream pattern
 async function readRenderCount(page: import('@playwright/test').Page): Promise<{
   bursts: number
   mutations: number
@@ -322,6 +327,7 @@ async function readRenderCount(page: import('@playwright/test').Page): Promise<{
   })
 }
 
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports -- pre-existing upstream pattern
 async function observedViewportIsActive(page: import('@playwright/test').Page): Promise<boolean> {
   return page.evaluate((surfaceSelector: string) => {
     const surfaces = document.querySelectorAll(surfaceSelector)
@@ -346,6 +352,7 @@ function assertNoRepaint(result: { bursts: number; mutations: number; timeline: 
   ).toBe(0)
 }
 
+// eslint-disable-next-line no-empty-pattern -- pre-existing upstream pattern
 test('tab reactivation preserves the mounted transcript without repainting', async ({}, testInfo) => {
   const page = fixture!.page
 
