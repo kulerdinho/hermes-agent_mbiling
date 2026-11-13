@@ -67,6 +67,16 @@ test('source multiarch prepares isolated native and packaging inputs before each
   assert.equal(runElectronBuilder(['--mac', '--x64', '--arm64'], { spawn: () => ({ status: 7 }) }), 7)
 })
 
+test('the Windows setup wizard (nsis) is prepared and admitted like the other package formats', () => {
+  const calls = []
+  const spawn = (_node, args) => { calls.push(args); return { status: 0 } }
+  assert.equal(runElectronBuilder(['--win', 'nsis', '--x64'], { spawn }), 0)
+  const prepare = calls.find(args => args[0].endsWith('prepare-packaging-tools.mjs'))
+  assert.equal(prepare[prepare.indexOf('--format') + 1], 'nsis')
+  const strict = calls.find(args => args[0].endsWith('run-electron-builder.mjs'))
+  assert.ok(strict.includes('nsis'))
+})
+
 test('strict builder refuses absent inputs before loading electron-builder', () => {
   const result = spawnSync(process.execPath, [path.join(import.meta.dirname, 'run-electron-builder.mjs'),
     '--prepared', path.join(import.meta.dirname, 'missing-prepared.json'), '--native-deps', 'missing', '--dir'], { encoding: 'utf8' })
