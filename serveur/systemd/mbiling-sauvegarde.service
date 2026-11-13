@@ -1,0 +1,8 @@
+[Unit]
+Description=Mbiling : sauvegarde des données
+
+[Service]
+Type=oneshot
+ExecStart=@DOSSIER@/sauvegarde/sauvegarder.sh
+Nice=10
+IOSchedulingClass=idle

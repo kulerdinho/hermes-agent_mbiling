@@ -1,0 +1,10 @@
+[Unit]
+Description=Mbiling : sauvegarde nocturne des données
+
+[Timer]
+OnCalendar=@HEURE@
+Persistent=true
+RandomizedDelaySec=10min
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,38 @@
+# Services du serveur Mbiling (phase 0).
+# Toutes les valeurs viennent de `.env` (voir `.env.exemple`). Lancer avec `./installer.sh`.
+name: mbiling
+
+services:
+  # Porte d'entrée unique : le tunnel envoie tout ici, puis la passerelle répartit
+  # entre la cellule (lot 3) et le Relais (lot 4). Elle n'écoute que sur 127.0.0.1.
+  passerelle:
+    image: ${MBILING_IMAGE_CADDY:?voir .env.exemple}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${MBILING_PORT_LOCAL:?voir .env.exemple}:8090"
+    environment:
+      MBILING_DOMAINE: ${MBILING_DOMAINE:?voir .env.exemple}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - passerelle_donnees:/data
+    networks:
+      - interne
+
+  # Tunnel Cloudflare vers ${MBILING_DOMAINE}. Activé par installer.sh seulement
+  # si le fichier du jeton existe. En réseau hôte, pour joindre 127.0.0.1:${MBILING_PORT_LOCAL}.
+  tunnel:
+    image: ${MBILING_IMAGE_CLOUDFLARED:?voir .env.exemple}
+    profiles: ["tunnel"]
+    restart: unless-stopped
+    network_mode: host
+    command: ["tunnel", "--no-autoupdate", "run", "--token-file", "/run/mbiling/tunnel.token"]
+    volumes:
+      - ${MBILING_JETON_TUNNEL_FICHIER:?voir .env.exemple}:/run/mbiling/tunnel.token:ro
+    depends_on:
+      - passerelle
+
+volumes:
+  passerelle_donnees:
+
+networks:
+  interne:
