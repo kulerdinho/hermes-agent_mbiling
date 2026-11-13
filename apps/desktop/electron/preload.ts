@@ -293,6 +293,9 @@ contextBridge.exposeInMainWorld('mbilingDesktop', {
     consent: allowed => ipcRenderer.invoke('mbiling:mains:consent', allowed),
     setToken: token => ipcRenderer.invoke('mbiling:mains:set-token', token),
     setActive: active => ipcRenderer.invoke('mbiling:mains:set-active', active),
+    setBrowser: patch => ipcRenderer.invoke('mbiling:mains:set-browser', patch),
+    addBlockedSite: entry => ipcRenderer.invoke('mbiling:mains:add-blocked-site', entry),
+    removeBlockedSite: pattern => ipcRenderer.invoke('mbiling:mains:remove-blocked-site', pattern),
     restart: () => ipcRenderer.invoke('mbiling:mains:restart'),
     open: which => ipcRenderer.invoke('mbiling:mains:open', which)
   },

@@ -611,7 +611,7 @@ export interface Translations extends NoticeTranslations {
     pluginPages: Record<'agentSettings' | 'blurb' | 'empty' | 'manage' | 'missing', string> & {
       pageCount: (n: number) => string
     }
-    mains: Record<'tokenAuto' | 'tokenEnrolling' | 'manualToken' | 'title' | 'intro' | 'enabled' | 'statusOff' | 'statusNoToken' | 'statusConnecting' | 'statusConnected' | 'relay' | 'token' | 'tokenPlaceholder' | 'tokenSet' | 'tokenMissing' | 'saveToken' | 'removeToken' | 'folders' | 'noFolders' | 'editPolicy' | 'bash' | 'bashMissing' | 'lastProblem' | 'noProblem' | 'openLog' | 'editSettings' | 'restart', string>
+    mains: Record<'tokenAuto' | 'tokenEnrolling' | 'manualToken' | 'title' | 'intro' | 'enabled' | 'statusOff' | 'statusNoToken' | 'statusConnecting' | 'statusConnected' | 'relay' | 'token' | 'tokenPlaceholder' | 'tokenSet' | 'tokenMissing' | 'saveToken' | 'removeToken' | 'folders' | 'noFolders' | 'editPolicy' | 'bash' | 'bashMissing' | 'lastProblem' | 'noProblem' | 'openLog' | 'editSettings' | 'restart' | 'browserHeading' | 'browserEnabled' | 'browserEnabledHint' | 'browserPreferred' | 'browserMissing' | 'blockedSites' | 'blockedSitesHint' | 'noBlockedSites' | 'blockedSitePlaceholder' | 'addBlockedSite' | 'removeBlockedSite', string>
     nav: {
       providers: string
       providerAccounts: string

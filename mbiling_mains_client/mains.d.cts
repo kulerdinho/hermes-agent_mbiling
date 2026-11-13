@@ -39,4 +39,6 @@ export interface MainsOptions {
 
 export function demarrer(config: MainsConfig, options?: MainsOptions): { arreter(): void }
 export function trouverBash(config: { bash?: string | null }, autres?: string[]): string
+/** Chemin du navigateur qui sera lancé (Edge ou Chrome) ; lève une erreur si aucun n'est trouvé. */
+export function trouverNavigateur(config: { chemin?: string | null; prefere?: string }): string
 export function versCheminBash(chemin: string): string
