@@ -45,13 +45,16 @@ async function principal() {
   const page = await app.firstWindow()
   await page.waitForFunction(() => Boolean(window.mbilingDesktop?.mains), null, { timeout: 60000 })
 
-  // Écran du premier lancement : l'adresse proposée doit être celle du fichier de réglages.
+  // Écran du premier lancement : un seul bouton « Se connecter », aucun champ d'adresse ni de jeton.
   await attendre(6000)
   await page.screenshot({ path: path.join(captures, '1-premier-lancement.png') })
-  const premierLancement = await page.evaluate(() =>
-    Array.from(document.querySelectorAll('input')).map(i => i.value).filter(Boolean)
-  )
-  console.log('ADRESSES ' + JSON.stringify(premierLancement))
+  const premierLancement = await page.evaluate(() => ({
+    boutonConnexion: Array.from(document.querySelectorAll('button')).some(b => /Sign in to Mbiling|Se connecter à Mbiling/.test(b.textContent || '')),
+    champs: Array.from(document.querySelectorAll('input')).filter(i => i.type !== 'checkbox' && i.type !== 'hidden').length,
+    adresseParDefaut: null
+  }))
+  premierLancement.adresseParDefaut = (await page.evaluate(() => window.mbilingDesktop.getDefaultConnection())).adresse
+  console.log('PREMIER_LANCEMENT ' + JSON.stringify(premierLancement))
 
   const avant = await page.evaluate(() => window.mbilingDesktop.mains.status())
   console.log('ETAT_AVANT ' + JSON.stringify(avant))

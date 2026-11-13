@@ -48,23 +48,32 @@ export function expandUserPath(value: string): string {
 }
 
 export interface DefaultConnection {
-  /** Server address proposed on the first-launch connection screen ('' when none). */
+  /** The Mbiling server the app signs in to ('' when none is configured). */
   adresse: string
-  /** Remote-only client (light variant): the first launch goes straight to the connection screen. */
+  /** Remote-only client (light variant): never offers a local install. */
   clientLeger: boolean
+  /**
+   * Team/support builds only: also offer the manual connection (address, token) and the local
+   * install. Off for users: Mbiling only works signed in to a Mbiling account in the cloud.
+   */
+  connexionAvancee: boolean
 }
 
 /** IPC answering the renderer's first-launch screen. */
 export function registerDefaultConnectionIpc(ipcMain: Electron.IpcMain, isLight: () => boolean): void {
   ipcMain.handle('mbiling:default-connection', (): DefaultConnection => {
-    let adresse = ''
+    let config: { adresse?: unknown; connexion_avancee?: unknown } = {}
 
     try {
-      adresse = String(readMbilingConfig<{ adresse?: string }>('connexion').adresse || '').trim()
+      config = readMbilingConfig<{ adresse?: unknown; connexion_avancee?: unknown }>('connexion')
     } catch {
-      adresse = ''
+      config = {}
     }
 
-    return { adresse, clientLeger: isLight() }
+    return {
+      adresse: String(config.adresse || '').trim(),
+      clientLeger: isLight(),
+      connexionAvancee: config.connexion_avancee === true
+    }
   })
 }

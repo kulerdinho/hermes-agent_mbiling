@@ -613,10 +613,22 @@ describe('DesktopInstallOverlay Mbiling first launch (sign-in only)', () => {
   const choice = { platform: 'win32', activeRoot: 'C:/Users/me/.mbiling', local: 'none', bundled: false } as const
   const BASE = 'https://api.mbiling.test'
 
-  function signInMock(options: { clientLeger?: boolean; reachable?: boolean; authMode?: 'oauth' | 'token'; connected?: boolean } = {}) {
+  function signInMock(
+    options: {
+      clientLeger?: boolean
+      connexionAvancee?: boolean
+      reachable?: boolean
+      authMode?: 'oauth' | 'token'
+      connected?: boolean
+    } = {}
+  ) {
     const desktop = installDesktopMock(bootstrapState({ setupChoice: choice }))
     const calls = {
-      getDefaultConnection: vi.fn().mockResolvedValue({ adresse: BASE, clientLeger: options.clientLeger ?? false }),
+      getDefaultConnection: vi.fn().mockResolvedValue({
+        adresse: BASE,
+        clientLeger: options.clientLeger ?? false,
+        connexionAvancee: options.connexionAvancee ?? false
+      }),
       consent: vi.fn().mockResolvedValue({}),
       apply: vi.fn().mockResolvedValue({})
     }
@@ -704,8 +716,29 @@ describe('DesktopInstallOverlay Mbiling first launch (sign-in only)', () => {
     expect(calls.apply).not.toHaveBeenCalled()
   })
 
-  it('keeps the address form as an advanced path, prefilled, and comes back to sign-in (light build)', async () => {
-    signInMock({ clientLeger: true })
+  it('offers no manual connection and no local install to users', async () => {
+    signInMock()
+    render(<DesktopInstallOverlay />)
+
+    expect(await screen.findByText('Sign in to Mbiling')).toBeTruthy()
+    expect(screen.queryByText('Advanced connection settings')).toBeNull()
+    expect(screen.queryByText('Install Mbiling locally')).toBeNull()
+  })
+
+  it('stays on sign-in even with no address configured, when manual connection is off', async () => {
+    const desktop = installDesktopMock(bootstrapState({ setupChoice: choice }))
+    Object.assign(desktop, {
+      getDefaultConnection: vi.fn().mockResolvedValue({ adresse: '', clientLeger: false, connexionAvancee: false })
+    })
+    render(<DesktopInstallOverlay />)
+
+    fireEvent.click(await screen.findByText('Sign in to Mbiling'))
+    expect(await screen.findByText("This Mbiling server doesn't offer account sign-in yet.")).toBeTruthy()
+    expect(screen.queryByText('Install Mbiling locally')).toBeNull()
+  })
+
+  it('team builds keep the address form behind Advanced, prefilled, and come back to sign-in (light build)', async () => {
+    signInMock({ clientLeger: true, connexionAvancee: true })
     render(<DesktopInstallOverlay />)
 
     fireEvent.click(await screen.findByText('Advanced connection settings'))
@@ -716,9 +749,11 @@ describe('DesktopInstallOverlay Mbiling first launch (sign-in only)', () => {
     expect(await screen.findByText('Sign in to Mbiling')).toBeTruthy()
   })
 
-  it('keeps the old setup choice when no default address is configured', async () => {
+  it('team builds with no address configured keep the original setup choice', async () => {
     const desktop = installDesktopMock(bootstrapState({ setupChoice: choice }))
-    Object.assign(desktop, { getDefaultConnection: vi.fn().mockResolvedValue({ adresse: '', clientLeger: false }) })
+    Object.assign(desktop, {
+      getDefaultConnection: vi.fn().mockResolvedValue({ adresse: '', clientLeger: false, connexionAvancee: true })
+    })
     render(<DesktopInstallOverlay />)
 
     expect(await screen.findByText('Install Mbiling locally')).toBeTruthy()

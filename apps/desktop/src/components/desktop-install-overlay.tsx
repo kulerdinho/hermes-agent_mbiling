@@ -303,18 +303,30 @@ export function DesktopInstallOverlay({ enabled = true }: DesktopInstallOverlayP
   const [copied, setCopied] = useState(false)
   const [cancelling, setCancelling] = useState(false)
   const [remoteOpen, setRemoteOpen] = useState(false)
-  // Mbiling first launch: with a server address in the app's settings, the user only signs in
-  // (FirstRunSignIn). The address/token forms and the local install stay behind "Advanced".
-  // The light (remote-only) build never offers a local install.
-  const [defaults, setDefaults] = useState<{ adresse: string; clientLeger: boolean } | null>(null)
+  // Mbiling first launch: the app only works signed in to a Mbiling account in the cloud, so the
+  // user only gets "Sign in" (FirstRunSignIn). The manual connection (address, token) and the
+  // local install exist only in team builds (connexion_avancee in connexion-par-defaut.json).
+  const [defaults, setDefaults] = useState<{ adresse: string; clientLeger: boolean; connexionAvancee: boolean } | null>(
+    null
+  )
   const [advanced, setAdvanced] = useState(false)
   const remoteOnly = Boolean(defaults?.clientLeger)
 
   useEffect(() => {
-    void window.mbilingDesktop
-      ?.getDefaultConnection?.()
+    const getDefaults = window.mbilingDesktop?.getDefaultConnection
+
+    // A bridge without Mbiling settings (older host) keeps the original setup choice.
+    const legacy = { adresse: '', clientLeger: false, connexionAvancee: true }
+
+    if (typeof getDefaults !== 'function') {
+      setDefaults(legacy)
+
+      return
+    }
+
+    void getDefaults()
       .then(value => setDefaults(value))
-      .catch(() => undefined)
+      .catch(() => setDefaults({ ...legacy, connexionAvancee: false }))
   }, [])
   const [now, setNow] = useState(() => Date.now())
   const logEndRef = useRef<HTMLDivElement | null>(null)
@@ -451,8 +463,13 @@ export function DesktopInstallOverlay({ enabled = true }: DesktopInstallOverlayP
     return null
   }
 
-  if (state.setupChoice && defaults?.adresse && !advanced && !remoteOpen) {
-    return <FirstRunSignIn onAdvanced={() => setAdvanced(true)} />
+  if (state.setupChoice && !defaults) {
+    // Never flash the local-install choice before knowing whether this build allows it.
+    return null
+  }
+
+  if (state.setupChoice && defaults && (defaults.adresse || !defaults.connexionAvancee) && !advanced && !remoteOpen) {
+    return <FirstRunSignIn onAdvanced={defaults.connexionAvancee ? () => setAdvanced(true) : undefined} />
   }
 
   if (remoteOpen || (remoteOnly && state.setupChoice)) {

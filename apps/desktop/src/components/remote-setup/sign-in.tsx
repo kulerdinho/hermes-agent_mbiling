@@ -10,8 +10,11 @@ import { Loader2 } from '@/lib/icons'
 type Step = 'idle' | 'waiting' | 'connecting'
 
 interface FirstRunSignInProps {
-  /** Opens the full connection form (server address, token): a support path, not the default. */
-  onAdvanced: () => void
+  /**
+   * Team builds only (connexion_avancee): opens the manual connection form. Absent for users:
+   * Mbiling only works signed in to a Mbiling account in the cloud.
+   */
+  onAdvanced?: () => void
   /** Called once the connection is applied. */
   onConnected?: () => void
 }
@@ -116,14 +119,16 @@ export function FirstRunSignIn({ onAdvanced, onConnected }: FirstRunSignInProps)
           </div>
         ) : null}
 
-        <button
-          className={`mt-5 text-xs underline-offset-2 hover:underline ${offerAdvanced ? 'text-foreground' : 'text-muted-foreground'}`}
-          disabled={busy}
-          onClick={onAdvanced}
-          type="button"
-        >
-          {copy.advanced}
-        </button>
+        {onAdvanced ? (
+          <button
+            className={`mt-5 text-xs underline-offset-2 hover:underline ${offerAdvanced ? 'text-foreground' : 'text-muted-foreground'}`}
+            disabled={busy}
+            onClick={onAdvanced}
+            type="button"
+          >
+            {copy.advanced}
+          </button>
+        ) : null}
       </div>
     </div>
   )

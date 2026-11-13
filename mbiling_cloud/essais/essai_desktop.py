@@ -59,6 +59,7 @@ def main() -> int:
     # Réglages de l'application : ceux livrés, avec le Relais local et le dossier de l'essai.
     reglages = json.loads((RACINE / "apps/desktop/config/mains.json").read_text(encoding="utf-8"))
     reglages["relais_url"] = f"ws://127.0.0.1:{PORT}/mains"
+    reglages["actif"] = True  # l'utilisateur a autorisé l'agent à utiliser ce PC (case cochée)
     (donnees / "mains.json").write_text(json.dumps(reglages), encoding="utf-8")
     politique = json.loads((RACINE / "apps/desktop/config/mains-politique.json").read_text(encoding="utf-8"))
     politique["dossiers_autorises"] = [str(dossier)]
@@ -100,8 +101,10 @@ def main() -> int:
         threading.Thread(target=lire_pilote, daemon=True).start()
         pret.wait(180)
 
-        adresses = next((l for l in lignes if l.startswith("ADRESSES ")), "")
-        verifier("le premier lancement propose l'adresse du fichier de réglages", "api.mbiling.com" in adresses, adresses)
+        ecran = json.loads(next((l for l in lignes if l.startswith("PREMIER_LANCEMENT ")), "PREMIER_LANCEMENT {}")[18:] or "{}")
+        verifier("le premier lancement n'affiche qu'un bouton « Se connecter », sans champ à remplir",
+                 ecran.get("boutonConnexion") is True and ecran.get("champs") == 0, json.dumps(ecran))
+        verifier("l'adresse du serveur vient du fichier de réglages", ecran.get("adresseParDefaut") == "https://api.mbiling.com")
         avant = next((l for l in lignes if l.startswith("ETAT_AVANT ")), "")
         verifier("sans jeton, les Mains attendent", '"jetonDefini":false' in avant and '"enMarche":false' in avant)
         verifier("après saisie du jeton, le Desktop se connecte au Relais", any(l == "PRET" for l in lignes),

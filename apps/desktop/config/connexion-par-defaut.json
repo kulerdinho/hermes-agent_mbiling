@@ -1,3 +1,4 @@
 {
-  "adresse": "https://api.mbiling.com"
+  "adresse": "https://api.mbiling.com",
+  "connexion_avancee": false
 }

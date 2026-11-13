@@ -180,17 +180,25 @@ test('the first-launch address comes from the settings file', async () => {
 
   assert.deepEqual(await invoke('mbiling:default-connection'), {
     adresse: 'https://api.mbiling.test',
-    clientLeger: true
+    clientLeger: true,
+    connexionAvancee: false
   })
 
+  fs.writeFileSync(
+    path.join(dirs.root, 'userData', 'connexion-par-defaut.json'),
+    JSON.stringify({ adresse: 'https://api.mbiling.test', connexion_avancee: true })
+  )
+  assert.equal(((await invoke('mbiling:default-connection')) as { connexionAvancee: boolean }).connexionAvancee, true)
+
+  // An unreadable file never unlocks the manual connection.
   fs.writeFileSync(path.join(dirs.root, 'userData', 'connexion-par-defaut.json'), 'not json')
-  assert.deepEqual(await invoke('mbiling:default-connection'), { adresse: '', clientLeger: true })
+  assert.deepEqual(await invoke('mbiling:default-connection'), { adresse: '', clientLeger: true, connexionAvancee: false })
 })
 
 // --- Automatic pairing: the app enrols this PC with the connected server ------------------------
 
 async function loadMainsConnected(reply: unknown = { appareil: 'pc-auto', jeton: 'jeton-auto', relais_url: 'wss://srv.test/mains' }) {
-  const request = vi.fn(async () => reply)
+  const request = vi.fn(async (_pathname: string, _method: string, _body?: string) => reply)
   const mod = await import('./mains-desktop')
   mod.registerMainsIpc({ request, connected: () => true })
 
@@ -237,7 +245,7 @@ test('applying a connection starts the Mains, which enrol when allowed and no to
 })
 
 test('never enrols while no remote server is connected', async () => {
-  const request = vi.fn(async () => ({ appareil: 'x', jeton: 'y' }))
+  const request = vi.fn(async (_pathname: string, _method: string, _body?: string) => ({ appareil: 'x', jeton: 'y' }))
   const mod = await import('./mains-desktop')
   mod.registerMainsIpc({ request, connected: () => false })
   await invoke('mbiling:mains:consent', true)

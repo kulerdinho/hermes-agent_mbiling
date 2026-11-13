@@ -223,7 +223,7 @@ declare global {
       }
       getBootProgress: () => Promise<DesktopBootProgress>
       getConnectionConfig: (profile?: null | string) => Promise<DesktopConnectionConfig>
-      getDefaultConnection: () => Promise<{ adresse: string; clientLeger: boolean }>
+      getDefaultConnection: () => Promise<{ adresse: string; clientLeger: boolean; connexionAvancee: boolean }>
       mains: {
         status: () => Promise<MbilingMainsStatus>
         enrol: () => Promise<MbilingMainsStatus>

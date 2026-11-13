@@ -44,7 +44,7 @@ export const BROWSER_BRIDGE_STUBS = {
   },
   cancelBootstrap: async () => ({ cancelled: false, ok: true }),
   // The browser build has no first-launch screen and cannot run the Mains (desktop only).
-  getDefaultConnection: async () => ({ adresse: '', clientLeger: false }),
+  getDefaultConnection: async () => ({ adresse: '', clientLeger: false, connexionAvancee: false }),
   mains: {
     status: async () => {
       throw browserUnsupported('The Mains')
