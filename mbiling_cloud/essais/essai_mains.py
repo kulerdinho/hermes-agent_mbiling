@@ -110,7 +110,7 @@ def main() -> int:
 
         c = lancer("echo test > /c/Windows/mbiling.txt")
         sortie = c.stdout.read()
-        verifier("écriture dans C:\\Windows refusée par le PC", "refusée" in sortie and c.wait(5) == 126)
+        verifier("écriture dans C:\\Windows refusée par le PC", "refusée" in sortie and c.wait(5) == 77)
 
         c = lancer("for i in 1 2 3; do echo tic $i; sleep 1; done")
         debut = time.time()
