@@ -48,11 +48,18 @@ async function principal() {
   // Écran du premier lancement : un seul bouton « Se connecter », aucun champ d'adresse ni de jeton.
   await attendre(6000)
   await page.screenshot({ path: path.join(captures, '1-premier-lancement.png') })
-  const premierLancement = await page.evaluate(() => ({
-    boutonConnexion: Array.from(document.querySelectorAll('button')).some(b => /Sign in to Mbiling|Se connecter à Mbiling/.test(b.textContent || '')),
-    champs: Array.from(document.querySelectorAll('input')).filter(i => i.type !== 'checkbox' && i.type !== 'hidden').length,
-    adresseParDefaut: null
-  }))
+  // Les champs sont comptés dans l'écran de connexion lui-même (l'application, derrière, en a).
+  const premierLancement = await page.evaluate(() => {
+    const bouton = Array.from(document.querySelectorAll('button')).find(b =>
+      /Sign in to Mbiling|Se connecter à Mbiling/.test(b.textContent || '')
+    )
+    const ecran = bouton ? bouton.closest('.fixed') : null
+    return {
+      boutonConnexion: Boolean(bouton),
+      champs: ecran ? Array.from(ecran.querySelectorAll('input, textarea')).filter(i => i.type !== 'checkbox' && i.type !== 'hidden').length : -1,
+      adresseParDefaut: null
+    }
+  })
   premierLancement.adresseParDefaut = (await page.evaluate(() => window.mbilingDesktop.getDefaultConnection())).adresse
   console.log('PREMIER_LANCEMENT ' + JSON.stringify(premierLancement))
 
