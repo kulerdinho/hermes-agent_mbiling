@@ -380,7 +380,7 @@ import {
   waitForManagedSshBootstrapFence,
   waitForManagedUpdateOperations
 } from './managed-ssh-update'
-import { registerDefaultConnectionIpc } from './mbiling-desktop-config'
+import { accountOnly, registerDefaultConnectionIpc } from './mbiling-desktop-config'
 import { registerMcpOauthCallbackIpc } from './mcp-oauth-callback-ipc'
 import { isMediaCapturePermission } from './media-capture-permission'
 import { createMediaProtocolHandler, MEDIA_PROTOCOL, mediaProtocolDownloadName } from './media-protocol'
@@ -2584,6 +2584,27 @@ function getFirstRunSetupGate() {
 
 async function waitForFirstRunSetupChoice(backend) {
   const gate = getFirstRunSetupGate()
+
+  // Mbiling: with no account connection saved, the app always waits for "Sign in" — even when a
+  // local engine is found on the PC (older install, `mbiling` on PATH). A local engine is never
+  // started by a user build (connexion_avancee off in connexion-par-defaut.json).
+  if (accountOnly()) {
+    const gated = backend && backend.kind !== 'bootstrap-needed' ? { ...backend, kind: 'bootstrap-needed' } : backend
+
+    updateBootProgress(
+      { error: null, message: 'Waiting for sign-in', phase: 'bootstrap.choice', progress: 12, running: true },
+      { allowDecrease: true }
+    )
+
+    const decision = await gate.wait(gated)
+
+    if (decision !== 'continue-local') {
+      return decision
+    }
+
+    // Unreachable in practice (the local choice is refused above); never fall through to local.
+    throw new FirstRunSetupResetError()
+  }
 
   if (!gate.shouldGate(backend)) {
     return 'continue-local'
@@ -14442,6 +14463,13 @@ registerUpdateHoldIpc(ipcMain, {
 })
 
 ipcMain.handle('mbiling:bootstrap:continue-local', async () => {
+  if (accountOnly()) {
+    // Mbiling users only work signed in to their cloud account: there is no local engine to start.
+    rememberLog('[bootstrap] local install refused: this build only connects to a Mbiling account')
+
+    return { ok: false, error: 'local install is not available in this build' }
+  }
+
   rememberLog('[bootstrap] local install selected by renderer; continuing first-launch bootstrap')
   continueFirstRunLocalBootstrap()
 

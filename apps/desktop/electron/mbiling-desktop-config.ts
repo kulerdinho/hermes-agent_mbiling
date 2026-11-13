@@ -77,3 +77,16 @@ export function registerDefaultConnectionIpc(ipcMain: Electron.IpcMain, isLight:
     }
   })
 }
+
+/**
+ * True for user builds: Mbiling only works signed in to a Mbiling account in the cloud, so no
+ * manual connection and no local engine. Team builds set connexion_avancee: true. An unreadable
+ * settings file keeps the safe answer (account only).
+ */
+export function accountOnly(): boolean {
+  try {
+    return readMbilingConfig<{ connexion_avancee?: unknown }>('connexion').connexion_avancee !== true
+  } catch {
+    return true
+  }
+}

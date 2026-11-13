@@ -131,6 +131,23 @@ export function BootFailureOverlay() {
   // A remote/cloud backend that failed to boot is fixable from gateway settings,
   // so the escape hatch earns emphasis (local failures keep it as a quiet ghost).
   const [remoteFailure, setRemoteFailure] = useState(false)
+  // Mbiling user builds (connexion_avancee off): only "Sign in" and "Retry" are offered. Safe
+  // default while the setting loads; a bridge without Mbiling settings keeps every action.
+  const [accountOnly, setAccountOnly] = useState(true)
+
+  useEffect(() => {
+    const getDefaults = window.mbilingDesktop?.getDefaultConnection
+
+    if (typeof getDefaults !== 'function') {
+      setAccountOnly(false)
+
+      return
+    }
+
+    void getDefaults()
+      .then(value => setAccountOnly(!value.connexionAvancee))
+      .catch(() => undefined)
+  }, [])
   // A bundled install (payload ships in-app) has no installer to repair with.
   // Read from the bootstrap state snapshot so Repair is never offered there;
   // "Reinstall the app" replaces it only when the payload itself is damaged.
@@ -501,6 +518,19 @@ export function BootFailureOverlay() {
 
     actions = [retryAction, ...(fixAction ? [fixAction] : []), { ...settingsAction, variant: 'ghost' }]
     hint = damagedPayload ? copy.bundledReinstallHint : bundled ? '' : copy.repairHint
+  }
+
+  if (accountOnly) {
+    // Mbiling user builds only work signed in to the cloud account: no local engine to repair or
+    // switch to, no manual gateway settings, no former publisher's portal or community links.
+    // What is left: sign in again (lapsed session) and retry (server back up).
+    actions = actions.filter(action => action.key === 'signin' || action.key === 'retry')
+
+    if (!actions.some(action => action.key === 'retry')) {
+      actions.push({ ...retryAction, variant: actions.length ? 'secondary' : undefined })
+    }
+
+    hint = remoteReauth ? hint : ''
   }
 
   if (view === 'connect') {

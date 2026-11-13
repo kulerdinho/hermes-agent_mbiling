@@ -494,3 +494,40 @@ describe('BootFailureOverlay', () => {
     }
   })
 })
+
+describe('BootFailureOverlay in Mbiling user builds (account only)', () => {
+  const localConfig = { ...remoteToken, mode: 'local', remoteUrl: '' }
+  const accountOnly = { getDefaultConnection: async () => ({ adresse: 'https://api.mbiling.test', clientLeger: true, connexionAvancee: false }) }
+
+  it('offers no local repair, local gateway or manual gateway settings', async () => {
+    const restore = stubDesktop(localConfig, accountOnly)
+    render(<BootFailureOverlay />)
+
+    expect(await screen.findByText(en.boot.failure.retry)).toBeTruthy()
+    await waitFor(() => expect(screen.queryByText(en.boot.failure.repairInstall)).toBeNull())
+    expect(screen.queryByText(en.boot.failure.gatewaySettings)).toBeNull()
+    expect(screen.queryByText(en.boot.failure.useLocalGateway)).toBeNull()
+    restore()
+  })
+
+  it('keeps only retry for a failed cloud connection', async () => {
+    const restore = stubDesktop(remoteToken, accountOnly)
+    render(<BootFailureOverlay />)
+
+    expect(await screen.findByText(en.boot.failure.retry)).toBeTruthy()
+    await waitFor(() => expect(screen.queryByText(en.boot.failure.gatewaySettings)).toBeNull())
+    expect(screen.queryByText(en.boot.failure.useLocalGateway)).toBeNull()
+    restore()
+  })
+
+  it('team builds keep every recovery action', async () => {
+    const restore = stubDesktop(localConfig, {
+      getDefaultConnection: async () => ({ adresse: '', clientLeger: false, connexionAvancee: true })
+    })
+    render(<BootFailureOverlay />)
+
+    expect(await screen.findByText(en.boot.failure.repairInstall)).toBeTruthy()
+    expect(screen.getByText(en.boot.failure.gatewaySettings)).toBeTruthy()
+    restore()
+  })
+})
