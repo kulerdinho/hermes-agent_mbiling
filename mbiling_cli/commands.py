@@ -321,10 +321,10 @@ COMMAND_REGISTRY: list[CommandDef] = [
     CommandDef("usage", "Show token usage and rate limits; `reset` redeems a banked Codex limit reset", "Info",
                args_hint="[reset [--force]]"),
     CommandDef("subscription", "View your Nous plan and change it in the browser", "Info",
-               cli_only=True, aliases=("upgrade",)),
+               cli_only=True, aliases=("upgrade",), desktop="hidden"),
     CommandDef("login", "Sign in with a Nous account (keeps your connectors)", "Info",
-               busy_policy="dispatch", desktop="settings"),
-    CommandDef("topup", "Show your Nous balance and manage billing on the portal", "Info"),
+               busy_policy="dispatch", desktop="hidden"),
+    CommandDef("topup", "Show your Nous balance and manage billing on the portal", "Info", desktop="hidden"),
     CommandDef("insights", "Show usage insights and analytics", "Info",
                args_hint="[days]", desktop="advanced"),
     CommandDef("platforms", "Show gateway/messaging platform status", "Info",
@@ -396,9 +396,21 @@ _COMMAND_LOOKUP: dict[str, CommandDef] = {
     key: cmd for cmd in COMMAND_REGISTRY for key in (cmd.name, *cmd.aliases)}
 
 
+# Commands that only serve the Nous Portal: unavailable while it is not offered (nous.enabled).
+NOUS_COMMANDS = frozenset({"subscription", "login", "topup"})
+
+
+def _offered(cmd: CommandDef | None) -> bool:
+    if cmd is None or cmd.name not in NOUS_COMMANDS:
+        return True
+    from mbiling_cli.anon_auth import nous_enabled
+    return nous_enabled()
+
+
 def resolve_command(name: str) -> CommandDef | None:
     """Resolve a command name or alias (leading slash optional) to its CommandDef."""
-    return _COMMAND_LOOKUP.get(name.lower().lstrip("/"))
+    cmd = _COMMAND_LOOKUP.get(name.lower().lstrip("/"))
+    return cmd if _offered(cmd) else None
 
 
 def _build_description(cmd: CommandDef) -> str:
@@ -416,7 +428,7 @@ def build_commands_by_category() -> dict[str, dict[str, str]]:
     """
     grouped: dict[str, dict[str, str]] = {}
     for cmd in COMMAND_REGISTRY:
-        if cmd.gateway_only:
+        if cmd.gateway_only or not _offered(cmd):
             continue
         entries = {f"/{cmd.name}": _build_description(cmd)}
         for alias in cmd.aliases:

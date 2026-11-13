@@ -17,7 +17,8 @@ const reactUi: TestProjectConfiguration = {
     // development build for the test worker so `act` resolves to a real
     // function, regardless of any ambient NODE_ENV (e.g. a shell that
     // inherited NODE_ENV=production from a desktop launch).
-    env: { NODE_ENV: 'development' },
+    // Mbiling builds hide Nous Portal (src/lib/nous.ts); the inherited UI tests exercise it.
+    env: { NODE_ENV: 'development', VITE_MBILING_NOUS_ENABLED: '1' },
     // The first test in each file pays jsdom env init + full module transform,
     // which can exceed vitest's 5000ms default under CI/load. 15s gives the
     // cold start headroom without masking genuinely hung tests. Hooks pay the

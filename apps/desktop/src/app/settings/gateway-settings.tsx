@@ -32,6 +32,7 @@ import {
   RefreshCw,
   Terminal
 } from '@/lib/icons'
+import { NOUS_ENABLED } from '@/lib/nous'
 import { coerceRemoteUrlScheme } from '@/lib/remote-url'
 import { selectableCardClass } from '@/lib/selectable-card'
 import { cn } from '@/lib/utils'
@@ -1068,14 +1069,16 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
             onSelect={() => setState(current => ({ ...current, mode: 'local' }))}
             title={g.localTitle}
           />
-          <ModeCard
-            active={state.mode === 'cloud'}
-            description={g.cloudDesc}
-            disabled={state.envOverride}
-            icon={Cloud}
-            onSelect={() => setState(current => ({ ...current, mode: 'cloud' }))}
-            title={g.cloudTitle}
-          />
+          {NOUS_ENABLED || state.mode === 'cloud' ? (
+            <ModeCard
+              active={state.mode === 'cloud'}
+              description={g.cloudDesc}
+              disabled={state.envOverride}
+              icon={Cloud}
+              onSelect={() => setState(current => ({ ...current, mode: 'cloud' }))}
+              title={g.cloudTitle}
+            />
+          ) : null}
           <ModeCard
             active={state.mode === 'remote'}
             description={g.remoteDesc}

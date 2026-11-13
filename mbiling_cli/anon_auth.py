@@ -153,8 +153,26 @@ def anon_failure_copy(code: str, *, retry_after: Any = None) -> str:
     return template.format(wait=friendly_wait(retry_after if retry_after else 60))
 
 
+def nous_enabled() -> bool:
+    """``nous.enabled`` (default False in Mbiling): the Nous Portal provider is offered at all.
+
+    False hides Nous from every picker, sign-in, billing and onboarding surface and stops every
+    request to the Portal. Fails closed (False) when the config cannot be read."""
+    try:
+        from mbiling_cli.config import load_config_readonly
+        nous_cfg = load_config_readonly().get("nous")
+    except Exception:
+        logger.debug("nous: config unreadable, treating nous.enabled as false", exc_info=True)
+        return False
+    if not isinstance(nous_cfg, dict):
+        return False
+    return bool(nous_cfg.get("enabled", False))
+
+
 def guest_allowed() -> bool:
     """``nous.guest`` (default True) has not switched guests off: no connector guest, no trial."""
+    if not nous_enabled():
+        return False
     try:
         from mbiling_cli.config import load_config_readonly
         nous_cfg = load_config_readonly().get("nous")

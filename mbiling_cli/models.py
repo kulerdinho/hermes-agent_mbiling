@@ -392,6 +392,9 @@ def fetch_nous_recommended_models(
     """Fetch the Portal's public recommended models (no auth): its R2 mirror, else the Portal itself.
     Results are reused for ``_NOUS_RECOMMENDED_CACHE_TTL`` s across restarts unless ``force_refresh``;
     stale disk data is the fallback on failure, and reading it never renews its freshness."""
+    from mbiling_cli.anon_auth import nous_enabled
+    if not nous_enabled():
+        return {}  # Nous Portal is not offered by Mbiling (config nous.enabled)
     base = (portal_base_url or "https://portal.nousresearch.com").rstrip("/")
     now = time.monotonic()
     cache_key = (_pricing_profile_key(), base)

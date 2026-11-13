@@ -678,6 +678,9 @@ def _build_oauth_catalog() -> list[dict[str, Any]]:
     in ``mbiling model`` order, so plugin-added OAuth/external providers appear automatically."""
     rows: list[dict[str, Any]] = []
     seen: set[str] = set()
+    from mbiling_cli.anon_auth import nous_enabled
+    if not nous_enabled():
+        seen.add("nous")  # Nous Portal is not offered by Mbiling (config nous.enabled)
     for entry in _OAUTH_PROVIDER_CATALOG:
         if entry["id"] not in seen:
             seen.add(entry["id"])

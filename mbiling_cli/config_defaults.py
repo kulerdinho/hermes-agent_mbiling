@@ -2665,6 +2665,10 @@ DEFAULT_CONFIG = {
     },
 
     "nous": {
+        # Nous Portal (Nous Research's accounts, inference, subscription, managed tools, cloud
+        # agents). Mbiling does not offer it: false hides it everywhere and sends nothing to any
+        # *.nousresearch.com host. true restores the original behaviour.
+        "enabled": False,
         # Upper bound (seconds) on the Nous auth keepalive tick, which derives from the
         # server-issued credential lifetime (raising above it has no effect). 0 disables the
         # keepalive thread.

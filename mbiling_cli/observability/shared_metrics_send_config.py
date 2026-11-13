@@ -60,6 +60,11 @@ def resolve_send_config(config: dict | None) -> SendConfig:
 
     enabled = shared.get("enabled") is True
     send_requested = shared.get("send") is True
+    from mbiling_cli.anon_auth import nous_enabled
+    if not nous_enabled():
+        # Shared metrics go to Nous Research's collector: never sent while Nous is not offered
+        # by Mbiling (config nous.enabled).
+        send_requested = False
 
     if send_requested and not enabled:
         # Loud, not silent: the user believes telemetry is being sent, and it never will be.

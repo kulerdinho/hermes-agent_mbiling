@@ -262,6 +262,10 @@ def _any_env(env_vars, read_env=os.environ.get) -> bool:
 def _skip(seen: set, excluded: set, *keys: str) -> bool:
     """True when any of *keys* (lowercased) is already emitted or excluded."""
     lowered = [k.lower() for k in keys]
+    if "nous" in lowered:
+        from mbiling_cli.anon_auth import nous_enabled
+        if not nous_enabled():
+            return True  # Nous Portal is not offered by Mbiling (config nous.enabled)
     return any(k in seen for k in lowered) or any(k in excluded for k in lowered)
 
 
@@ -500,6 +504,8 @@ def _free_tier_nous_row(row: dict) -> dict | None:
     row through untouched. Builders that compute the full catalog lazily should pass
     ``models=[]`` and only compute when the returned row still has no models."""
     from mbiling_cli import anon_auth
+    if not anon_auth.nous_enabled():
+        return None
     if not anon_auth.has_guest():
         return row
     if not anon_auth.guest_allowed():

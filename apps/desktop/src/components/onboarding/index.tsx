@@ -62,6 +62,7 @@ export {
   sortProviders
 } from './providers'
 
+import { NOUS_ENABLED } from '@/lib/nous'
 import { $gateway, activeGatewayConnectionId } from '@/store/gateway'
 import { captureOnboardingScope, requestOnboardingGateway } from '@/store/onboarding-scope'
 
@@ -660,7 +661,7 @@ export function Picker({ ctx }: { ctx: OnboardingContext }) {
     return <Status>{t.onboarding.lookingUpProviders}</Status>
   }
 
-  const featured = ordered.find(p => p.id === FEATURED_ID) ?? null
+  const featured = NOUS_ENABLED ? (ordered.find(p => p.id === FEATURED_ID) ?? null) : null
   const rest = featured ? ordered.filter(p => p.id !== FEATURED_ID) : ordered
   // Collapse the secondary providers behind a disclosure whenever Nous Portal
   // is present to anchor the choice — otherwise show the full list. The
@@ -751,7 +752,8 @@ function KeyFormStep({
   onSelect: (provider: OAuthProvider) => void
   providers: OAuthProvider[]
 }) {
-  const nous = localEndpoint ? null : (providers.find(p => p.id === FEATURED_ID) ?? NOUS_FALLBACK)
+  const nous =
+    localEndpoint || !NOUS_ENABLED ? null : (providers.find(p => p.id === FEATURED_ID) ?? NOUS_FALLBACK)
 
   return (
     <div className="grid gap-3">

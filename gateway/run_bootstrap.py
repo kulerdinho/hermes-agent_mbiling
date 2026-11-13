@@ -857,6 +857,9 @@ async def start_gateway(config: Optional[GatewayConfig] = None, replace: bool = 
             return record_startup()
 
         def _start_keepalive() -> None:
+            from mbiling_cli.anon_auth import nous_enabled
+            if not nous_enabled():
+                return  # Nous Portal is not offered by Mbiling (config nous.enabled)
             from mbiling_cli.nous_auth_keepalive import start_nous_auth_keepalive
             start_nous_auth_keepalive()
 

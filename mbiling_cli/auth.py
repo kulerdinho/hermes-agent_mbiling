@@ -1515,6 +1515,9 @@ def _logged_in_oauth_active_provider(*, skip_free_tier: bool = False) -> Optiona
     try:
         _maybe = _load_auth_store().get("active_provider")
         if _maybe == "nous":
+            from mbiling_cli.anon_auth import nous_enabled
+            if not nous_enabled():
+                return None  # Nous Portal is not offered by Mbiling (config nous.enabled)
             from mbiling_cli.anon_auth import free_inference_active, has_guest
             if has_guest() and (skip_free_tier or not free_inference_active()):
                 return None  # this guest carries no inference here (or is being discounted): not a login
@@ -1679,8 +1682,8 @@ def resolve_provider(
     # only the desktop's trial claim does (welcome_trial), so provider resolution stays free of network.
     if not skip_free_tier:
         try:
-            from mbiling_cli.anon_auth import free_inference_active
-            if free_inference_active():
+            from mbiling_cli.anon_auth import free_inference_active, nous_enabled
+            if nous_enabled() and free_inference_active():
                 return "nous"
         except Exception as exc:
             logger.debug("free tier check during provider resolution skipped: %s", exc)

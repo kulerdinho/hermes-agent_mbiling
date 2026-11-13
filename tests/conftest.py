@@ -444,6 +444,16 @@ def _hermetic_environment(tmp_path, tmp_path_factory, monkeypatch):
 # Backward-compat alias — old tests reference this fixture name. Keep it
 # as a no-op wrapper so imports don't break.
 @pytest.fixture(autouse=True)
+def _nous_portal_enabled_for_upstream_tests(request, monkeypatch):
+    """Mbiling ships with Nous Portal off (``nous.enabled: false``); the inherited tests exercise
+    the Nous code paths, so they run with it on. Mark a test ``nous_disabled`` to keep it off."""
+    if request.node.get_closest_marker("nous_disabled"):
+        return
+    import mbiling_cli.anon_auth as _anon_auth
+    monkeypatch.setattr(_anon_auth, "nous_enabled", lambda: True)
+
+
+@pytest.fixture(autouse=True)
 def _isolate_mbiling_home(_hermetic_environment):
     """Alias preserved for any test that yields this name explicitly."""
     return

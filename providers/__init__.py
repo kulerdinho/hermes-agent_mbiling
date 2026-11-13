@@ -399,6 +399,9 @@ def unlisted_provider_names() -> set[str]:
         except Exception:
             logger.debug("provider %s listed() raised; hiding it", profile.name, exc_info=True)
             hidden.add(profile.name)
+    from mbiling_cli.anon_auth import nous_enabled
+    if not nous_enabled():
+        hidden.add("nous")  # Nous Portal is not offered by Mbiling (config nous.enabled)
     return hidden
 
 

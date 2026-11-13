@@ -96,6 +96,9 @@ def connectors_available(
         if not resolved_loader().enabled:
             return False
         if entitlement_check is None:
+            from mbiling_cli.anon_auth import nous_enabled
+            if not nous_enabled():
+                return False  # connectors run through the Nous tool gateway, not offered by Mbiling
             from mbiling_cli.anon_auth import is_guest_state
             from tools.managed_tool_gateway import _read_nous_provider_state
 

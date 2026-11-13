@@ -28,6 +28,7 @@ import {
 } from '@/lib/icons'
 import { isEditableTarget } from '@/lib/keybinds/combo'
 import { typeToFocusChar } from '@/lib/keybinds/composer-focus-keys'
+import { NOUS_ENABLED } from '@/lib/nous'
 import { cn } from '@/lib/utils'
 import { getMbilingConfigDefaults, getMbilingConfigRecord, saveMbilingConfig } from '@/mbiling'
 import { $commandPaletteOpen, openCommandPalettePage } from '@/store/command-palette'
@@ -292,6 +293,9 @@ export function SettingsView({ onClose, onConfigSaved, onMainModelChanged }: Set
             label: t.settings.nav.notifications,
             onSelect: () => setActiveView('notifications')
           },
+          // Nous billing: hidden while Nous Portal is not offered (lib/nous.ts).
+          ...(NOUS_ENABLED
+            ? [
           {
             active: activeView === 'billing',
             children: [
@@ -318,7 +322,9 @@ export function SettingsView({ onClose, onConfigSaved, onMainModelChanged }: Set
             id: 'billing',
             label: t.settings.nav.billing,
             onSelect: () => setActiveView('billing')
-          },
+          }
+              ]
+            : []),
           {
             active: activeView === 'providers',
             children: [

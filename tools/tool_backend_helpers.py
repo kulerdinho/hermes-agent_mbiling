@@ -19,6 +19,9 @@ def managed_nous_tools_enabled(*, force_fresh: bool = False) -> bool:
     """Coarse gate: entitled to the Nous Tool Gateway (paid Portal access OR a live free
     pool). Fails closed on unknown/error — never blocks startup. Callers narrow per category
     via ``tool_gateway_entitled_for``; ``force_fresh`` is for flows needing a just-bought grant."""
+    from mbiling_cli.anon_auth import nous_enabled
+    if not nous_enabled():
+        return False  # Nous Portal is not offered by Mbiling (config nous.enabled)
     try:
         from mbiling_cli.nous_account import get_nous_portal_account_info
         # Branched call, not ``force_fresh=force_fresh``: tests stub the reader with zero-arg lambdas.

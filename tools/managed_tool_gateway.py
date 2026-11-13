@@ -171,6 +171,9 @@ def resolve_free_search_gateway(token_reader: Optional[Callable[[], Optional[str
     anonymous guest tier included, so it needs a token this profile may use (guest-disabled and refresh
     rules live in the reader), not paid entitlement or a registered account. Search only: every other
     vendor route goes through :func:`resolve_managed_tool_gateway`."""
+    from mbiling_cli.anon_auth import nous_enabled
+    if not nous_enabled():
+        return None  # Nous Portal is not offered by Mbiling (config nous.enabled)
     return _vendor_gateway("perplexity", None, token_reader)
 
 

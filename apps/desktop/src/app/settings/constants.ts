@@ -20,6 +20,8 @@ import type { ThemeMode } from '@/themes/context'
 // lib/personalities (mirrors mbiling_cli/personality.py BUILTIN_PERSONALITIES).
 export { BUILTIN_PERSONALITIES } from '@/lib/personalities'
 
+import { NOUS_ENABLED } from '@/lib/nous'
+
 import { defineFieldCopy } from './field-copy'
 import type { DesktopConfigSection } from './types'
 
@@ -44,7 +46,7 @@ interface ProviderPrefix {
 export const EMPTY_SELECT_VALUE = '__mbiling_empty__'
 export const CONTROL_TEXT = 'text-xs'
 
-export const PROVIDER_GROUPS: ProviderPrefix[] = [
+const ALL_PROVIDER_GROUPS: ProviderPrefix[] = [
   {
     prefix: 'NOUS_',
     name: 'Nous Portal',
@@ -228,6 +230,9 @@ export const PROVIDER_GROUPS: ProviderPrefix[] = [
     priority: 23
   }
 ]
+
+// Nous Portal is not offered by Mbiling unless the build enables it (lib/nous.ts).
+export const PROVIDER_GROUPS: ProviderPrefix[] = ALL_PROVIDER_GROUPS.filter(g => NOUS_ENABLED || g.prefix !== 'NOUS_')
 
 // Schema-side select overrides for desktop-relevant enum fields whose
 // backend schema only declares a string type.
