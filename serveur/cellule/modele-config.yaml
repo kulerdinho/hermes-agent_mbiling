@@ -1,0 +1,22 @@
+# Configuration de départ d'une cellule Mbiling (phase 0).
+# installer.sh la copie dans le dossier de données de la cellule à sa création, en
+# remplaçant @MODELE@ par MBILING_MODELE (serveur/.env). Ensuite, elle appartient à la
+# cellule : une nouvelle installation ne l'écrase jamais.
+model: "@MODELE@"
+
+plugins:
+  enabled: [mbiling-mains]
+  # Le plugin des Mains fournit un environnement de terminal : il doit être chargé dans le moteur.
+  isolation: in_process
+
+terminal:
+  # Les commandes de l'agent s'exécutent sur le PC de l'utilisateur, via le Relais.
+  backend: mbiling_mains
+  timeout: 60
+
+approvals:
+  mode: manual
+
+# Les points de restauration enregistreraient des chemins du serveur, pas ceux du PC.
+checkpoints:
+  enabled: false

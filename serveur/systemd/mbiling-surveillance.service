@@ -1,0 +1,7 @@
+[Unit]
+Description=Mbiling : relevé mémoire et processeur des conteneurs
+
+[Service]
+Type=oneshot
+# Une ligne par conteneur dans le journal : journalctl -u mbiling-surveillance
+ExecStart=/usr/bin/docker stats --no-stream --format "{{.Name}} cpu={{.CPUPerc}} mem={{.MemUsage}} ({{.MemPerc}})" mbiling-cellule-1 mbiling-relais-1 mbiling-passerelle-1

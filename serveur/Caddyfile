@@ -21,9 +21,13 @@
 		respond 404
 	}
 
-	# Les lots 3 (cellule) et 4 (Relais, /mains) ajoutent leurs routes ici.
+	# Les Mains (PC de l'utilisateur) se connectent au Relais en WebSocket.
+	handle /mains {
+		reverse_proxy relais:8000
+	}
+
+	# Tout le reste va à la cellule (API et WebSocket du Desktop, protégés par son jeton).
 	handle {
-		header Content-Type "text/plain; charset=utf-8"
-		respond "Mbiling ({$MBILING_DOMAINE}) : serveur en préparation." 503
+		reverse_proxy cellule:9119
 	}
 }

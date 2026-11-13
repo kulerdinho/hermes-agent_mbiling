@@ -4,7 +4,7 @@ name: mbiling
 
 services:
   # Porte d'entrée unique : le tunnel envoie tout ici, puis la passerelle répartit
-  # entre la cellule (lot 3) et le Relais (lot 4). Elle n'écoute que sur 127.0.0.1.
+  # entre la cellule et le Relais. Elle n'écoute que sur 127.0.0.1.
   passerelle:
     image: ${MBILING_IMAGE_CADDY:?voir .env.exemple}
     restart: unless-stopped
@@ -18,8 +18,45 @@ services:
     networks:
       - interne
 
-  # Tunnel Cloudflare vers ${MBILING_DOMAINE}. Activé par installer.sh seulement
-  # si le fichier du jeton existe. En réseau hôte, pour joindre 127.0.0.1:${MBILING_PORT_LOCAL}.
+  # La cellule de l'organisation de test : le moteur en mode serveur, joignable
+  # seulement par la passerelle (réseau interne, aucun port publié).
+  cellule:
+    image: ${MBILING_IMAGE_MOTEUR:?voir .env.exemple}
+    restart: unless-stopped
+    command: ["serve", "--host", "0.0.0.0", "--port", "9119"]
+    environment:
+      MBILING_DASHBOARD_SESSION_TOKEN: ${MBILING_JETON_CELLULE:?généré par installer.sh}
+      MBILING_RELAIS_URL: http://relais:8000
+      MBILING_RELAIS_JETON: ${MBILING_RELAIS_JETON_INTERNE:?généré par installer.sh}
+      MBILING_RELAIS_URL_PUBLIQUE: wss://${MBILING_DOMAINE}/mains
+      MBILING_ORGANISATION: ${MBILING_ORGANISATION:?voir .env.exemple}
+    volumes:
+      - ${MBILING_DONNEES}/cellules/${MBILING_ORGANISATION}/data:/opt/data
+    mem_limit: ${MBILING_CELLULE_MEMOIRE:?voir .env.exemple}
+    cpus: ${MBILING_CELLULE_CPU:?voir .env.exemple}
+    depends_on:
+      - relais
+    networks:
+      - interne
+
+  # Le Relais des Mains : relie la cellule au PC de l'utilisateur. Même image que le moteur.
+  relais:
+    image: ${MBILING_IMAGE_MOTEUR:?voir .env.exemple}
+    restart: unless-stopped
+    command: ["/opt/mbiling/.venv/bin/python", "-m", "uvicorn", "mbiling_cloud.relais.app:creer_app",
+              "--factory", "--host", "0.0.0.0", "--port", "8000", "--log-level", "warning"]
+    environment:
+      MBILING_RELAIS_CONFIG: /etc/mbiling/relais.yaml
+      MBILING_RELAIS_JETON_INTERNE: ${MBILING_RELAIS_JETON_INTERNE:?généré par installer.sh}
+      MBILING_JETON_APPAREIL_PC_TEST_1: ${MBILING_JETON_APPAREIL_PC_TEST_1:?généré par installer.sh}
+    volumes:
+      - ./relais.yaml:/etc/mbiling/relais.yaml:ro
+      - ${MBILING_DONNEES}/relais:/opt/data
+    networks:
+      - interne
+
+  # Tunnel Cloudflare vers MBILING_DOMAINE. Activé par installer.sh seulement si le
+  # fichier du jeton existe. En réseau hôte, pour joindre 127.0.0.1:MBILING_PORT_LOCAL.
   tunnel:
     image: ${MBILING_IMAGE_CLOUDFLARED:?voir .env.exemple}
     profiles: ["tunnel"]

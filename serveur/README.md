@@ -31,6 +31,19 @@ vers `http://localhost:8090`. Il dépose ensuite le jeton dans `MBILING_JETON_TU
 (par défaut `/etc/mbiling/cloudflared.token`). Il ne le transmet jamais par message ni par git.
 On relance ensuite `./installer.sh`.
 
+## La cellule et le Relais
+
+- **L'image du moteur** est construite sur le serveur, depuis ce dépôt :
+  `sudo docker build -t mbiling-moteur:phase0 .` (à la racine du dépôt). Le Relais utilise la même image.
+- **Le modèle d'IA :** `MBILING_MODELE`, plus la clé de **test** plafonnée (`MBILING_CLE_IA_VARIABLE`
+  et `MBILING_CLE_IA`). `installer.sh` copie la clé dans les secrets de la cellule.
+- **Les jetons internes** (cellule, Relais, PC de test) sont générés dans `.env` au premier lancement.
+  Le Desktop se connecte à `https://MBILING_DOMAINE` avec `MBILING_JETON_CELLULE`.
+- **La configuration de départ** (`cellule/modele-config.yaml`) n'est copiée qu'à la création de la
+  cellule, et les profils de `MBILING_PROFILS` ne sont créés qu'une fois.
+- **Ressources :** la cellule est plafonnée (`MBILING_CELLULE_MEMOIRE`, `MBILING_CELLULE_CPU`), et un relevé
+  est noté toutes les 5 minutes : `journalctl -u mbiling-surveillance`.
+
 ## Vérifier
 
 ```bash
