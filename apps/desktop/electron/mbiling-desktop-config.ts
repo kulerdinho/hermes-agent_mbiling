@@ -42,9 +42,12 @@ export function readMbilingConfig<T>(name: MbilingConfigName): T {
   return JSON.parse(fs.readFileSync(userFile, 'utf8').replace(/^\uFEFF/, '')) as T
 }
 
-/** `{documents}` / `{home}` in a configured path become the user's real folders. */
+/** `{documents}` / `{home}` / `{donnees}` (the app's data folder) in a configured path become real folders. */
 export function expandUserPath(value: string): string {
-  return value.replaceAll('{documents}', app.getPath('documents')).replaceAll('{home}', app.getPath('home'))
+  return value
+    .replaceAll('{documents}', app.getPath('documents'))
+    .replaceAll('{home}', app.getPath('home'))
+    .replaceAll('{donnees}', app.getPath('userData'))
 }
 
 export interface DefaultConnection {

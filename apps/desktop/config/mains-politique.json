@@ -2,6 +2,7 @@
   "dossiers_autorises": [
     "{documents}\\Mbiling-Test"
   ],
+  "sites_interdits": [],
   "interdits": [
     "(^|[^\\w])/c/windows([/\\s'\"]|$)",
     "c:[\\\\/]+windows",

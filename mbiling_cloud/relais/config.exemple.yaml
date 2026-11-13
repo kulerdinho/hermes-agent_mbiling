@@ -10,7 +10,7 @@ jeton_interne_env: MBILING_RELAIS_JETON_INTERNE
 
 # Tunnel du navigateur (facultatif) : jeton que la cellule met dans son adresse CDP
 # (http://relais:<port>/cdp/<organisation>/<jeton>). Sans cette ligne, le tunnel est désactivé.
-jeton_cdp_env: MBILING_RELAIS_JETON_CDP
+# jeton_cdp_env: MBILING_RELAIS_JETON_CDP
 
 # PC inscrits automatiquement (quand l'utilisateur autorise l'agent à utiliser son PC) :
 # le Relais n'y garde que l'empreinte de chaque jeton. Mettre ce fichier sur un volume sauvegardé.

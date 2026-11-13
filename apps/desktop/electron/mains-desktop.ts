@@ -14,7 +14,7 @@ import path from 'node:path'
 import { app, ipcMain, safeStorage, shell } from 'electron'
 
 import * as mainsCore from '../../../mbiling_mains_client/mains.cjs'
-import type { MainsConfig, MainsEtat } from '../../../mbiling_mains_client/mains.cjs'
+import type { MainsConfig, MainsEtat, MainsNavigateur } from '../../../mbiling_mains_client/mains.cjs'
 
 import { expandUserPath, readMbilingConfig, userConfigPath } from './mbiling-desktop-config'
 
@@ -24,11 +24,14 @@ interface MainsDesktopSettings {
   bash: string | null
   marge_timeout_s: number
   reconnexion: { delai_initial_ms: number; delai_max_ms: number }
+  /** The browser the agent drives on this PC (dedicated profile, visible window). */
+  navigateur?: MainsNavigateur
 }
 
 interface MainsPolicy {
   dossiers_autorises: string[]
   interdits: string[]
+  sites_interdits: string[]
 }
 
 export interface MainsStatus {
@@ -130,7 +133,8 @@ function readPolicy(): MainsPolicy {
 
   return {
     dossiers_autorises: (policy.dossiers_autorises || []).map(expandUserPath),
-    interdits: policy.interdits || []
+    interdits: policy.interdits || [],
+    sites_interdits: policy.sites_interdits || []
   }
 }
 
@@ -181,7 +185,10 @@ export function startMains(): void {
       bash: settings.bash,
       marge_timeout_s: settings.marge_timeout_s,
       reconnexion: settings.reconnexion,
-      politique: readPolicy()
+      politique: readPolicy(),
+      ...(settings.navigateur
+        ? { navigateur: { ...settings.navigateur, profil: expandUserPath(settings.navigateur.profil) } }
+        : {})
     }
 
     engine = mainsCore.demarrer(config, {
