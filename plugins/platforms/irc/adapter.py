@@ -591,7 +591,7 @@ def register(ctx):
     ctx.register_platform(
         name="irc",
         dashboard_description="Relay messages between an IRC channel (or DMs) and Mbiling.",
-        docs_url="https://hermes-agent.nousresearch.com/docs/user-guide/messaging/irc",
+        docs_url="https://mbiling.com/docs/user-guide/messaging/irc",
         label="IRC",
         adapter_factory=IRCAdapter,
         check_fn=check_requirements,

@@ -27,7 +27,7 @@ Mbiling 的 Termux 软件包适用于 aarch64（arm64-v8a）设备，目前处�
    ```bash
    mkdir -p "$PREFIX/etc/apt/keyrings"
    curl -fsSL \
-     https://hermes-assets.nousresearch.com/releases/termux/canary/key.asc \
+     https://assets.mbiling.com/releases/termux/canary/key.asc \
      -o "$PREFIX/etc/apt/keyrings/mbiling-agent.asc"
    ```
 
@@ -49,7 +49,7 @@ Mbiling 的 Termux 软件包适用于 aarch64（arm64-v8a）设备，目前处�
 
    ```bash
    printf '%s\n' \
-     "deb [signed-by=$PREFIX/etc/apt/keyrings/mbiling-agent.asc] https://hermes-assets.nousresearch.com/releases/termux/canary mbiling-canary main" \
+     "deb [signed-by=$PREFIX/etc/apt/keyrings/mbiling-agent.asc] https://assets.mbiling.com/releases/termux/canary mbiling-canary main" \
      > "$PREFIX/etc/apt/sources.list.d/mbiling-agent.list"
    ```
 

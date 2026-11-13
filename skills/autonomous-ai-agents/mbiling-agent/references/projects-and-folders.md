@@ -141,6 +141,6 @@ mbiling kanban create "Wire the webhook" --project payments
 - `references/background-systems.md` — kanban overview.
 - `references/project-context-files.md` — a different feature: `AGENTS.md` / `.mbiling.md` /
   `CLAUDE.md` instruction files that load into a session.
-- https://hermes-agent.nousresearch.com/docs/user-guide/features/kanban#managing-boards-from-the-dashboard
+- https://mbiling.com/docs/user-guide/features/kanban#managing-boards-from-the-dashboard
   (board ↔ project binding) and
-  https://hermes-agent.nousresearch.com/docs/reference/cli-commands#hermes-project
+  https://mbiling.com/docs/reference/cli-commands#mbiling-project

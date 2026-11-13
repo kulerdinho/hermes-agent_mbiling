@@ -109,7 +109,7 @@ param(
 
     [string]$WorkRoot = $(if ($env:MBILING_E2E_WORKROOT) { $env:MBILING_E2E_WORKROOT } else { Join-Path $env:TEMP "mbiling-desktop-gui-e2e" }),
 
-    [string]$SetupExeUrl = "https://hermes-assets.nousresearch.com/Hermes-Setup.exe",
+    [string]$SetupExeUrl = "https://assets.mbiling.com/Mbiling-Setup.exe",
 
     # Driver dependencies come from the current checkout lockfile.
     [string]$DriverNode = $env:MBILING_E2E_NODE

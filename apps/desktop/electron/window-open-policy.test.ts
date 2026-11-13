@@ -21,7 +21,7 @@ describe('hub-iframe-policy predicates', () => {
     expect(isMbilingHubOrigin('')).toBe(false)
     expect(isMbilingHubOrigin(null)).toBe(false)
     expect(isMbilingHubOrigin(undefined)).toBe(false)
-    expect(isMbilingHubOrigin('https://hermes-agent.nousresearch.com.evil.example')).toBe(false)
+    expect(isMbilingHubOrigin('https://mbiling.com.evil.example')).toBe(false)
     expect(isMbilingHubOrigin('https://evil.example')).toBe(false)
     expect(isMbilingHubOrigin('file://')).toBe(false)
   })
@@ -103,7 +103,7 @@ describe('createWindowOpenHandler trusted-hub delegation', () => {
     const openExternalUrl = vi.fn()
 
     const handler = createWindowOpenHandler(undefined, {
-      getOpenerOrigin: () => 'https://hermes-agent.nousresearch.com.evil.example',
+      getOpenerOrigin: () => 'https://mbiling.com.evil.example',
       openExternalUrl
     })
 

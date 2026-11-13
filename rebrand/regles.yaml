@@ -138,6 +138,7 @@ profond:
       - 'localhost|127[.]0[.]0[.]1|0[.]0[.]0[.]0|host|x'
       - '(?:.+[.])?example(?:[.](?:com|org|net|test))?'
       - '.+[.](?:test|local|lan|invalid|internal|localhost|example)'
+      - '(?:[a-z0-9-]+[.])?mbiling[.]com'   # site Mbiling
     amont:
       - '(?:www[.])?github[.]com/NousResearch/hermes-agent(?![A-Za-z0-9_-])'
       - 'raw[.]githubusercontent[.]com/NousResearch/hermes-agent(?![A-Za-z0-9_-])'
@@ -166,6 +167,31 @@ profond:
     - ['☤', '◉']
 
   # Jamais modifiés ni renommés (mentions légales, attribution des auteurs).
+  exclusions:
+    - "LICENSE"
+    - "NOTICE"
+    - "rebrand/**"
+    - "contributors/**"
+
+# ---------------------------------------------------------------------------
+# Liens : toutes les adresses qui menaient au site de Nous Research mènent
+# désormais au site Mbiling. Le domaine est défini ICI, à un seul endroit.
+# Appliqué par rebrand/rediriger_liens.py, qui écrit aussi la liste des pages
+# que le site Mbiling devra servir : rebrand/liens-mbiling.md.
+# ---------------------------------------------------------------------------
+liens:
+  domaine: "mbiling.com"
+  # [motif (expression régulière, insensible à la casse), remplacement]
+  # {domaine} est remplacé par le domaine ci-dessus.
+  redirections:
+    - ['Docs-hermes--agent[.]nousresearch[.]com', 'Docs-{domaine}']
+    - ['setup[.]hermes-agent[.]nousresearch[.]com', 'setup.{domaine}']
+    - ['hermes-agent[.]nousresearch[.]com', '{domaine}']
+    - ['hermes-assets[.]nousresearch[.]com', 'assets.{domaine}']
+    - ['(?<![\w.-])hermes[.]nousresearch[.]com', '{domaine}']
+    - ['nousresearch[.]github[.]io/hermes-agent', '{domaine}']
+    - ['https?://(?:www[.])?nousresearch[.]com(?![\w.-])', 'https://{domaine}']
+    - ['\b(security|support|info)@nousresearch[.]com', '\1@{domaine}']
   exclusions:
     - "LICENSE"
     - "NOTICE"

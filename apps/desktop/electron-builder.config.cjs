@@ -280,7 +280,7 @@ module.exports = {
   },
   linux: {
     category: 'Development',
-    maintainer: 'Nous Research <support@nousresearch.com>',
+    maintainer: 'Nous Research <support@mbiling.com>',
     synopsis: light
       ? 'Remote-only desktop client for Mbiling Agent.'
       : 'Native desktop shell for Mbiling Agent.',

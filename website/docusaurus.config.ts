@@ -8,7 +8,7 @@ const config: Config = {
   tagline: 'The self-improving AI agent',
   favicon: 'img/favicon.ico',
 
-  url: 'https://hermes-agent.nousresearch.com',
+  url: 'https://mbiling.com',
   baseUrl: '/docs/',
 
   organizationName: 'NousResearch',
@@ -147,7 +147,7 @@ const config: Config = {
           position: 'left',
         },
         {
-          href: 'https://hermes-agent.nousresearch.com/',
+          href: 'https://mbiling.com/',
           label: 'Download',
           position: 'left',
         },
@@ -156,7 +156,7 @@ const config: Config = {
           position: 'right',
         },
         {
-          href: 'https://hermes-agent.nousresearch.com',
+          href: 'https://mbiling.com',
           label: 'Home',
           position: 'right',
         },
@@ -195,13 +195,13 @@ const config: Config = {
         {
           title: 'More',
           items: [
-            { label: 'Desktop Download', href: 'https://hermes-agent.nousresearch.com/' },
+            { label: 'Desktop Download', href: 'https://mbiling.com/' },
             { label: 'GitHub', href: 'https://github.com/kulerdinho/mbiling' },
-            { label: 'Nous Research', href: 'https://nousresearch.com' },
+            { label: 'Nous Research', href: 'https://mbiling.com' },
           ],
         },
       ],
-      copyright: `Built by <a href="https://nousresearch.com">Nous Research</a> · MIT License · ${new Date().getFullYear()}`,
+      copyright: `Built by <a href="https://mbiling.com">Nous Research</a> · MIT License · ${new Date().getFullYear()}`,
     },
     prism: {
       theme: prismThemes.github,

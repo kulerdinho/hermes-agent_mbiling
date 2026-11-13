@@ -34,7 +34,7 @@ fireworks = FireworksProfile(
     # Attribution headers (canonical Mbiling set); via default_headers so they
     # survive switch_model and credential rotation.
     default_headers=LazyHeaders({
-        "HTTP-Referer": "https://hermes-agent.nousresearch.com",
+        "HTTP-Referer": "https://mbiling.com",
         "X-Title": "Mbiling Agent",
         "User-Agent": lambda: mbiling_user_agent("MbilingAgent"),
     }),

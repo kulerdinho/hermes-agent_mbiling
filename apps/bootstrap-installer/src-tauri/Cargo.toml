@@ -2,7 +2,7 @@
 name = "mbiling-bootstrap"
 version = "0.0.0"
 description = "Mbiling Setup — signed installer that drives scripts/install.ps1"
-authors = ["Nous Research <info@nousresearch.com>"]
+authors = ["Nous Research <info@mbiling.com>"]
 edition = "2021"
 rust-version = "1.77"
 

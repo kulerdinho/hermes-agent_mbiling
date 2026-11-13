@@ -1,7 +1,7 @@
 # Mbiling CLI Reference
 
 Live sources when anything looks stale: `mbiling --help`, `mbiling <command> --help`,
-https://hermes-agent.nousresearch.com/docs/reference/cli-commands
+https://mbiling.com/docs/reference/cli-commands
 
 ### Global Flags
 
@@ -79,7 +79,7 @@ mbiling gateway run|install|start|stop|restart|status|setup
 ```
 
 20+ platforms: Telegram, Discord, Slack, WhatsApp (Baileys + Business Cloud API), iMessage (Photon — `mbiling photon setup`), Signal, Email, SMS, Matrix, Mattermost, Teams, LINE, SimpleX, ntfy, Google Chat, Home Assistant, DingTalk, Feishu, WeCom, Weixin, API Server, Webhooks. Open WebUI connects via the API Server adapter. Most adapters ship under `plugins/platforms/`.
-Docs: https://hermes-agent.nousresearch.com/docs/user-guide/messaging/
+Docs: https://mbiling.com/docs/user-guide/messaging/
 
 ### Sessions
 
@@ -142,10 +142,10 @@ Plugin- and provider-supplied subcommands (e.g. `mbiling photon setup`) only app
 
 | Looking for... | Location |
 |---|---|
-| Config options | `mbiling config edit` · [Configuration docs](https://hermes-agent.nousresearch.com/docs/user-guide/configuration) |
-| Tools / toolsets | `mbiling tools list` · [Tools reference](https://hermes-agent.nousresearch.com/docs/reference/tools-reference) |
-| Skills catalog | `mbiling skills browse` · [Skills catalog](https://hermes-agent.nousresearch.com/docs/reference/skills-catalog) |
-| Provider setup | `mbiling model` · [Providers guide](https://hermes-agent.nousresearch.com/docs/integrations/providers) |
-| Env variables | `mbiling config env-path` · [Env vars reference](https://hermes-agent.nousresearch.com/docs/reference/environment-variables) |
+| Config options | `mbiling config edit` · [Configuration docs](https://mbiling.com/docs/user-guide/configuration) |
+| Tools / toolsets | `mbiling tools list` · [Tools reference](https://mbiling.com/docs/reference/tools-reference) |
+| Skills catalog | `mbiling skills browse` · [Skills catalog](https://mbiling.com/docs/reference/skills-catalog) |
+| Provider setup | `mbiling model` · [Providers guide](https://mbiling.com/docs/integrations/providers) |
+| Env variables | `mbiling config env-path` · [Env vars reference](https://mbiling.com/docs/reference/environment-variables) |
 | Gateway logs | `~/.mbiling/logs/gateway.log` (or `mbiling logs`) |
 | Sessions | `mbiling sessions browse` (reads state.db) |

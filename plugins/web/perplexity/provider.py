@@ -55,7 +55,7 @@ _KEY_URL = "https://www.perplexity.ai/account/api"
 # request; the call already carries the user's own API key.
 def _headers() -> dict[str, str]:
     return {
-        "HTTP-Referer": "https://hermes-agent.nousresearch.com",
+        "HTTP-Referer": "https://mbiling.com",
         "X-Title": "Mbiling Agent",
         "User-Agent": mbiling_user_agent("MbilingAgent"),
         "X-Pplx-Integration": "mbiling-agent",

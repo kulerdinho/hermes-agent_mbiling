@@ -519,7 +519,7 @@ def main(argv: list | None = None) -> int:
     ap.add_argument("--pool", required=True, type=Path)
     ap.add_argument("--out", required=True, type=Path)
     # mbiling-nightly is the suite actually published today
-    # (https://hermes-assets.nousresearch.com/releases/termux/nightly/,
+    # (https://assets.mbiling.com/releases/termux/nightly/,
     # verified 2026-09-06); mbiling-stable/mbiling-canary are what CI stages
     # for the stable/canary channels.
     ap.add_argument(

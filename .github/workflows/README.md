@@ -473,7 +473,7 @@ Re-smoke an already staged artifact without rebuilding:
 ```sh
 gh workflow run desktop-bundle-smoke.yml --ref <test-branch> \
   -f platform=win32 -f arch=x64 -f format=msix -f sha=<built commit> \
-  -f commit-build=true -f public-base=https://hermes-assets.nousresearch.com/
+  -f commit-build=true -f public-base=https://assets.mbiling.com/
 ```
 
 ### Install & update E2E family

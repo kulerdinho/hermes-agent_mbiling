@@ -211,7 +211,7 @@ source ~/.bashrc
 # If you previously installed with sudo, clean up:
 sudo rm /usr/local/bin/mbiling
 # Then re-run the standard installer
-curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
+curl -fsSL https://mbiling.com/install.sh | bash
 ```
 
 ---
@@ -653,9 +653,9 @@ If an MCP server crashes mid-request, Mbiling will report a timeout. Check the s
 
 #### The Skills Hub page won't load in the desktop app (403 / blocked)
 
-**Cause:** The docs site (`hermes-agent.nousresearch.com`) is served through Vercel, whose WAF denies some residential IP ranges it considers flagged. If your network is on such a range, every request to the domain returns a 403 block page.
+**Cause:** The docs site (`mbiling.com`) is served through Vercel, whose WAF denies some residential IP ranges it considers flagged. If your network is on such a range, every request to the domain returns a 403 block page.
 
-**Solution:** The Skills Hub picker probes the primary domain and automatically falls back to the equivalent GitHub Pages deployment (`nousresearch.github.io/hermes-agent`), which serves the same catalog. If the page still fails on both origins, check whether a proxy, DNS filter, or firewall is blocking both hosts — and report the affected range to the maintainers so it can be reviewed on the deployment side.
+**Solution:** The Skills Hub picker probes the primary domain and automatically falls back to the equivalent GitHub Pages deployment (`mbiling.com`), which serves the same catalog. If the page still fails on both origins, check whether a proxy, DNS filter, or firewall is blocking both hosts — and report the affected range to the maintainers so it can be reviewed on the deployment side.
 
 ---
 
@@ -802,7 +802,7 @@ Skills with very long descriptions are truncated to 40 characters in the Telegra
 
 1. Install Mbiling Agent on the new machine:
    ```bash
-   curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
+   curl -fsSL https://mbiling.com/install.sh | bash
    ```
 
 2. On the **source machine**, create a full backup:

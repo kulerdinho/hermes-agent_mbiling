@@ -1203,7 +1203,7 @@ export const ruOverrides = {
       sshErrHostKey:
         'Ключ хоста ИЗМЕНИЛСЯ с последнего подключения. Убедитесь, что это ожидаемо, затем выполните ssh-keygen -R <host> и переподключитесь.',
       sshErrNotInstalled:
-        'Mbiling не установлен на удалённой машине. Установите его там (curl -fsSL https://hermes-agent.nousresearch.com/install.sh | sh) или задайте путь к Mbiling.',
+        'Mbiling не установлен на удалённой машине. Установите его там (curl -fsSL https://mbiling.com/install.sh | sh) или задайте путь к Mbiling.',
       sshErrPlatform:
         'Неподдерживаемая удалённая платформа. SSH-режим Mbiling Desktop поддерживает удалённые хосты Linux, macOS и Windows.',
       sshErrTimeout: 'SSH-соединение истекло. Хост может быть недоступен или «спит».',

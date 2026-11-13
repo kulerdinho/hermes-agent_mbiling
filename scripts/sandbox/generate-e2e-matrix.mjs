@@ -141,7 +141,7 @@ function startLabel(from, to) {
 export const SPEC = {
   windows: {
     install: [
-      // irm https://hermes.nousresearch.com/install.ps1 | iex
+      // irm https://mbiling.com/install.ps1 | iex
       { method: 'installer-script' },
       // The same one-liner with -IncludeDesktop: builds Mbiling.exe AND
       // registers Start Menu / Desktop shortcuts, so it is a second real

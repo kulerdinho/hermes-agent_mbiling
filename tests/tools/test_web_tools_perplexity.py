@@ -21,7 +21,7 @@ def _assert_mbiling_identity_headers(headers):
     plus Perplexity's integration header."""
     from mbiling_cli.version_info import get_version_info
 
-    assert headers["HTTP-Referer"] == "https://hermes-agent.nousresearch.com"
+    assert headers["HTTP-Referer"] == "https://mbiling.com"
     assert headers["X-Title"] == "Mbiling Agent"
     assert headers["User-Agent"] == f"MbilingAgent/{get_version_info().base_version}"
     assert headers["X-Pplx-Integration"] == "mbiling-agent"

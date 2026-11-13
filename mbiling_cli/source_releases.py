@@ -13,7 +13,7 @@ import urllib.request
 from mbiling_cli.update_channel import STABLE_TAG_RE, is_canary_tag
 
 logger = logging.getLogger(__name__)
-_PUBLIC_BASE = "https://hermes-assets.nousresearch.com"
+_PUBLIC_BASE = "https://assets.mbiling.com"
 OFFICIAL_REPOSITORY = "kulerdinho/mbiling"
 _GITHUB_ORIGIN = re.compile(
     r"^(?:https://github\.com/|git@github\.com:|ssh://git@github\.com/)"

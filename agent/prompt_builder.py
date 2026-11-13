@@ -175,7 +175,7 @@ MBILING_AGENT_HELP_GUIDANCE = (
     # persona (no Mbiling identity line) still learns from "Mbiling Agent itself" + "your own features" what it runs on.
     "For help with Mbiling Agent itself — configuring, setting up, using, extending, or troubleshooting it — "
     "or to understand your own features, tools, or capabilities, the documentation at "
-    "https://hermes-agent.nousresearch.com/docs is your "
+    "https://mbiling.com/docs is your "
     "authoritative reference and always holds the latest, most up-to-date information. The `mbiling-agent` "
     "skill has the actual commands and proven workflows — load it with skill_view(name='mbiling-agent') "
     "before configuring, modifying, or troubleshooting Mbiling so you don't guess or invent workarounds."
@@ -185,7 +185,7 @@ MBILING_AGENT_HELP_GUIDANCE = (
 MBILING_AGENT_HELP_GUIDANCE_NO_SKILLS = (
     "For help with Mbiling Agent itself — configuring, setting up, using, extending, or troubleshooting it — "
     "or to understand your own features, tools, or capabilities, the documentation at "
-    "https://hermes-agent.nousresearch.com/docs is the "
+    "https://mbiling.com/docs is the "
     "authoritative reference and always holds the latest, most up-to-date information. Point the user there "
     "(or read it yourself if you have a way to fetch web content)."
 )

@@ -2,7 +2,7 @@
 
 Set via `mbiling model` (picker) or `mbiling setup`. 35+ provider profiles ship as
 plugins under `plugins/model-providers/`; user plugins of the same name override.
-Full docs: https://hermes-agent.nousresearch.com/docs/integrations/providers
+Full docs: https://mbiling.com/docs/integrations/providers
 
 ### Providers
 

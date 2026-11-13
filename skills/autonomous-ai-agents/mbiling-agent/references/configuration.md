@@ -1,7 +1,7 @@
 # Configuration, Toolsets & Voice
 
 Edit with `mbiling config edit` or `mbiling config set section.key value`.
-Full reference: https://hermes-agent.nousresearch.com/docs/user-guide/configuration
+Full reference: https://mbiling.com/docs/user-guide/configuration
 
 ### Config Sections (most-used keys)
 

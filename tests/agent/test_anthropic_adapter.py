@@ -87,7 +87,7 @@ class TestBuildAnthropicClient:
             )
             kwargs = mock_sdk.Anthropic.call_args[1]
             headers = kwargs["default_headers"]
-            assert headers["HTTP-Referer"] == "https://hermes-agent.nousresearch.com"
+            assert headers["HTTP-Referer"] == "https://mbiling.com"
             assert headers["X-Title"] == "Mbiling Agent"
             from mbiling_cli.version_info import get_version_info
             assert headers["User-Agent"] == f"MbilingAgent/{get_version_info().base_version}"
@@ -1814,7 +1814,7 @@ def test_oauth_system_prompt_sanitizer_preserves_docs_url():
                 "role": "system",
                 "content": (
                     "Mbiling Agent by Nous Research uses mbiling-agent skills. "
-                    "Docs: https://hermes-agent.nousresearch.com/docs ; "
+                    "Docs: https://mbiling.com/docs ; "
                     "interpreter ~/.mbiling/mbiling-agent/venv/bin/python ; "
                     "source github.com/kulerdinho/mbiling ; mail mbiling-agent@example.com ; "
                     "skill_view(name='mbiling-agent') ; mbiling-agent's docs ; built by mbiling-agent."
@@ -1830,7 +1830,7 @@ def test_oauth_system_prompt_sanitizer_preserves_docs_url():
 
     system_text = "\n".join(block["text"] for block in kwargs["system"])
     assert "Claude Code by Anthropic uses claude-code skills." in system_text
-    assert "https://hermes-agent.nousresearch.com/docs" in system_text
+    assert "https://mbiling.com/docs" in system_text
     # Paths and repo slugs are addresses too: a subagent told to run
     # ``~/.mbiling/claude-code/venv/bin/python`` fails on a file that does not exist.
     assert "~/.mbiling/mbiling-agent/venv/bin/python" in system_text

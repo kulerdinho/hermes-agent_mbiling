@@ -15,7 +15,7 @@ from datetime import UTC
 # Attribution headers (same values as OpenRouter / Vercel / Fireworks); via
 # default_headers so they survive model switches and credential rotation.
 _ATTRIBUTION_HEADERS = {
-    "HTTP-Referer": "https://hermes-agent.nousresearch.com",
+    "HTTP-Referer": "https://mbiling.com",
     "X-Title": "Mbiling Agent",
     "User-Agent": lambda: mbiling_user_agent("MbilingAgent"),
 }

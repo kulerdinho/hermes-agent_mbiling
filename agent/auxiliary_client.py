@@ -873,7 +873,7 @@ _PROVIDERS_WITHOUT_VISION: frozenset = frozenset({"kimi-coding", "kimi-coding-cn
 
 # OpenRouter app attribution (always sent). `X-Title` is what the dashboard reads.
 _OR_HEADERS_BASE = {
-    "HTTP-Referer": "https://hermes-agent.nousresearch.com",
+    "HTTP-Referer": "https://mbiling.com",
     "X-Title": "Mbiling Agent",
     "X-OpenRouter-Categories": "productivity,cli-agent",
 }
@@ -942,7 +942,7 @@ from mbiling_cli.version_info import mbiling_user_agent
 
 
 def _ai_gateway_headers() -> dict[str, str]:
-    return {"HTTP-Referer": "https://hermes-agent.nousresearch.com", "X-Title": "Mbiling Agent",
+    return {"HTTP-Referer": "https://mbiling.com", "X-Title": "Mbiling Agent",
             "User-Agent": mbiling_user_agent("MbilingAgent")}
 
 # Nous Portal attribution tags, built per call. They come from agent.portal_tags so the client=

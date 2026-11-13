@@ -374,7 +374,7 @@ build. Source checkouts are separate: `main` is their only valid channel.
 
 `--build-commit` prints its deterministic downloads-page URL before dispatch,
 including in dry runs:
-`https://hermes-assets.nousresearch.com/releases/commit/<full-sha>/index.html`.
+`https://assets.mbiling.com/releases/commit/<full-sha>/index.html`.
 `CLOUDFLARE_R2_PUBLIC_URL` overrides the public origin. After admission, the
 commit summary runs even when a build or assembly job fails; it lists only
 receipt-backed existing downloads and marks missing binaries as not built.

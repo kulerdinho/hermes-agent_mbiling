@@ -26,7 +26,7 @@ import {
 } from '@/store/updates'
 
 const RELEASE_NOTES_URL = 'https://github.com/kulerdinho/mbiling/releases'
-const INSTALLER_URL = 'https://hermes-agent.nousresearch.com/'
+const INSTALLER_URL = 'https://mbiling.com/'
 
 export type UpdateStatusTone = 'idle' | 'available' | 'error' | 'unsupported'
 

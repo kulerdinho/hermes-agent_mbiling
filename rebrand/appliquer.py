@@ -52,7 +52,7 @@ CHAINE = re.compile(
     r"'(?:\\.|[^'\\\n])*'"
     r'|"(?:\\.|[^"\\\n])*"'
     r"|`(?:\\.|[^`\\])*`",
-    re.S,
+    re.DOTALL,
 )
 JSX_TEXTE = re.compile(r">([^<>{}\n]*)<")
 COMMENTAIRE = re.compile(r"^\s*(//|\*|/\*)")

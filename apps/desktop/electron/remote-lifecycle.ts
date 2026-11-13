@@ -264,7 +264,7 @@ async function locateMbiling(ssh, remoteMbilingPath) {
 
   const err: any = new Error(
     'Mbiling is not installed on the remote host (could not find a `mbiling` executable). ' +
-      'Install it on the remote with:  curl -fsSL https://hermes-agent.nousresearch.com/install.sh | sh  ' +
+      'Install it on the remote with:  curl -fsSL https://mbiling.com/install.sh | sh  ' +
       '— or set the Mbiling path explicitly in the SSH connection settings.'
   )
 

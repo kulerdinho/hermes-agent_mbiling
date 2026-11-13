@@ -35,7 +35,7 @@ from tests.e2e.core.upgrade import _helpers as H
 from tests.e2e.core.upgrade import _install_helpers as I
 from tests.e2e.core.upgrade.network import _netedge as N
 
-ASSETS = "hermes-assets.nousresearch.com"
+ASSETS = "assets.mbiling.com"
 REPOSITORY = "kulerdinho/mbiling"
 # Hosts a correctly isolated update must never reach directly; with the proxy they appear in
 # the proxy log as "refused" (the proxy has no route for them).
@@ -215,7 +215,7 @@ def assert_isolated(inst: Installed) -> None:
     probe = (
         "import socket,sys\n"
         "bad=[]\n"
-        "for host in ('github.com','pypi.org','hermes-assets.nousresearch.com'):\n"
+        "for host in ('github.com','pypi.org','assets.mbiling.com'):\n"
         "    try: socket.getaddrinfo(host,443); bad.append('dns:'+host)\n"
         "    except OSError: pass\n"
         "for ip in ('140.82.112.3','1.1.1.1'):\n"
@@ -233,7 +233,7 @@ def assert_isolated(inst: Installed) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Release-channel records (the R2 objects under https://hermes-assets.nousresearch.com/).
+# Release-channel records (the R2 objects under https://assets.mbiling.com/).
 # ---------------------------------------------------------------------------
 
 def canonical(value: object) -> bytes:
