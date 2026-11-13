@@ -91,3 +91,66 @@ export function withTimeout<T>(
     )
   })
 }
+
+/**
+ * Like withTimeout, but the clock is paused while `isWaitingOnUser()` is true (checked every
+ * `pollMs`). Mbiling: the first launch waits for the user to sign in; that wait is not a slow
+ * backend and must never turn into "couldn't start". Any time spent waiting on the user restarts
+ * the full budget once the wait is over.
+ */
+export function withTimeoutPausedWhile<T>(
+  promise: Promise<T>,
+  ms: number,
+  message: string,
+  isWaitingOnUser: () => Promise<boolean>,
+  pollMs = 2_000
+): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    let elapsed = 0
+    let settled = false
+
+    const tick = async (): Promise<void> => {
+      if (settled) {
+        return
+      }
+
+      let waiting = false
+
+      try {
+        waiting = await isWaitingOnUser()
+      } catch {
+        waiting = false
+      }
+
+      if (settled) {
+        return
+      }
+
+      elapsed = waiting ? 0 : elapsed + pollMs
+
+      if (elapsed >= ms) {
+        settled = true
+        reject(new TimeoutError(message))
+
+        return
+      }
+
+      timer = setTimeout(() => void tick(), pollMs)
+    }
+
+    let timer: ReturnType<typeof setTimeout> = setTimeout(() => void tick(), pollMs)
+
+    Promise.resolve(promise).then(
+      value => {
+        settled = true
+        clearTimeout(timer)
+        resolve(value)
+      },
+      err => {
+        settled = true
+        clearTimeout(timer)
+        reject(err)
+      }
+    )
+  })
+}
