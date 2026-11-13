@@ -20,7 +20,13 @@ const BASE: MbilingMainsStatus = {
   fichierReglages: 'C:/data/mains.json',
   journal: 'C:/data/logs/mains.log',
   inscriptionAutomatique: false,
-  inscriptionEnCours: false
+  inscriptionEnCours: false,
+  navigateur: {
+    actif: true,
+    prefere: 'edge',
+    executable: 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
+    sitesInterdits: [{ motif: '^file:', libelle: '^file:' }]
+  }
 }
 
 function installMains(status: MbilingMainsStatus) {
@@ -29,8 +35,18 @@ function installMains(status: MbilingMainsStatus) {
     setToken: vi.fn().mockResolvedValue({ ...status, jetonDefini: true, enMarche: true }),
     setActive: vi.fn().mockResolvedValue({ ...status, actif: false }),
     restart: vi.fn().mockResolvedValue(status),
+    setBrowser: vi.fn().mockResolvedValue({ ...status, navigateur: { ...status.navigateur, prefere: 'chrome' } }),
+    addBlockedSite: vi.fn().mockResolvedValue({
+      ...status,
+      navigateur: {
+        ...status.navigateur,
+        sitesInterdits: [...status.navigateur.sitesInterdits, { motif: 'banque', libelle: 'banque.fr' }]
+      }
+    }),
+    removeBlockedSite: vi.fn().mockResolvedValue({ ...status, navigateur: { ...status.navigateur, sitesInterdits: [] } }),
     open: vi.fn().mockResolvedValue(null)
   }
+
   Object.defineProperty(window, 'mbilingDesktop', { configurable: true, value: { mains } })
 
   return mains
@@ -96,5 +112,36 @@ describe('MainsSettings', () => {
     render(<MainsSettings />)
 
     expect(await screen.findByText('refusé par le Relais : jeton inconnu')).toBeTruthy()
+  })
+
+  it('shows the browser that will be used and lets the user prefer another one', async () => {
+    const mains = installMains(BASE)
+    render(<MainsSettings />)
+
+    expect(await screen.findByText('C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'Google Chrome' }))
+    await waitFor(() => expect(mains.setBrowser).toHaveBeenCalledWith({ prefere: 'chrome' }))
+  })
+
+  it('says so when neither Edge nor Chrome is installed', async () => {
+    installMains({ ...BASE, navigateur: { ...BASE.navigateur, executable: null } })
+    render(<MainsSettings />)
+
+    expect(await screen.findByText('Neither Edge nor Chrome was found on this PC.')).toBeTruthy()
+  })
+
+  it('adds a blocked site from what the user types and removes one', async () => {
+    const mains = installMains(BASE)
+    render(<MainsSettings />)
+
+    const field = (await screen.findByPlaceholderText('e.g. mybank.com')) as HTMLInputElement
+    fireEvent.change(field, { target: { value: 'banque.fr' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Add' }))
+    await waitFor(() => expect(mains.addBlockedSite).toHaveBeenCalledWith('banque.fr'))
+    expect(await screen.findByText('banque.fr')).toBeTruthy()
+    expect(field.value).toBe('')
+
+    fireEvent.click(screen.getByRole('button', { name: 'Remove ^file:' }))
+    await waitFor(() => expect(mains.removeBlockedSite).toHaveBeenCalledWith('^file:'))
   })
 })

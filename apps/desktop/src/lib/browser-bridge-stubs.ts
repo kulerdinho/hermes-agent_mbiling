@@ -55,6 +55,15 @@ export const BROWSER_BRIDGE_STUBS = {
     consent: async () => {
       throw browserUnsupported('The Mains')
     },
+    setBrowser: async () => {
+      throw browserUnsupported('The Mains')
+    },
+    addBlockedSite: async () => {
+      throw browserUnsupported('The Mains')
+    },
+    removeBlockedSite: async () => {
+      throw browserUnsupported('The Mains')
+    },
     setToken: async () => {
       throw browserUnsupported('The Mains')
     },

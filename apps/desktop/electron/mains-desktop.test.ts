@@ -36,7 +36,8 @@ const electron = vi.hoisted(() => {
 const core = vi.hoisted(() => ({
   demarrer: vi.fn(),
   trouverBash: vi.fn(() => 'C:\\bash.exe'),
-  versCheminBash: vi.fn((value: string) => value)
+  versCheminBash: vi.fn((value: string) => value),
+  trouverNavigateur: vi.fn((): string => 'C:/Edge/msedge.exe')
 }))
 
 vi.mock('electron', () => electron)
@@ -115,6 +116,7 @@ test('saving a token stores it encrypted and starts the Mains with the local pol
     { relais_url: string; politique: { dossiers_autorises: string[]; interdits: string[] } },
     { jeton: string; bashEmbarques: string[] }
   ]
+
   assert.equal(options.jeton, 'secret-appareil')
   assert.equal(config.relais_url, SETTINGS.relais_url)
   assert.deepEqual(config.politique.dossiers_autorises, [path.join(dirs.root, 'documents') + '\\Mbiling-Test'])
@@ -193,10 +195,12 @@ test('the first-launch address comes from the settings file', async () => {
       fournisseurs: [{ id: 'google', libelle: 'Google' }, { id: 'Bad Id!', libelle: 'x' }, { id: 'apple' }]
     })
   )
+
   const avancee = (await invoke('mbiling:default-connection')) as {
     connexionAvancee: boolean
     fournisseurs: { id: string; libelle: string }[]
   }
+
   assert.equal(avancee.connexionAvancee, true)
   assert.deepEqual(avancee.fournisseurs, [{ id: 'google', libelle: 'Google' }], 'invalid entries are dropped')
 
@@ -295,4 +299,66 @@ test('an enrolment failure is reported and nothing is stored', async () => {
   await assert.rejects(() => invoke('mbiling:mains:enrol') as Promise<unknown>, /inscription de ce PC impossible/)
   assert.equal(mains.mainsStatus().jetonDefini, false)
   assert.match(mains.mainsStatus().raison ?? '', /inscription de ce PC impossible/)
+})
+
+test('a domain typed by the user blocks it and its subdomains, never look-alikes', async () => {
+  const { siteToPattern, patternToSite } = await loadMains()
+  const pattern = siteToPattern(' https://Banque.fr/ ')
+  const rule = new RegExp(pattern, 'i')
+
+  assert.equal(patternToSite(pattern), 'banque.fr')
+  assert.ok(rule.test('https://banque.fr/compte'))
+  assert.ok(rule.test('https://www.banque.fr'))
+  assert.ok(rule.test('http://banque.fr:8443/'))
+  assert.ok(!rule.test('https://mabanque.fr/'))
+  assert.ok(!rule.test('https://banque.fr.exemple.com/'))
+  assert.ok(!rule.test('https://bancaire.exemple.com/?r=banque.fr'))
+})
+
+test('a pattern that is not a domain must be a valid regular expression', async () => {
+  const { siteToPattern, patternToSite } = await loadMains()
+
+  assert.equal(siteToPattern('^file:'), '^file:')
+  assert.equal(patternToSite('^file:'), '^file:')
+  assert.throws(() => siteToPattern('(non ferme'))
+  assert.throws(() => siteToPattern('   '))
+})
+
+test('the browser settings and blocked sites are saved and passed to the Mains', async () => {
+  await loadMains()
+  await invoke('mbiling:mains:set-token', 'jeton')
+
+  let status = (await invoke('mbiling:mains:set-browser', { actif: false, prefere: 'chrome' })) as {
+    navigateur: { actif: boolean; prefere: string; executable: string | null }
+  }
+
+  assert.equal(status.navigateur.actif, false)
+  assert.equal(status.navigateur.prefere, 'chrome')
+  assert.equal(status.navigateur.executable, 'C:/Edge/msedge.exe')
+  await invoke('mbiling:mains:set-browser', { prefere: 'firefox' })
+  const saved = JSON.parse(fs.readFileSync(path.join(dirs.root, 'userData', 'mains.json'), 'utf8'))
+  assert.deepEqual({ actif: saved.navigateur.actif, prefere: saved.navigateur.prefere }, { actif: false, prefere: 'chrome' })
+
+  await invoke('mbiling:mains:add-blocked-site', 'banque.fr')
+  status = (await invoke('mbiling:mains:add-blocked-site', 'banque.fr')) as typeof status & {
+    navigateur: { sitesInterdits: { motif: string; libelle: string }[] }
+  }
+  const sites = (status.navigateur as unknown as { sitesInterdits: { motif: string; libelle: string }[] }).sitesInterdits
+  assert.deepEqual(sites.map(site => site.libelle), ['banque.fr'], 'a site is only listed once')
+
+  const policy = JSON.parse(fs.readFileSync(path.join(dirs.root, 'userData', 'mains-politique.json'), 'utf8'))
+  assert.deepEqual(policy.interdits, POLICY.interdits, 'the rest of the policy is kept')
+
+  const config = core.demarrer.mock.calls.at(-1)![0] as {
+    navigateur: { actif: boolean; profil: string }
+    politique: { sites_interdits: string[] }
+  }
+
+  assert.equal(config.navigateur.actif, false)
+  assert.equal(config.navigateur.profil, path.join(dirs.root, 'userData', 'navigateur'))
+  assert.deepEqual(config.politique.sites_interdits, [sites[0].motif])
+
+  await invoke('mbiling:mains:remove-blocked-site', sites[0].motif)
+  const after = JSON.parse(fs.readFileSync(path.join(dirs.root, 'userData', 'mains-politique.json'), 'utf8'))
+  assert.deepEqual(after.sites_interdits, [])
 })

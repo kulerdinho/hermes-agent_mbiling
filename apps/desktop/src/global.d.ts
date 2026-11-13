@@ -235,6 +235,9 @@ declare global {
         consent: (allowed: boolean) => Promise<MbilingMainsStatus>
         setToken: (token: string) => Promise<MbilingMainsStatus>
         setActive: (active: boolean) => Promise<MbilingMainsStatus>
+        setBrowser: (patch: { actif?: boolean; prefere?: 'edge' | 'chrome' }) => Promise<MbilingMainsStatus>
+        addBlockedSite: (entry: string) => Promise<MbilingMainsStatus>
+        removeBlockedSite: (pattern: string) => Promise<MbilingMainsStatus>
         restart: () => Promise<MbilingMainsStatus>
         open: (which: 'politique' | 'reglages' | 'journal') => Promise<null | string>
       }
@@ -1912,4 +1915,10 @@ export interface MbilingMainsStatus {
   journal: string
   inscriptionAutomatique: boolean
   inscriptionEnCours: boolean
+  navigateur: {
+    actif: boolean
+    prefere: string
+    executable: string | null
+    sitesInterdits: { motif: string; libelle: string }[]
+  }
 }

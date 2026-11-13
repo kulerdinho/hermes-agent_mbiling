@@ -4,9 +4,15 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import type { MbilingMainsStatus } from '@/global'
 import { useI18n } from '@/i18n'
-import { Monitor } from '@/lib/icons'
+import { Globe, Monitor } from '@/lib/icons'
 
 import { ListRow, SectionHeading, SettingsContent, ToggleRow } from './primitives'
+
+// Brand names, not translated: the engine accepts exactly these two values.
+const BROWSERS = [
+  { id: 'edge', label: 'Microsoft Edge' },
+  { id: 'chrome', label: 'Google Chrome' }
+] as const
 
 /**
  * This PC (the Mains): lets the Mbiling agent on the server run commands on this computer,
@@ -22,6 +28,8 @@ export function MainsSettings() {
   const [error, setError] = useState<string | null>(null)
   // Signed in to a Mbiling server, this PC is linked automatically; typing a token is a support path.
   const [manual, setManual] = useState(false)
+  const [site, setSite] = useState('')
+  const browser = status?.navigateur
 
   const refresh = useCallback(async () => {
     const mains = window.mbilingDesktop?.mains
@@ -153,6 +161,93 @@ export function MainsSettings() {
       />
 
       <ListRow description={status?.bash || copy.bashMissing} title={copy.bash} />
+
+      <SectionHeading icon={Globe} title={copy.browserHeading} />
+
+      <ToggleRow
+        checked={Boolean(browser?.actif)}
+        description={copy.browserEnabledHint}
+        disabled={busy || !browser}
+        label={copy.browserEnabled}
+        onChange={on => void run(() => window.mbilingDesktop.mains.setBrowser({ actif: on }))}
+      />
+
+      <ListRow
+        action={
+          <div className="flex items-center gap-2">
+            {BROWSERS.map(choice => (
+              <Button
+                aria-pressed={browser?.prefere === choice.id}
+                disabled={busy || !browser}
+                key={choice.id}
+                onClick={() => void run(() => window.mbilingDesktop.mains.setBrowser({ prefere: choice.id }))}
+                size="sm"
+                variant={browser?.prefere === choice.id ? 'secondary' : 'outline'}
+              >
+                {choice.label}
+              </Button>
+            ))}
+          </div>
+        }
+        description={browser ? browser.executable || copy.browserMissing : '—'}
+        title={copy.browserPreferred}
+      />
+
+      <ListRow
+        action={
+          <form
+            className="flex items-center gap-2"
+            onSubmit={event => {
+              event.preventDefault()
+              void run(async () => {
+                const next = await window.mbilingDesktop.mains.addBlockedSite(site)
+                setSite('')
+
+                return next
+              })
+            }}
+          >
+            <Input
+              aria-label={copy.blockedSites}
+              className="h-8 w-48"
+              onChange={event => setSite(event.target.value)}
+              placeholder={copy.blockedSitePlaceholder}
+              value={site}
+            />
+            <Button disabled={busy || !site.trim()} size="sm" type="submit">
+              {copy.addBlockedSite}
+            </Button>
+          </form>
+        }
+        below={
+          browser?.sitesInterdits.length ? (
+            <ul className="flex flex-wrap gap-2">
+              {browser.sitesInterdits.map(blocked => (
+                <li
+                  className="flex items-center gap-1 rounded-md border border-border px-2 py-0.5 text-xs"
+                  key={blocked.motif}
+                >
+                  <span className="font-mono">{blocked.libelle}</span>
+                  <Button
+                    aria-label={`${copy.removeBlockedSite} ${blocked.libelle}`}
+                    className="h-5 px-1"
+                    disabled={busy}
+                    onClick={() => void run(() => window.mbilingDesktop.mains.removeBlockedSite(blocked.motif))}
+                    size="sm"
+                    variant="ghost"
+                  >
+                    ×
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-xs text-muted-foreground">{copy.noBlockedSites}</p>
+          )
+        }
+        description={copy.blockedSitesHint}
+        title={copy.blockedSites}
+      />
 
       <ListRow
         action={

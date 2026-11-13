@@ -21,7 +21,7 @@ const fs = require('node:fs')
 const os = require('node:os')
 const path = require('node:path')
 
-const { creerNavigateur } = require('./navigateur.cjs')
+const { creerNavigateur, trouverNavigateur } = require('./navigateur.cjs')
 
 function trouverBash(config, autres = []) {
   const candidats = [
@@ -215,7 +215,7 @@ function demarrer(config, options = {}) {
   }
 }
 
-module.exports = { demarrer, verifierPolitique, compilerPolitique, versCheminBash, trouverBash }
+module.exports = { demarrer, verifierPolitique, compilerPolitique, versCheminBash, trouverBash, trouverNavigateur }
 
 if (require.main === module) {
   const chemin = process.argv[2]

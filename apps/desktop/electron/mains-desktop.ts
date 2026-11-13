@@ -52,6 +52,54 @@ export interface MainsStatus {
   /** The app can enrol this PC by itself (a Mbiling server connection is available). */
   inscriptionAutomatique: boolean
   inscriptionEnCours: boolean
+  /** The PC's browser the agent may drive (CDP tunnel). */
+  navigateur: MainsBrowserStatus
+}
+
+export interface BlockedSite {
+  /** Pattern stored in mains-politique.json (sites_interdits). */
+  motif: string
+  /** What the user typed: the domain for a domain rule, otherwise the pattern itself. */
+  libelle: string
+}
+
+export interface MainsBrowserStatus {
+  actif: boolean
+  prefere: string
+  /** Browser that will be launched, or null when neither Edge nor Chrome is found. */
+  executable: string | null
+  sitesInterdits: BlockedSite[]
+}
+
+const DOMAIN = /^[a-z0-9-]+(\.[a-z0-9-]+)+$/i
+const DOMAIN_RULE = /^\^https\?:\/\/\(\[\^\/\]\*\\\.\)\?(.+)\(\?=\[\/:\?#\]\|\$\)$/
+
+/**
+ * A site the user types becomes a pattern: a domain ("banque.fr", with or without https://)
+ * blocks it and its subdomains; anything else must be a valid regular expression (support).
+ */
+export function siteToPattern(entry: string): string {
+  const value = entry.trim()
+  const bare = value.replace(/^https?:\/\//i, '').replace(/\/+$/, '')
+
+  if (DOMAIN.test(bare)) {
+    return `^https?://([^/]*\\.)?${bare.toLowerCase().replaceAll('.', '\\.')}(?=[/:?#]|$)`
+  }
+
+  if (!value) {
+    throw new Error('adresse vide')
+  }
+
+  new RegExp(value, 'i')
+
+  return value
+}
+
+/** The label shown for a stored pattern (the domain back for a domain rule). */
+export function patternToSite(pattern: string): string {
+  const match = DOMAIN_RULE.exec(pattern)
+
+  return match ? match[1].replaceAll('\\.', '.') : pattern
 }
 
 /** Authenticated request to the connected Mbiling server (injected by main.ts). */
@@ -127,6 +175,29 @@ function readSettings(): MainsDesktopSettings {
 function writeSettings(patch: Partial<MainsDesktopSettings>): void {
   const settings = readSettings()
   fs.writeFileSync(userConfigPath('mains'), `${JSON.stringify({ ...settings, ...patch }, null, 2)}\n`, 'utf8')
+}
+
+function writePolicy(patch: Partial<MainsPolicy>): void {
+  const raw = readMbilingConfig<Record<string, unknown>>('politique')
+  fs.writeFileSync(userConfigPath('politique'), `${JSON.stringify({ ...raw, ...patch }, null, 2)}\n`, 'utf8')
+}
+
+function browserStatus(settings: MainsDesktopSettings | null, policy: MainsPolicy | null): MainsBrowserStatus {
+  const browser = settings?.navigateur || {}
+  let executable: string | null = null
+
+  try {
+    executable = mainsCore.trouverNavigateur(browser)
+  } catch {
+    executable = null
+  }
+
+  return {
+    actif: browser.actif !== false,
+    prefere: browser.prefere || 'edge',
+    executable,
+    sitesInterdits: (policy?.sites_interdits ?? []).map(motif => ({ motif, libelle: patternToSite(motif) }))
+  }
 }
 
 function readPolicy(): MainsPolicy {
@@ -258,7 +329,8 @@ export function mainsStatus(): MainsStatus {
     fichierReglages: userConfigPath('mains'),
     journal: logPath(),
     inscriptionAutomatique: requestBackend !== null && serverConnected(),
-    inscriptionEnCours: enrolling !== null
+    inscriptionEnCours: enrolling !== null,
+    navigateur: browserStatus(settings, policy)
   }
 }
 
@@ -362,6 +434,46 @@ export function registerMainsIpc(options: { request?: BackendRequest; connected?
 
     return mainsStatus()
   })
+  ipcMain.handle('mbiling:mains:set-browser', (_event, patch: unknown) => {
+    const next: NavigateurConfig = { ...(readSettings().navigateur || {}) }
+    const value = (patch && typeof patch === 'object' ? patch : {}) as { actif?: unknown; prefere?: unknown }
+
+    if (typeof value.actif === 'boolean') {
+      next.actif = value.actif
+    }
+
+    if (value.prefere === 'edge' || value.prefere === 'chrome') {
+      next.prefere = value.prefere
+    }
+
+    writeSettings({ navigateur: next })
+    startMains()
+
+    return mainsStatus()
+  })
+  ipcMain.handle('mbiling:mains:add-blocked-site', (_event, entry: unknown) => {
+    const pattern = siteToPattern(typeof entry === 'string' ? entry : '')
+    const current = readPolicy().sites_interdits
+
+    if (!current.includes(pattern)) {
+      writePolicy({ sites_interdits: [...current, pattern] })
+      writeLog('SITE INTERDIT AJOUTÉ', pattern)
+      startMains()
+    }
+
+    return mainsStatus()
+  })
+  ipcMain.handle('mbiling:mains:remove-blocked-site', (_event, pattern: unknown) => {
+    const current = readPolicy().sites_interdits
+
+    if (typeof pattern === 'string' && current.includes(pattern)) {
+      writePolicy({ sites_interdits: current.filter(item => item !== pattern) })
+      writeLog('SITE INTERDIT RETIRÉ', pattern)
+      startMains()
+    }
+
+    return mainsStatus()
+  })
   ipcMain.handle('mbiling:mains:restart', () => {
     reenrolTried = false
     startMains()
@@ -371,6 +483,7 @@ export function registerMainsIpc(options: { request?: BackendRequest; connected?
   ipcMain.handle('mbiling:mains:open', async (_event, which: unknown) => {
     readPolicy()
     readSettings()
+
     const target =
       which === 'politique' ? userConfigPath('politique') : which === 'journal' ? logPath() : userConfigPath('mains')
 
