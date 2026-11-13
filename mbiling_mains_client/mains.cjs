@@ -21,6 +21,8 @@ const fs = require('node:fs')
 const os = require('node:os')
 const path = require('node:path')
 
+const { creerNavigateur } = require('./navigateur.cjs')
+
 function trouverBash(config, autres = []) {
   const candidats = [
     config.bash,
@@ -98,6 +100,13 @@ function demarrer(config, options = {}) {
   const envoyer = (message) => {
     if (socket && socket.readyState === 1) socket.send(JSON.stringify(message))
   }
+
+  // Navigateur piloté par l'agent (lot 6) : seulement si la configuration l'active.
+  const navigateur = config.navigateur && config.navigateur.actif
+    ? creerNavigateur(config.navigateur, {
+      journal, envoyer, SocketWeb, sitesInterdits: (config.politique || {}).sites_interdits || []
+    })
+    : null
 
   function executer(demande) {
     const refus = verifierPolitique(politique, demande.script)
@@ -183,11 +192,15 @@ function demarrer(config, options = {}) {
       } else if (message.t === 'annuler') {
         journal('ANNULER', message.id)
         tuerArbre(enCours.get(message.id))
+      } else if (typeof message.t === 'string' && message.t.startsWith('cdp')) {
+        if (navigateur) navigateur.traiter(message)
+        else envoyer({ t: 'cdp_erreur', id: message.id, raison: 'le navigateur est désactivé sur ce PC' })
       }
     }
     socket.onerror = () => {}
     socket.onclose = () => {
       for (const tache of enCours.values()) tuerArbre(tache)
+      if (navigateur) navigateur.fermerTout()
       if (arrete) return
       surEtat({ connecte: false, appareil: null, raison: 'déconnecté' })
       journal('DÉCONNECTÉ', `nouvel essai dans ${attente} ms`)
@@ -201,6 +214,7 @@ function demarrer(config, options = {}) {
     arreter() {
       arrete = true
       for (const tache of enCours.values()) tuerArbre(tache)
+      if (navigateur) navigateur.fermerTout()
       if (socket) socket.close()
     }
   }

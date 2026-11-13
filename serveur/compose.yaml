@@ -49,8 +49,11 @@ services:
       MBILING_RELAIS_CONFIG: /etc/mbiling/relais.yaml
       MBILING_RELAIS_JETON_INTERNE: ${MBILING_RELAIS_JETON_INTERNE:?généré par installer.sh}
       MBILING_JETON_APPAREIL_PC_TEST_1: ${MBILING_JETON_APPAREIL_PC_TEST_1:?généré par installer.sh}
+      MBILING_RELAIS_JETON_CDP: ${MBILING_RELAIS_JETON_CDP:?généré par installer.sh}
     volumes:
       - ./relais.yaml:/etc/mbiling/relais.yaml:ro
+      # Le code du Relais suit le dépôt (git pull), sans reconstruire l'image du moteur.
+      - ../mbiling_cloud:/opt/mbiling/mbiling_cloud:ro
       - ${MBILING_DONNEES}/relais:/opt/data
     networks:
       - interne

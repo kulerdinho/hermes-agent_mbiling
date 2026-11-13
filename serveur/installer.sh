@@ -19,7 +19,7 @@ grep -E '^[A-Z_]+=' "$dossier/.env.exemple" | while IFS= read -r ligne; do
 done
 
 # Jetons internes : générés une seule fois, longs et aléatoires, conservés dans .env.
-for nom in MBILING_JETON_CELLULE MBILING_RELAIS_JETON_INTERNE MBILING_JETON_APPAREIL_PC_TEST_1; do
+for nom in MBILING_JETON_CELLULE MBILING_RELAIS_JETON_INTERNE MBILING_JETON_APPAREIL_PC_TEST_1 MBILING_RELAIS_JETON_CDP; do
 	if ! grep -qE "^$nom=.+" "$env_fichier"; then
 		sed -i "/^$nom=/d" "$env_fichier"
 		echo "$nom=$(openssl rand -base64 48 | tr -d '\n/+=' | cut -c1-48)" >>"$env_fichier"
@@ -46,13 +46,27 @@ if ! sudo test -f "$cellule_donnees/config.yaml"; then
 	echo "Configuration de la cellule créée depuis le modèle."
 fi
 
-# Clé d'IA de test : écrite dans les secrets de la cellule (son .env), jamais dans config.yaml.
-if [ -n "${MBILING_CLE_IA:-}" ] && [ -n "${MBILING_CLE_IA_VARIABLE:-}" ]; then
-	sudo touch "$cellule_donnees/.env"
-	sudo sed -i "/^$MBILING_CLE_IA_VARIABLE=/d" "$cellule_donnees/.env"
-	echo "$MBILING_CLE_IA_VARIABLE=$MBILING_CLE_IA" | sudo tee -a "$cellule_donnees/.env" >/dev/null
-	sudo chmod 600 "$cellule_donnees/.env"
-fi
+# Secrets de la cellule : écrits dans le .env de la cellule et de chacun de ses profils
+# (chaque profil ne lit que le sien), jamais dans config.yaml.
+ecrire_secret_cellule() {
+	local nom="$1" valeur="$2" fichier
+	for fichier in "$cellule_donnees/.env" $(sudo sh -c "ls -d '$cellule_donnees'/profiles/*/ 2>/dev/null" | sed 's|/$|/.env|'); do
+		sudo touch "$fichier"
+		sudo sed -i "/^$nom=/d" "$fichier"
+		echo "$nom=$valeur" | sudo tee -a "$fichier" >/dev/null
+		sudo chown 10000:10000 "$fichier"
+		sudo chmod 600 "$fichier"
+	done
+}
+
+ecrire_secrets_cellule() {
+	# Clé d'IA de test.
+	if [ -n "${MBILING_CLE_IA:-}" ] && [ -n "${MBILING_CLE_IA_VARIABLE:-}" ]; then
+		ecrire_secret_cellule "$MBILING_CLE_IA_VARIABLE" "$MBILING_CLE_IA"
+	fi
+	# Navigateur du PC (lot 6) : l'adresse CDP passe par le Relais et porte son jeton.
+	ecrire_secret_cellule BROWSER_CDP_URL "http://relais:8000/cdp/$MBILING_ORGANISATION/$MBILING_RELAIS_JETON_CDP"
+}
 
 # Minuteurs systemd : sauvegarde nocturne et relevé des ressources.
 for unite in mbiling-sauvegarde.service mbiling-sauvegarde.timer \
@@ -91,5 +105,10 @@ for profil in $MBILING_PROFILS; do
 		compose exec -T -u mbiling -e HOME=/opt/data cellule mbiling profile create "$profil" --clone
 	fi
 done
+
+# Après la création des profils, pour qu'ils reçoivent aussi les secrets ; la cellule relit
+# ses .env au redémarrage.
+ecrire_secrets_cellule
+compose restart cellule
 
 compose ps

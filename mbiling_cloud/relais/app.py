@@ -14,6 +14,13 @@ Protocole avec les Mains (messages JSON, un par trame texte) :
   PC  -> Relais : {"t": "sortie", "id", "d": "texte"}
   PC  -> Relais : {"t": "fin", "id", "code": 0}
   Relais -> PC  : {"t": "annuler", "id"}
+  Navigateur (lot 6) : messages « cdp* », décrits dans mbiling_mains_client/navigateur.cjs.
+
+Tunnel du navigateur : la cellule utilise ``http://relais:<port>/cdp/<organisation>/<jeton CDP>``
+comme adresse CDP. Le Relais transmet ``/json/...`` (HTTP) et ``/devtools/...`` (WebSocket) au
+navigateur lancé par les Mains sur le PC de l'organisation, et réécrit les adresses
+``ws://127.0.0.1:<port>/`` des réponses vers lui-même. Ces routes ne sont pas publiées par la
+passerelle : seule la cellule les joint, par le réseau interne.
 
 Les PC sont inscrits automatiquement : quand un utilisateur connecté autorise l'agent à utiliser
 son PC, la cellule demande au Relais un jeton d'appareil (POST /interne/appareils). Le Relais ne
@@ -35,8 +42,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, AsyncIterator
 
-from fastapi import FastAPI, Header, HTTPException, WebSocket, WebSocketDisconnect
-from fastapi.responses import StreamingResponse
+from fastapi import FastAPI, Header, HTTPException, Request, WebSocket, WebSocketDisconnect
+from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel
 
 
@@ -72,6 +79,10 @@ class Appareil:
     async def envoyer(self, message: dict[str, Any]) -> None:
         async with self.envoi:
             await self.socket.send_text(json.dumps(message, ensure_ascii=False))
+
+
+# Messages du PC rattachés à une demande en cours (commande ou canal du navigateur).
+MESSAGES_DU_PC = frozenset({"sortie", "fin", "cdp_http_reponse", "cdp_erreur", "cdp_ouvert", "cdp", "cdp_ferme"})
 
 
 def empreinte(jeton: str) -> str:
@@ -146,6 +157,8 @@ def creer_app() -> FastAPI:
     appareils_fixes = {
         empreinte(secret(a["jeton_env"])): (a["identifiant"], a["organisation"]) for a in config.get("appareils") or []
     }
+    # Tunnel du navigateur : désactivé tant que la configuration ne nomme pas son jeton.
+    jeton_cdp = secret(config["jeton_cdp_env"]) if config.get("jeton_cdp_env") else None
     fichier = config.get("fichier_appareils")
     registre = RegistreAppareils(Path(fichier) if fichier else None)
     connectes: dict[str, Appareil] = {}  # organisation -> appareil (un seul en phase 0)
@@ -189,7 +202,7 @@ def creer_app() -> FastAPI:
             while True:
                 message = json.loads(await socket.receive_text())
                 file = appareil.files.get(str(message.get("id")))
-                if file is not None and message.get("t") in ("sortie", "fin"):
+                if file is not None and message.get("t") in MESSAGES_DU_PC:
                     await file.put(message)
         except (WebSocketDisconnect, RuntimeError, json.JSONDecodeError):
             pass
@@ -276,5 +289,71 @@ def creer_app() -> FastAPI:
                         pass
 
         return StreamingResponse(flux(), media_type="application/x-ndjson")
+
+    def cdp_autorise(jeton: str) -> bool:
+        return jeton_cdp is not None and hmac.compare_digest(jeton.encode(), jeton_cdp.encode())
+
+    @app.get("/cdp/{organisation}/{jeton}/json{suite:path}")
+    async def cdp_http(organisation: str, jeton: str, suite: str, request: Request) -> Response:
+        """Découverte CDP (``/json/version``, ``/json/list``…) du navigateur du PC."""
+        if not cdp_autorise(jeton):
+            raise HTTPException(status_code=401, detail="jeton CDP invalide")
+        appareil = connectes.get(organisation)
+        if not appareil:
+            raise HTTPException(status_code=503, detail="aucun appareil connecté pour cette organisation")
+        identifiant = uuid.uuid4().hex
+        file: asyncio.Queue = asyncio.Queue()
+        appareil.files[identifiant] = file
+        try:
+            await appareil.envoyer({"t": "cdp_http", "id": identifiant, "chemin": f"/json{suite}"})
+            message = await asyncio.wait_for(file.get(), limites["delai_cdp_s"])
+        except asyncio.TimeoutError:
+            raise HTTPException(status_code=504, detail="le navigateur du PC ne répond pas") from None
+        finally:
+            appareil.files.pop(identifiant, None)
+        if message["t"] != "cdp_http_reponse":
+            raise HTTPException(status_code=502, detail=str(message.get("raison", "navigateur indisponible")))
+        # Les adresses WebSocket du navigateur désignent le PC : on les fait passer par le Relais.
+        vers_relais = f"ws://{request.headers['host']}/cdp/{organisation}/{jeton}/"
+        corps = str(message.get("corps", ""))
+        for hote in ("127.0.0.1", "localhost"):
+            corps = corps.replace(f"ws://{hote}:{message.get('port')}/", vers_relais)
+        return Response(corps, status_code=int(message.get("statut", 200)), media_type="application/json")
+
+    @app.websocket("/cdp/{organisation}/{jeton}/devtools/{suite:path}")
+    async def cdp_canal(socket: WebSocket, organisation: str, jeton: str, suite: str) -> None:
+        """Canal CDP : chaque trame passe telle quelle entre la cellule et le navigateur du PC."""
+        appareil = connectes.get(organisation)
+        if not cdp_autorise(jeton) or not appareil:
+            await socket.close(code=4401 if not cdp_autorise(jeton) else 4503)
+            return
+        await socket.accept()
+        identifiant = uuid.uuid4().hex
+        file: asyncio.Queue = asyncio.Queue()
+        appareil.files[identifiant] = file
+
+        async def vers_cellule() -> None:
+            while True:
+                message = await file.get()
+                if message["t"] == "cdp":
+                    await socket.send_text(message.get("d", ""))
+                elif message["t"] != "cdp_ouvert":  # fermé, erreur ou PC perdu
+                    break
+            await socket.close()
+
+        tache = asyncio.create_task(vers_cellule())
+        try:
+            await appareil.envoyer({"t": "cdp_ouvrir", "id": identifiant, "chemin": f"/devtools/{suite}"})
+            while True:
+                await appareil.envoyer({"t": "cdp", "id": identifiant, "d": await socket.receive_text()})
+        except (WebSocketDisconnect, RuntimeError):
+            pass
+        finally:
+            tache.cancel()
+            appareil.files.pop(identifiant, None)
+            try:
+                await appareil.envoyer({"t": "cdp_fermer", "id": identifiant})
+            except Exception:
+                pass
 
     return app

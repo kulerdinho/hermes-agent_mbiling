@@ -4,7 +4,15 @@
   "bash": null,
   "marge_timeout_s": 15,
   "reconnexion": { "delai_initial_ms": 1000, "delai_max_ms": 30000 },
+  "navigateur": {
+    "actif": true,
+    "chemin": null,
+    "preference": ["edge", "chrome"],
+    "profil": "C:\\Users\\VOUS\\AppData\\Local\\Mbiling\\navigateur",
+    "delai_demarrage_s": 20
+  },
   "politique": {
+    "sites_interdits": [],
     "dossiers_autorises": ["C:\\Users\\VOUS\\Documents\\Mbiling-Test"],
     "interdits": [
       "(^|[^\\w])/c/windows([/\\s'\"]|$)",
