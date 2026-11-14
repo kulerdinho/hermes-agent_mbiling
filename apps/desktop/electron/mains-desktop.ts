@@ -103,7 +103,8 @@ export function patternToSite(pattern: string): string {
 }
 
 /** Authenticated request to the connected Mbiling server (injected by main.ts). */
-export type BackendRequest = (pathname: string, method: string, body?: string) => Promise<unknown>
+// `body` is a plain object: the request function JSON-encodes it itself (never pass a string).
+export type BackendRequest = (pathname: string, method: string, body?: Record<string, unknown>) => Promise<unknown>
 
 interface Enrolment {
   appareil: string
@@ -369,7 +370,7 @@ export function enrolMains(): Promise<void> {
 
   const run = async (): Promise<void> => {
     try {
-      const reply = (await request(ENROL_PATH, 'POST', JSON.stringify({ nom: os.hostname() }))) as Enrolment | null
+      const reply = (await request(ENROL_PATH, 'POST', { nom: os.hostname() })) as Enrolment | null
 
       if (!reply || typeof reply.jeton !== 'string' || !reply.jeton) {
         throw new Error("le serveur n'a pas renvoyé de jeton pour ce PC")
