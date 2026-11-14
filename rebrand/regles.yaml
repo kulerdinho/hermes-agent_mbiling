@@ -51,6 +51,9 @@ exacts:
     - ["'HermesBundled'", "'MbilingBundled'"]
     - ["com.nousresearch.", "com.mbiling."]
     - ["`NousResearch.", "`Mbiling."]
+  # Page de connexion du tableau de bord web : la marque au-dessus du formulaire.
+  "mbiling_cli/dashboard_auth/login_page.py":
+    - ['<div class="brand">Nous<span class="dot"></span>Research</div>', '<div class="brand">Mbiling</div>']
   # Identité de l'agent (son « âme » par défaut, ses copies dans les tests et la documentation) :
   # il se présente comme Mbiling, sans l'éditeur d'origine.
   "SOUL.md": &identite
