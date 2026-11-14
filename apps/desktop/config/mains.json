@@ -1,6 +1,6 @@
 {
   "actif": false,
-  "relais_url": "wss://api.mbiling.com/mains",
+  "relais_url": "wss://mbiling.chloe-consulting.bid/mains",
   "bash": null,
   "marge_timeout_s": 15,
   "reconnexion": {

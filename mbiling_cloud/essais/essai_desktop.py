@@ -104,7 +104,8 @@ def main() -> int:
         ecran = json.loads(next((l for l in lignes if l.startswith("PREMIER_LANCEMENT ")), "PREMIER_LANCEMENT {}")[18:] or "{}")
         verifier("le premier lancement n'affiche qu'un bouton « Se connecter », sans champ à remplir",
                  ecran.get("boutonConnexion") is True and ecran.get("champs") == 0, json.dumps(ecran))
-        verifier("l'adresse du serveur vient du fichier de réglages", ecran.get("adresseParDefaut") == "https://api.mbiling.com")
+        verifier("l'adresse du serveur vient du fichier de réglages", ecran.get("adresseParDefaut") == json.loads(
+                     (RACINE / "apps/desktop/config/connexion-par-defaut.json").read_text(encoding="utf-8"))["adresse"])
         avant = next((l for l in lignes if l.startswith("ETAT_AVANT ")), "")
         verifier("sans jeton, les Mains attendent", '"jetonDefini":false' in avant and '"enMarche":false' in avant)
         verifier("après saisie du jeton, le Desktop se connecte au Relais", any(l == "PRET" for l in lignes),
