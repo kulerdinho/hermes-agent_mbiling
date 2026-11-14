@@ -51,6 +51,26 @@ exacts:
     - ["'HermesBundled'", "'MbilingBundled'"]
     - ["com.nousresearch.", "com.mbiling."]
     - ["`NousResearch.", "`Mbiling."]
+  # Identité de l'agent (son « âme » par défaut, ses copies dans les tests et la documentation) :
+  # il se présente comme Mbiling, sans l'éditeur d'origine.
+  "SOUL.md": &identite
+    - ["Mbiling Agent, built by Nous Research.", "Mbiling Agent."]
+  "docker/SOUL.md": *identite
+  "agent/prompt_builder.py": *identite
+  "mbiling_cli/default_soul.py": *identite
+  "tests/fixtures/prompt_surface/prompts/cli-code.claude.txt": *identite
+  "tests/fixtures/prompt_surface/prompts/cli.claude.txt": *identite
+  "tests/fixtures/prompt_surface/prompts/cli.gemini.txt": *identite
+  "tests/fixtures/prompt_surface/prompts/cli.gpt.txt": *identite
+  "tests/fixtures/prompt_surface/prompts/cli.mbiling.txt": *identite
+  "tests/fixtures/prompt_surface/prompts/cron.claude.txt": *identite
+  "tests/fixtures/prompt_surface/prompts/desktop.claude.txt": *identite
+  "tests/fixtures/prompt_surface/prompts/discord.claude.txt": *identite
+  "tests/fixtures/prompt_surface/prompts/telegram.claude.txt": *identite
+  "website/docs/developer-guide/prompt-assembly.md": *identite
+  "website/docs/user-guide/features/personality.md": *identite
+  "website/i18n/zh-Hans/docusaurus-plugin-content-docs/current/developer-guide/prompt-assembly.md": *identite
+  "website/i18n/zh-Hans/docusaurus-plugin-content-docs/current/user-guide/features/personality.md": *identite
 
 # Jamais modifiés, quel que soit le périmètre.
 exclusions:
