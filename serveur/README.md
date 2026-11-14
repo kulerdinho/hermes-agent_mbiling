@@ -38,7 +38,10 @@ On relance ensuite `./installer.sh`.
 - **Le modèle d'IA :** `MBILING_MODELE`, plus la clé de **test** plafonnée (`MBILING_CLE_IA_VARIABLE`
   et `MBILING_CLE_IA`). `installer.sh` copie la clé dans les secrets de la cellule.
 - **Les jetons internes** (cellule, Relais, PC de test) sont générés dans `.env` au premier lancement.
-  Le Desktop se connecte à `https://MBILING_DOMAINE` avec `MBILING_JETON_CELLULE`.
+  `MBILING_JETON_CELLULE` est l'accès d'administration (page `/login`, champ du jeton).
+- **La connexion des utilisateurs** (Desktop, navigateur) : identifiant `MBILING_CONNEXION_IDENTIFIANT`
+  et mot de passe `MBILING_CONNEXION_MOT_DE_PASSE`, généré dans `.env` au premier lancement. La cellule
+  n'en reçoit que l'empreinte. Pour changer le mot de passe : le remplacer dans `.env`, relancer `installer.sh`.
 - **La configuration de départ** (`cellule/modele-config.yaml`) n'est copiée qu'à la création de la
   cellule, et les profils de `MBILING_PROFILS` ne sont créés qu'une fois.
 - **Ressources :** la cellule est plafonnée (`MBILING_CELLULE_MEMOIRE`, `MBILING_CELLULE_CPU`), et un relevé

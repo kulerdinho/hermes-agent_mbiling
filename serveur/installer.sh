@@ -26,11 +26,31 @@ for nom in MBILING_JETON_CELLULE MBILING_RELAIS_JETON_INTERNE MBILING_JETON_APPA
 		echo "Jeton généré : $nom"
 	fi
 done
+# Connexion des utilisateurs : mot de passe (court, à taper) et clé de signature des sessions.
+if ! grep -qE "^MBILING_CONNEXION_MOT_DE_PASSE=.+" "$env_fichier"; then
+	sed -i "/^MBILING_CONNEXION_MOT_DE_PASSE=/d" "$env_fichier"
+	echo "MBILING_CONNEXION_MOT_DE_PASSE=$(openssl rand -base64 24 | tr -d '\n/+=' | cut -c1-20)" >>"$env_fichier"
+	echo "Mot de passe de connexion généré (à lire dans .env)."
+fi
+if ! grep -qE "^MBILING_CONNEXION_SECRET=.+" "$env_fichier"; then
+	sed -i "/^MBILING_CONNEXION_SECRET=/d" "$env_fichier"
+	echo "MBILING_CONNEXION_SECRET=$(openssl rand -base64 32 | tr -d '\n')" >>"$env_fichier"
+fi
 chmod 600 "$env_fichier"
 
 set -a
 . "$env_fichier"
 set +a
+
+# Empreinte du mot de passe, calculée par le moteur lui-même (scrypt), recalculée à chaque
+# installation pour suivre un changement de mot de passe. Entre apostrophes : elle contient des $.
+empreinte_mdp="$(printf '%s' "$MBILING_CONNEXION_MOT_DE_PASSE" | sudo docker run --rm -i -w /opt/mbiling \
+	--entrypoint /opt/mbiling/.venv/bin/python "$MBILING_IMAGE_MOTEUR" -c \
+	"import sys; from plugins.dashboard_auth.basic import hash_password; print(hash_password(sys.stdin.read()))")"
+sed -i "/^MBILING_CONNEXION_EMPREINTE=/d" "$env_fichier"
+echo "MBILING_CONNEXION_EMPREINTE='$empreinte_mdp'" >>"$env_fichier"
+# Exportée : pour docker compose, l'environnement du shell passe avant le fichier .env.
+export MBILING_CONNEXION_EMPREINTE="$empreinte_mdp"
 
 compose() { sudo docker compose --project-directory "$dossier" "${profils[@]}" "$@"; }
 
