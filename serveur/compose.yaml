@@ -23,7 +23,8 @@ services:
   cellule:
     image: ${MBILING_IMAGE_MOTEUR:?voir .env.exemple}
     restart: unless-stopped
-    command: ["serve", "--host", "0.0.0.0", "--port", "9119"]
+    # « dashboard » sert le Desktop ET l'interface web ; « serve » ne servirait que le Desktop.
+    command: ["dashboard", "--host", "0.0.0.0", "--port", "9119", "--no-open"]
     environment:
       MBILING_DASHBOARD_SESSION_TOKEN: ${MBILING_JETON_CELLULE:?généré par installer.sh}
       # Connexion par identifiant et mot de passe (fournisseur « basic » du moteur).
