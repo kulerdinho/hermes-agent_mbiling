@@ -43,6 +43,11 @@ chaines:
 # Remplacements exacts, fichier par fichier (identité technique visible :
 # nom de l'exécutable, identifiant de l'application, éditeur).
 exacts:
+  # Thèmes du Desktop : libellés visibles seulement (les identifiants « nous » restent, ce sont des clés enregistrées).
+  "apps/desktop/src/themes/presets.ts":
+    - ["label: 'Nous',", "label: 'Mbiling',"]
+    - ["description: 'GitHub chrome, Nous blue accent',", "description: 'Chrome GitHub, accent bleu Mbiling (par défaut)',"]
+    - ["label: 'Nous Alt',", "label: 'Mbiling Alt',"]
   "apps/desktop/product-identity.cjs":
     - ["kebab: 'hermes',", "kebab: 'mbiling',"]
     - ["'hermes-light'", "'mbiling-light'"]
