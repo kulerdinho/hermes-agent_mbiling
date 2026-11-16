@@ -41,6 +41,9 @@ services:
       # Les commandes des agents s'exécutent toujours sur le PC du client, jamais dans la cellule,
       # même si l'écran des réglages d'un profil remet son terminal sur « local ».
       MBILING_TERMINAL_IMPOSE: ${MBILING_TERMINAL_CELLULE:-mbiling_mains}
+      # Les fichiers que l'agent écrit sont donc sur le PC : c'est la politique des Mains du PC
+      # (dossiers autorisés) qui les limite, pas le dossier /opt/data de l'image.
+      MBILING_WRITE_SAFE_ROOT: ""
     volumes:
       - ${MBILING_DONNEES}/cellules/${MBILING_ORGANISATION}/data:/opt/data
       # Le module des Mains suit le dépôt (git pull), sans reconstruire l'image du moteur.
