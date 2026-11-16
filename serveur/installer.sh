@@ -59,10 +59,32 @@ cellule_donnees="$MBILING_DONNEES/cellules/$MBILING_ORGANISATION/data"
 sudo install -d -m 750 "$MBILING_DONNEES" "$MBILING_DONNEES/cellules" "$MBILING_DONNEES/relais" "$cellule_donnees"
 sudo install -d -m 700 "$MBILING_SAUVEGARDES"
 
+# Le modèle d'IA de la cellule : un fournisseur direct (MBILING_MODELE au format fournisseur:modèle),
+# ou une passerelle compatible OpenAI (MBILING_IA_URL, ex. OmniRoute) avec, en option, un modèle de
+# secours (limite 429, panne) et un modèle pour la vision.
+section_ia() {
+	if [ -z "${MBILING_IA_URL:-}" ]; then
+		printf 'model: "%s"\n' "$MBILING_MODELE"
+		return
+	fi
+	printf 'model:\n  provider: custom\n  base_url: "%s"\n  default: "%s"\n' "$MBILING_IA_URL" "$MBILING_MODELE"
+	if [ -n "${MBILING_MODELE_SECOURS:-}" ]; then
+		printf 'fallback_providers:\n  - provider: custom\n    base_url: "%s"\n    model: "%s"\n' \
+			"$MBILING_IA_URL" "$MBILING_MODELE_SECOURS"
+	fi
+	if [ -n "${MBILING_MODELE_VISION:-}" ]; then
+		printf 'auxiliary:\n  vision:\n    provider: custom\n    base_url: "%s"\n    model: "%s"\n' \
+			"$MBILING_IA_URL" "$MBILING_MODELE_VISION"
+	fi
+}
+
 # Configuration de départ de la cellule, seulement à sa création.
 if ! sudo test -f "$cellule_donnees/config.yaml"; then
-	sed "s|@MODELE@|$MBILING_MODELE|" "$dossier/cellule/modele-config.yaml" |
+	ia="$(mktemp)"
+	section_ia >"$ia"
+	sed -e "/^@IA@\$/{r $ia" -e 'd}' "$dossier/cellule/modele-config.yaml" |
 		sudo tee "$cellule_donnees/config.yaml" >/dev/null
+	rm -f "$ia"
 	echo "Configuration de la cellule créée depuis le modèle."
 fi
 
