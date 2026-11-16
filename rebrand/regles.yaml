@@ -51,6 +51,16 @@ exacts:
     - ["'HermesBundled'", "'MbilingBundled'"]
     - ["com.nousresearch.", "com.mbiling."]
     - ["`NousResearch.", "`Mbiling."]
+  # Bannière du chat (TUI et onglet Chat du web) : la devise et la signature de l'éditeur d'origine.
+  "ui-tui/src/i18n/en/chatBits.ts":
+    - ['tagFull: ''Nous Research · Messenger of the Digital Gods'',', 'tagFull: ''Mbiling'',']
+    - ['tagMid: ''Messenger of the Digital Gods'',', 'tagMid: ''Mbiling'',']
+  "ui-tui/src/components/branding.tsx":
+    - ['const TAG_TINY = ''Nous Research''', 'const TAG_TINY = ''Mbiling''']
+    - ['> · Nous Research</Text>', '> · Mbiling</Text>']
+  # Page de connexion du tableau de bord web : la marque au-dessus du formulaire.
+  "mbiling_cli/dashboard_auth/login_page.py":
+    - ['<div class="brand">Nous<span class="dot"></span>Research</div>', '<div class="brand">Mbiling</div>']
   # Identité de l'agent (son « âme » par défaut, ses copies dans les tests et la documentation) :
   # il se présente comme Mbiling, sans l'éditeur d'origine.
   "SOUL.md": &identite

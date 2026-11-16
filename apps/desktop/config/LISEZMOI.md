@@ -2,7 +2,12 @@
 
 Ces fichiers sont livrés avec l'application (dossier `resources/mbiling-config`). Au premier
 lancement, chacun est copié dans le dossier de données de l'application, où il peut être modifié :
-la copie de l'utilisateur prime toujours sur celle livrée.
+la copie de l'utilisateur prime sur celle livrée.
+
+**Exception : les adresses des serveurs viennent toujours de l'application.** `connexion-par-defaut.json`
+n'est jamais copié ni lu dans le dossier de données, et l'adresse du Relais (`relais_url`) est toujours
+lue dans le `mains.json` livré. Ainsi, une mise à jour qui change de serveur n'est jamais annulée par
+une copie laissée par une version précédente.
 
 | Fichier | Contenu |
 |---|---|

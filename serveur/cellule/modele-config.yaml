@@ -20,3 +20,11 @@ approvals:
 # Les points de restauration enregistreraient des chemins du serveur, pas ceux du PC.
 checkpoints:
   enabled: false
+
+# Mbiling n'envoie aucune statistique à l'éditeur d'origine (Nous Research) : la question
+# « Share with Nous » est réputée répondue « non » (offer_version = OFFER_VERSION du moteur).
+telemetry:
+  shared_metrics:
+    enabled: false
+    send: false
+    offer_version: 2

@@ -23,9 +23,12 @@ services:
   cellule:
     image: ${MBILING_IMAGE_MOTEUR:?voir .env.exemple}
     restart: unless-stopped
-    # « dashboard » sert le Desktop ET l'interface web ; « serve » ne servirait que le Desktop.
-    command: ["dashboard", "--host", "0.0.0.0", "--port", "9119", "--no-open"]
+    # Le programme principal ne fait rien : l'interface web (qui sert aussi le Desktop) tourne
+    # comme service supervisé (MBILING_DASHBOARD=1). Avec « dashboard » comme commande, l'image
+    # n'enregistrerait pas les services des agents et le chat web ne démarrerait pas.
+    command: ["sleep", "infinity"]
     environment:
+      MBILING_DASHBOARD: "1"
       MBILING_DASHBOARD_SESSION_TOKEN: ${MBILING_JETON_CELLULE:?généré par installer.sh}
       # Connexion par identifiant et mot de passe (fournisseur « basic » du moteur).
       MBILING_DASHBOARD_BASIC_AUTH_USERNAME: ${MBILING_CONNEXION_IDENTIFIANT:?voir .env.exemple}

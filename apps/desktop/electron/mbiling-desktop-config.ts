@@ -1,8 +1,11 @@
 /**
  * Mbiling Desktop settings files (connection proposed at first launch, the Mains, the local
  * policy). Defaults ship in `resources/mbiling-config` (apps/desktop/config in a dev checkout);
- * on first use each one is copied into userData, where the user's copy always wins. No value is
- * written in code: see apps/desktop/config/LISEZMOI.md.
+ * on first use each one is copied into userData, where the user's copy wins. Server addresses are
+ * the exception: they always come from the shipped files (the connection file is never copied, and
+ * the Mains relay address is read from the shipped mains.json), so an update that changes the server
+ * is never undone by a copy left by an older version. No value is written in code: see
+ * apps/desktop/config/LISEZMOI.md.
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -29,8 +32,24 @@ export function userConfigPath(name: MbilingConfigName): string {
   return path.join(app.getPath('userData'), MBILING_CONFIG_FILES[name])
 }
 
+/** Settings files that always come from the app: never copied to, nor read from, userData. */
+const SHIPPED_ONLY: ReadonlySet<MbilingConfigName> = new Set(['connexion'])
+
+function parseConfig<T>(file: string): T {
+  return JSON.parse(fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, '')) as T
+}
+
+/** Reads the default shipped with the app, ignoring any user copy. */
+export function readShippedConfig<T>(name: MbilingConfigName): T {
+  return parseConfig<T>(path.join(shippedConfigDir(), MBILING_CONFIG_FILES[name]))
+}
+
 /** Reads a settings file: the user's copy, else the shipped default (copied for later edits). */
 export function readMbilingConfig<T>(name: MbilingConfigName): T {
+  if (SHIPPED_ONLY.has(name)) {
+    return readShippedConfig<T>(name)
+  }
+
   const userFile = userConfigPath(name)
 
   if (!fs.existsSync(userFile)) {
@@ -39,7 +58,7 @@ export function readMbilingConfig<T>(name: MbilingConfigName): T {
     fs.copyFileSync(shipped, userFile)
   }
 
-  return JSON.parse(fs.readFileSync(userFile, 'utf8').replace(/^\uFEFF/, '')) as T
+  return parseConfig<T>(userFile)
 }
 
 /** `{documents}` / `{home}` in a configured path become the user's real folders. */
