@@ -51,6 +51,11 @@ exacts:
   # Apparence par défaut : thème Mbiling en mode sombre (choix du produit), plus « suivre le système ».
   "apps/desktop/src/themes/context.tsx":
     - ["value === 'light' || value === 'dark' || value === 'system' ? value : 'system'", "value === 'light' || value === 'dark' || value === 'system' ? value : 'dark'"]
+  # Échelle de l'interface 110 % et texte du chat 150 % par défaut (choix du produit).
+  "apps/desktop/electron/zoom.ts":
+    - ["export const DEFAULT_ZOOM_LEVEL = 0", "export const DEFAULT_ZOOM_LEVEL = Math.log(1.1) / Math.log(ZOOM_FACTOR_BASE)"]
+  "apps/desktop/src/store/chat-text-scale.ts":
+    - ["const DEFAULT_CHAT_TEXT_SCALE = 110", "const DEFAULT_CHAT_TEXT_SCALE = 150 // Mbiling default"]
   "apps/desktop/electron/main.ts":
     - ["    // Missing / malformed → follow the OS like a fresh install.\n  }\n\n  return 'system'", "    // Missing / malformed → Mbiling's default appearance, like a fresh install.\n  }\n\n  return 'dark'"]
   "apps/desktop/product-identity.cjs":
