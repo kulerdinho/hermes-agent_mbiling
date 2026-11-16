@@ -38,6 +38,9 @@ services:
       MBILING_RELAIS_JETON: ${MBILING_RELAIS_JETON_INTERNE:?généré par installer.sh}
       MBILING_RELAIS_URL_PUBLIQUE: wss://${MBILING_DOMAINE}/mains
       MBILING_ORGANISATION: ${MBILING_ORGANISATION:?voir .env.exemple}
+      # Les commandes des agents s'exécutent toujours sur le PC du client, jamais dans la cellule,
+      # même si l'écran des réglages d'un profil remet son terminal sur « local ».
+      MBILING_TERMINAL_IMPOSE: ${MBILING_TERMINAL_CELLULE:-mbiling_mains}
     volumes:
       - ${MBILING_DONNEES}/cellules/${MBILING_ORGANISATION}/data:/opt/data
       # Le module des Mains suit le dépôt (git pull), sans reconstruire l'image du moteur.

@@ -78,6 +78,12 @@ def terminal_env(name: str, default: str = "") -> str:
     No scope: process env, then *default*. Refusal scope: raise. Policy scope: ONLY the
     policy; a missing key yields *default*, never os.environ.
     """
+    if name == "TERMINAL_ENV":
+        # Mbiling Cloud cell: the terminal backend is imposed by the cell, never by a profile's
+        # config.yaml (a settings screen that rewrites it must not make commands run in the cell).
+        imposed = os.environ.get("MBILING_TERMINAL_IMPOSE", "").strip().lower()
+        if imposed:
+            return imposed
     scope = _terminal_scope_var.get()
     if scope is None:
         return os.environ.get(name, default)
