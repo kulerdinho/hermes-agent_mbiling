@@ -40,6 +40,8 @@ services:
       MBILING_ORGANISATION: ${MBILING_ORGANISATION:?voir .env.exemple}
     volumes:
       - ${MBILING_DONNEES}/cellules/${MBILING_ORGANISATION}/data:/opt/data
+      # Le module des Mains suit le dépôt (git pull), sans reconstruire l'image du moteur.
+      - ../plugins/mbiling_mains:/opt/mbiling/plugins/mbiling_mains:ro
     mem_limit: ${MBILING_CELLULE_MEMOIRE:?voir .env.exemple}
     cpus: ${MBILING_CELLULE_CPU:?voir .env.exemple}
     depends_on:
