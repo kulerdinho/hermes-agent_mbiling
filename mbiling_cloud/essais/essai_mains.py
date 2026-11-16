@@ -78,11 +78,8 @@ def main() -> int:
             except OSError:
                 time.sleep(0.2)
         journal = open(travail / "mains.log", "w", encoding="utf-8")
-        temporaire = travail / "temp-du-pc"
-        temporaire.mkdir()
-        env_pc = {**env, "TMPDIR": str(temporaire), "TEMP": str(temporaire), "TMP": str(temporaire)}
         mains = subprocess.Popen(["node", str(RACINE / "mbiling_mains_client/mains.cjs"), str(travail / "mains.json")],
-                                 env=env_pc, stdout=journal, stderr=subprocess.STDOUT)
+                                 env=env, stdout=journal, stderr=subprocess.STDOUT)
         t = charger_transport()
         cfg = t.ConfigRelais(url=f"http://127.0.0.1:{PORT}", jeton=env["MBILING_RELAIS_JETON_INTERNE"], organisation="org-test")
         info = None
@@ -106,7 +103,10 @@ def main() -> int:
         verifier("entrée standard et code de retour", "écrite à distance" in sortie and c.wait(5) == 3)
         verifier("le fichier existe sur le PC", (dossier / "rapport.txt").exists())
 
-        shutil.rmtree(temporaire / "mbiling-mains")
+        # Le script vit dans le dossier de travail du client : il l'efface lui-même, comme Windows.
+        c = lancer('rm -rf "$(dirname "$0")"')
+        c.stdout.read()
+        c.wait(5)
         c = lancer("echo encore")
         sortie = c.stdout.read()
         verifier("le dossier temporaire du PC effacé par Windows : la commande passe quand même",
