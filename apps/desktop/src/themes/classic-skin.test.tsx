@@ -112,15 +112,16 @@ describe('Classic Mbiling is an explicit Desktop pick, never inferred from stock
     expect(paintedSkin()).toBe('nous')
   })
 
-  it('/skin gold and /skin mbiling select Classic; /skin default stays the Desktop default (Nous)', async () => {
+  it('/skin gold selects Classic; /skin mbiling and /skin default select the Desktop default (Mbiling)', async () => {
     const run = await launch(stockDefaultSkin)
 
     act(() => void run.api.skin?.('gold'))
     expect(run.api.theme?.themeName).toBe('classic')
 
-    act(() => void run.api.skin?.('nous'))
     act(() => void run.api.skin?.('mbiling'))
-    expect(run.api.theme?.themeName).toBe('classic')
+    expect(run.api.theme?.themeName).toBe('nous')
+
+    act(() => void run.api.skin?.('gold'))
 
     act(() => void run.api.skin?.('default'))
     expect(run.api.theme?.themeName).toBe('nous')

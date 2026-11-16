@@ -1448,10 +1448,10 @@ function readPersistedThemeSource() {
       return parsed.themeSource
     }
   } catch {
-    // Missing / malformed → follow the OS like a fresh install.
+    // Missing / malformed → Mbiling's default appearance, like a fresh install.
   }
 
-  return 'system'
+  return 'dark'
 }
 
 function writePersistedThemeSource(mode) {

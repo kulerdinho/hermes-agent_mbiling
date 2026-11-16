@@ -2,15 +2,16 @@ import { useCallback } from 'react'
 
 import { useTheme } from './context'
 
-// Old names land on a shipped theme so muscle memory works. `gold`/`mbiling`
-// only ever meant the classic gold look, so they reach Classic Mbiling; `default`
-// stays Nous because it is also the stock config value, which Desktop reads as
+// Old names land on a shipped theme so muscle memory works. `gold`
+// only ever meant the classic gold look, so it reaches Classic Mbiling; `mbiling` is the
+// default theme's visible name (labelled Mbiling), so it lands there like `default`, which
+// is also the stock config value, which Desktop reads as
 // "the Desktop default" everywhere else (boot, backend sync, setTheme).
 const ALIASES: Record<string, string> = {
   ares: 'ember',
   default: 'nous',
   gold: 'classic',
-  mbiling: 'classic',
+  mbiling: 'nous',
   'nous-light': 'nous'
 }
 
