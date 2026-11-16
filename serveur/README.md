@@ -42,6 +42,12 @@ On relance ensuite `./installer.sh`.
 - **La connexion des utilisateurs** (Desktop, navigateur) : identifiant `MBILING_CONNEXION_IDENTIFIANT`
   et mot de passe `MBILING_CONNEXION_MOT_DE_PASSE`, généré dans `.env` au premier lancement. La cellule
   n'en reçoit que l'empreinte. Pour changer le mot de passe : le remplacer dans `.env`, relancer `installer.sh`.
+- **Renouveler tous les secrets** (fin de la phase 0, ou après une fuite) : `./renouveler-secrets.sh`.
+  Il demande le nouveau mot de passe (saisie masquée), régénère les jetons internes et la clé des sessions,
+  révoque les PC inscrits (l'application les réinscrit à la connexion suivante), puis relance `installer.sh`.
+  Le jeton du tunnel et la clé d'IA se renouvellent chez leurs fournisseurs.
+- **Où s'exécutent les commandes des agents :** `MBILING_TERMINAL_CELLULE` (par défaut `mbiling_mains`,
+  le PC du client), imposé à tous les profils : un écran de réglages ne peut pas les ramener dans la cellule.
 - **La configuration de départ** (`cellule/modele-config.yaml`) n'est copiée qu'à la création de la
   cellule, et les profils de `MBILING_PROFILS` ne sont créés qu'une fois.
 - **Ressources :** la cellule est plafonnée (`MBILING_CELLULE_MEMOIRE`, `MBILING_CELLULE_CPU`), et un relevé

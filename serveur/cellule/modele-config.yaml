@@ -1,8 +1,9 @@
 # Configuration de départ d'une cellule Mbiling (phase 0).
 # installer.sh la copie dans le dossier de données de la cellule à sa création, en
-# remplaçant @MODELE@ par MBILING_MODELE (serveur/.env). Ensuite, elle appartient à la
-# cellule : une nouvelle installation ne l'écrase jamais.
-model: "@MODELE@"
+# remplaçant la ligne @IA@ par le modèle d'IA de serveur/.env (MBILING_MODELE, MBILING_IA_URL,
+# MBILING_MODELE_SECOURS, MBILING_MODELE_VISION). Ensuite, elle appartient à la cellule : une
+# nouvelle installation ne l'écrase jamais. Les profils créés ensuite en reçoivent une copie.
+@IA@
 
 plugins:
   enabled: [mbiling-mains]

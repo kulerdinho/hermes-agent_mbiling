@@ -104,7 +104,20 @@ function demarrer(config, options = {}) {
   // Lot 6 : le navigateur du PC, piloté par l'agent à travers le Relais (tunnel CDP).
   const navigateur = creerNavigateur(config.navigateur, config.politique || {}, { envoyer, journal, SocketWeb })
 
+  // Le moteur attend toujours une fin : une erreur locale (disque plein, dossier temporaire
+  // effacé par Windows…) doit lui revenir, sinon il attend jusqu'à son délai puis annule.
   function executer(demande) {
+    try {
+      lancer(demande)
+    } catch (e) {
+      journal('ERREUR', demande.id, e.message)
+      enCours.delete(demande.id)
+      envoyer({ t: 'sortie', id: demande.id, d: `[Mains Mbiling] impossible de lancer la commande : ${e.message}\n` })
+      envoyer({ t: 'fin', id: demande.id, code: 127 })
+    }
+  }
+
+  function lancer(demande) {
     const refus = verifierPolitique(politique, demande.script)
     if (refus) {
       journal('REFUS', demande.id, refus)
@@ -116,6 +129,8 @@ function demarrer(config, options = {}) {
     // Le script passe par un fichier : la ligne de commande de Windows est limitée à 32 Ko.
     const fichierScript = path.join(dossierTravail, `${demande.id}.sh`)
     const fichierPid = path.join(dossierTravail, `${demande.id}.pid`)
+    // Windows vide le dossier temporaire quand le disque est plein : on le recrée à chaque fois.
+    fs.mkdirSync(dossierTravail, { recursive: true })
     fs.writeFileSync(fichierScript, demande.script, { encoding: 'utf8', mode: 0o600 })
     const lanceur = 'echo $$ > "$0"; if [ "$1" = login ]; then exec bash -l "$2"; else exec bash "$2"; fi'
     const args = ['-c', lanceur, versCheminBash(fichierPid), demande.login ? 'login' : 'simple', versCheminBash(fichierScript)]

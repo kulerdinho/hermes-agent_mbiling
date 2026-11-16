@@ -103,6 +103,15 @@ def main() -> int:
         verifier("entrée standard et code de retour", "écrite à distance" in sortie and c.wait(5) == 3)
         verifier("le fichier existe sur le PC", (dossier / "rapport.txt").exists())
 
+        # Le script vit dans le dossier de travail du client : il l'efface lui-même, comme Windows.
+        c = lancer('rm -rf "$(dirname "$0")"')
+        c.stdout.read()
+        c.wait(5)
+        c = lancer("echo encore")
+        sortie = c.stdout.read()
+        verifier("le dossier temporaire du PC effacé par Windows : la commande passe quand même",
+                 "encore" in sortie and c.wait(5) == 0)
+
         gros = "x=0\n" + "x=$((x+1))\n" * 6000 + "echo total=$x\n"
         c = lancer(gros)
         sortie = c.stdout.read()
