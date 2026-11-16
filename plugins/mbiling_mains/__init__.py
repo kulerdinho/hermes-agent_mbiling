@@ -17,8 +17,10 @@ from plugins.mbiling_mains.transport import ConfigRelais, MainsIndisponibles, in
 
 class FournisseurMains(TerminalEnvironmentProvider):
     is_remote = True
-    # Ce n'est pas un bac à sable jetable : c'est le vrai PC du client.
-    is_container = False
+    # Le PC a son propre système de fichiers : les chemins relatifs des outils de fichiers se résolvent
+    # dans le dossier de départ du PC, jamais dans celui de la cellule (/opt/data). Ce n'est pas pour
+    # autant un bac à sable jetable : les approbations restent actives (skip_container_guards ci-dessous).
+    is_container = True
 
     @property
     def name(self) -> str:
