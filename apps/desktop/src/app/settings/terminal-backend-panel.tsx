@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react'
 import type { ProfileScope } from '@/api/client'
 import { Button } from '@/components/ui/button'
 import { useI18n } from '@/i18n'
+import { accountOnlyBuild } from '@/lib/account-only-build'
 import { AlertTriangle, Check, Loader2, RefreshCw } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 import { getTerminalBackends, selectTerminalBackend } from '@/mbiling'
@@ -57,6 +58,13 @@ export function TerminalBackendPanel({ onConfiguredChange, profile }: TerminalBa
   const [data, setData] = useState<TerminalBackendsResponse | null>(null)
   const [loading, setLoading] = useState(true)
   const [selecting, setSelecting] = useState<string | null>(null)
+  // Mbiling user builds: "local" would be the cloud server's own shell, so it is not a choice.
+  // Hidden while the setting loads; an already-active local row stays visible so the list is honest.
+  const [hideLocal, setHideLocal] = useState(true)
+
+  useEffect(() => {
+    void accountOnlyBuild().then(setHideLocal)
+  }, [])
 
   const refresh = useCallback(async () => {
     setLoading(true)
@@ -130,6 +138,10 @@ export function TerminalBackendPanel({ onConfiguredChange, profile }: TerminalBa
     return null
   }
 
+  const visibleBackends = data.backends.filter(
+    backend => !(hideLocal && backend.name === 'local' && !backend.active)
+  )
+
   return (
     <div className="grid gap-1.5">
       <div className="flex items-baseline justify-between gap-2 px-0.5">
@@ -139,7 +151,7 @@ export function TerminalBackendPanel({ onConfiguredChange, profile }: TerminalBa
         </Button>
       </div>
       <div className="grid gap-1">
-        {data.backends.map(backend => (
+        {visibleBackends.map(backend => (
           <button
             aria-pressed={backend.active}
             className={cn(

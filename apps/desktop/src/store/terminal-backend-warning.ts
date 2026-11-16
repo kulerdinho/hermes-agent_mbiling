@@ -1,4 +1,5 @@
 import { translateNow } from '@/i18n'
+import { accountOnlyBuild } from '@/lib/account-only-build'
 import { getTerminalBackends, selectTerminalBackend } from '@/mbiling'
 import { notify, notifyError } from '@/store/notifications'
 import { requestRoute } from '@/store/recovery-requests'
@@ -39,6 +40,8 @@ export async function warnIfTerminalBackendUnavailable(): Promise<boolean> {
   }
 
   const copy = 'settings.toolsets.terminalBackend'
+  // Mbiling user builds: "local" would be the cloud server's own shell, never the user's PC.
+  const offerLocal = !(await accountOnlyBuild())
 
   notify({
     id: TOAST_ID,
@@ -47,13 +50,15 @@ export async function warnIfTerminalBackendUnavailable(): Promise<boolean> {
     message: translateNow(`${copy}.unavailableMessage`, broken.label),
     detail: broken.detail || undefined,
     action: { label: translateNow(`${copy}.openBackendSettings`), onClick: () => requestRoute(TERMINAL_TOOLSET_ROUTE) },
-    secondaryAction: {
-      label: translateNow(`${copy}.useLocal`),
-      onClick: () =>
-        void selectTerminalBackend('local')
-          .then(() => notify({ kind: 'success', message: translateNow(`${copy}.switchedToLocal`) }))
-          .catch(err => notifyError(err, translateNow(`${copy}.failedSelect`, 'local')))
-    }
+    secondaryAction: offerLocal
+      ? {
+          label: translateNow(`${copy}.useLocal`),
+          onClick: () =>
+            void selectTerminalBackend('local')
+              .then(() => notify({ kind: 'success', message: translateNow(`${copy}.switchedToLocal`) }))
+              .catch(err => notifyError(err, translateNow(`${copy}.failedSelect`, 'local')))
+        }
+      : undefined
   })
 
   return true

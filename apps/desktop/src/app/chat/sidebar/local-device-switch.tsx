@@ -4,8 +4,9 @@ import { useRef, useState } from 'react'
 import { FirstRunRemoteSetup } from '@/components/remote-setup/first-run'
 import { ConfirmDialog } from '@/components/ui/confirm-dialog'
 import { useI18n } from '@/i18n'
+import { accountOnlyBuild } from '@/lib/account-only-build'
 import { localBootstrapNeeded } from '@/lib/local-backend-probe'
-import { notifyError } from '@/store/notifications'
+import { notify, notifyError } from '@/store/notifications'
 
 export interface LocalDeviceTarget {
   connectionId: string
@@ -52,6 +53,13 @@ export function useLocalDeviceSwitch() {
 
     if (!bootstrapNeeded) {
       return true
+    }
+
+    // Mbiling user builds have no local engine to install and no manual connection to offer.
+    if (await accountOnlyBuild()) {
+      notify({ kind: 'warning', message: t.profiles.switchConnectionFailed(target.label) })
+
+      return false
     }
 
     return new Promise(resolve => {
