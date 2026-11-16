@@ -64,13 +64,16 @@ const normalizeSkin = (name: string | null): string =>
 /**
  * A stored mode, or `system` when there isn't one.
  *
- * A fresh profile follows the OS. Defaulting to `light` meant someone whose
+ * Mbiling: a fresh profile opens in dark mode (the product's chosen look, the
+ * Mbiling theme in dark). The user can still pick Light or System.
+ *
+ * Upstream note: a fresh profile followed the OS. Defaulting to `light` meant someone whose
  * desktop is dark got a white window on first launch and had to go find the
  * setting — and with per-appearance translucency it also handed them light's
  * much heavier tint, tuned for a bright desktop they don't have.
  */
 const normalizeMode = (value: string | null): ThemeMode =>
-  value === 'light' || value === 'dark' || value === 'system' ? value : 'system'
+  value === 'light' || value === 'dark' || value === 'system' ? value : 'dark'
 
 // ─── Per-profile appearance persistence ─────────────────────────────────────
 // Skin and mode are each stored per profile. "default" isn't a real profile —

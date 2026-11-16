@@ -48,6 +48,11 @@ exacts:
     - ["label: 'Nous',", "label: 'Mbiling',"]
     - ["description: 'GitHub chrome, Nous blue accent',", "description: 'Chrome GitHub, accent bleu Mbiling (par défaut)',"]
     - ["label: 'Nous Alt',", "label: 'Mbiling Alt',"]
+  # Apparence par défaut : thème Mbiling en mode sombre (choix du produit), plus « suivre le système ».
+  "apps/desktop/src/themes/context.tsx":
+    - ["value === 'light' || value === 'dark' || value === 'system' ? value : 'system'", "value === 'light' || value === 'dark' || value === 'system' ? value : 'dark'"]
+  "apps/desktop/electron/main.ts":
+    - ["    // Missing / malformed → follow the OS like a fresh install.\n  }\n\n  return 'system'", "    // Missing / malformed → Mbiling's default appearance, like a fresh install.\n  }\n\n  return 'dark'"]
   "apps/desktop/product-identity.cjs":
     - ["kebab: 'hermes',", "kebab: 'mbiling',"]
     - ["'hermes-light'", "'mbiling-light'"]
