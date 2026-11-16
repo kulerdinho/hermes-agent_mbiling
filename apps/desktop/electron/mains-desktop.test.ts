@@ -217,7 +217,7 @@ test('the first-launch address comes from the settings file', async () => {
 // --- Automatic pairing: the app enrols this PC with the connected server ------------------------
 
 async function loadMainsConnected(reply: unknown = { appareil: 'pc-auto', jeton: 'jeton-auto', relais_url: 'wss://srv.test/mains' }) {
-  const request = vi.fn(async (_pathname: string, _method: string, _body?: string) => reply)
+  const request = vi.fn(async (_pathname: string, _method: string, _body?: Record<string, unknown>) => reply)
   const mod = await import('./mains-desktop')
   mod.registerMainsIpc({ request, connected: () => true })
 
@@ -241,7 +241,8 @@ test('once allowed and connected, the PC enrols by itself and the Mains start', 
   const status = (await invoke('mbiling:mains:enrol')) as { jetonDefini: boolean; enMarche: boolean; relais: string }
 
   assert.deepEqual(request.mock.calls[0].slice(0, 2), ['/api/plugins/mbiling_mains/appareil', 'POST'])
-  assert.equal(JSON.parse(request.mock.calls[0][2] as string).nom, os.hostname())
+  // An object, not a JSON string: the request function encodes it (a string arrived double-encoded, 422).
+  assert.deepEqual(request.mock.calls[0][2], { nom: os.hostname() })
   assert.equal(status.jetonDefini, true)
   assert.equal(status.enMarche, true)
   assert.equal(status.relais, 'wss://srv.test/mains', 'the relay address given by the server is kept')
@@ -264,7 +265,7 @@ test('applying a connection starts the Mains, which enrol when allowed and no to
 })
 
 test('never enrols while no remote server is connected', async () => {
-  const request = vi.fn(async (_pathname: string, _method: string, _body?: string) => ({ appareil: 'x', jeton: 'y' }))
+  const request = vi.fn(async (_pathname: string, _method: string, _body?: Record<string, unknown>) => ({ appareil: 'x', jeton: 'y' }))
   const mod = await import('./mains-desktop')
   mod.registerMainsIpc({ request, connected: () => false })
   await invoke('mbiling:mains:consent', true)

@@ -10114,7 +10114,7 @@ async function fetchJsonForProfile(profile, path) {
 }
 
 // Issue an arbitrary method against a profile's resolved backend, parsed JSON.
-async function requestJsonForProfile(profile: string, path: string, method: string, body?: string) {
+async function requestJsonForProfile(profile: string, path: string, method: string, body?: unknown) {
   const conn = await ensureBackend(profile)
 
   return fetchJsonForBackend(conn, path, { method, body, timeoutMs: DEFAULT_FETCH_TIMEOUT_MS })
