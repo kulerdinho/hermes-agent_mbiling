@@ -51,6 +51,31 @@ test('a selected non-local backend that is not ready warns once with Use Local /
   expect(selectTerminalBackend).toHaveBeenCalledWith('local')
 })
 
+// Mbiling user builds only work signed in to the cloud account: "local" there is the server's own
+// shell, so the warning must not offer it.
+test('a Mbiling user build (account only) warns without offering Use Local', async () => {
+  const bridge = window as unknown as { mbilingDesktop?: unknown }
+  const previous = bridge.mbilingDesktop
+  bridge.mbilingDesktop = {
+    getDefaultConnection: async () => ({ adresse: 'https://api.mbiling.test', clientLeger: true, connexionAvancee: false })
+  }
+
+  try {
+    getTerminalBackends.mockResolvedValue({
+      active: 'docker',
+      backends: [row('local', 'ready'), row('docker', 'unavailable', true)]
+    })
+
+    expect(await warnIfTerminalBackendUnavailable()).toBe(true)
+
+    const toast = $notifications.get()[0]
+    expect(toast?.action).toBeTruthy()
+    expect(toast?.secondaryAction).toBeUndefined()
+  } finally {
+    bridge.mbilingDesktop = previous
+  }
+})
+
 test('local or ready backends and probe failures stay silent', async () => {
   expect(unavailableTerminalBackend([row('local', 'ready', true), row('docker', 'unavailable')])).toBeNull()
   expect(unavailableTerminalBackend([row('docker', 'ready', true)])).toBeNull()
