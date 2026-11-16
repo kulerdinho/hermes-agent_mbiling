@@ -100,8 +100,18 @@ test('copies the shipped settings to userData on first use, and the user copy th
   const userCopy = path.join(dirs.root, 'userData', 'mains.json')
   assert.ok(fs.existsSync(userCopy))
 
-  fs.writeFileSync(userCopy, `\uFEFF${JSON.stringify({ ...SETTINGS, relais_url: 'wss://mine.test/mains' })}`)
-  assert.equal(mains.mainsStatus().relais, 'wss://mine.test/mains')
+  fs.writeFileSync(userCopy, `\uFEFF${JSON.stringify({ ...SETTINGS, actif: false })}`)
+  assert.equal(mains.mainsStatus().actif, false)
+})
+
+test('the relay address always comes from the app, never from a copy left by an older version', async () => {
+  const mains = await loadMains()
+  const userCopy = path.join(dirs.root, 'userData', 'mains.json')
+  fs.writeFileSync(userCopy, JSON.stringify({ ...SETTINGS, relais_url: 'wss://old-server.test/mains' }))
+
+  assert.equal(mains.mainsStatus().relais, SETTINGS.relais_url)
+  await invoke('mbiling:mains:set-active', false)
+  assert.equal(JSON.parse(fs.readFileSync(userCopy, 'utf8')).relais_url, undefined, 'the user copy no longer stores it')
 })
 
 test('saving a token stores it encrypted and starts the Mains with the local policy', async () => {
@@ -187,14 +197,20 @@ test('the first-launch address comes from the settings file', async () => {
     fournisseurs: []
   })
 
+  // A copy left in userData by an older version (old server address) is never read.
   fs.writeFileSync(
     path.join(dirs.root, 'userData', 'connexion-par-defaut.json'),
-    JSON.stringify({
-      adresse: 'https://api.mbiling.test',
-      connexion_avancee: true,
-      fournisseurs: [{ id: 'google', libelle: 'Google' }, { id: 'Bad Id!', libelle: 'x' }, { id: 'apple' }]
-    })
+    JSON.stringify({ adresse: 'https://old-server.test', connexion_avancee: true })
   )
+  const fresh = (await invoke('mbiling:default-connection')) as { adresse: string; connexionAvancee: boolean }
+  assert.equal(fresh.adresse, 'https://api.mbiling.test')
+  assert.equal(fresh.connexionAvancee, false)
+
+  writeShipped('connexion-par-defaut.json', {
+    adresse: 'https://api.mbiling.test',
+    connexion_avancee: true,
+    fournisseurs: [{ id: 'google', libelle: 'Google' }, { id: 'Bad Id!', libelle: 'x' }, { id: 'apple' }]
+  })
 
   const avancee = (await invoke('mbiling:default-connection')) as {
     connexionAvancee: boolean
@@ -205,7 +221,7 @@ test('the first-launch address comes from the settings file', async () => {
   assert.deepEqual(avancee.fournisseurs, [{ id: 'google', libelle: 'Google' }], 'invalid entries are dropped')
 
   // An unreadable file never unlocks the manual connection.
-  fs.writeFileSync(path.join(dirs.root, 'userData', 'connexion-par-defaut.json'), 'not json')
+  fs.writeFileSync(path.join(dirs.root, 'config', 'connexion-par-defaut.json'), 'not json')
   assert.deepEqual(await invoke('mbiling:default-connection'), {
     adresse: '',
     clientLeger: true,
@@ -245,7 +261,7 @@ test('once allowed and connected, the PC enrols by itself and the Mains start', 
   assert.deepEqual(request.mock.calls[0][2], { nom: os.hostname() })
   assert.equal(status.jetonDefini, true)
   assert.equal(status.enMarche, true)
-  assert.equal(status.relais, 'wss://srv.test/mains', 'the relay address given by the server is kept')
+  assert.equal(status.relais, SETTINGS.relais_url, 'the relay address comes from the app, like the server address')
   const sealed = fs.readFileSync(path.join(dirs.root, 'userData', 'mains-jeton.bin')).toString()
   assert.ok(!sealed.includes('jeton-auto'), 'the device token must never be stored in clear')
   assert.equal((core.demarrer.mock.calls[0][1] as { jeton: string }).jeton, 'jeton-auto')

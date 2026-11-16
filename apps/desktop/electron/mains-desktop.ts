@@ -16,7 +16,7 @@ import { app, ipcMain, safeStorage, shell } from 'electron'
 import * as mainsCore from '../../../mbiling_mains_client/mains.cjs'
 import type { MainsConfig, MainsEtat, NavigateurConfig } from '../../../mbiling_mains_client/mains.cjs'
 
-import { expandUserPath, readMbilingConfig, userConfigPath } from './mbiling-desktop-config'
+import { expandUserPath, readMbilingConfig, readShippedConfig, userConfigPath } from './mbiling-desktop-config'
 
 interface MainsDesktopSettings {
   actif: boolean
@@ -169,13 +169,16 @@ function readToken(): string | null {
   }
 }
 
+/** The user's settings, except the relay address, which always comes from the app (see readShippedConfig). */
 function readSettings(): MainsDesktopSettings {
-  return readMbilingConfig<MainsDesktopSettings>('mains')
+  const settings = readMbilingConfig<MainsDesktopSettings>('mains')
+
+  return { ...settings, relais_url: readShippedConfig<MainsDesktopSettings>('mains').relais_url }
 }
 
-function writeSettings(patch: Partial<MainsDesktopSettings>): void {
-  const settings = readSettings()
-  fs.writeFileSync(userConfigPath('mains'), `${JSON.stringify({ ...settings, ...patch }, null, 2)}\n`, 'utf8')
+function writeSettings(patch: Partial<Omit<MainsDesktopSettings, 'relais_url'>>): void {
+  const { relais_url: _shipped, ...settings } = { ...readSettings(), ...patch }
+  fs.writeFileSync(userConfigPath('mains'), `${JSON.stringify(settings, null, 2)}\n`, 'utf8')
 }
 
 function writePolicy(patch: Partial<MainsPolicy>): void {
@@ -377,7 +380,7 @@ export function enrolMains(): Promise<void> {
       }
 
       setToken(reply.jeton)
-      writeSettings({ actif: true, ...(reply.relais_url ? { relais_url: reply.relais_url } : {}) })
+      writeSettings({ actif: true })
       writeLog('INSCRIT', reply.appareil)
     } catch (err) {
       const message = `inscription de ce PC impossible : ${err instanceof Error ? err.message : String(err)}`
