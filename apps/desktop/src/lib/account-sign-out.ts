@@ -1,3 +1,5 @@
+import { clearDesktopBootFailure } from '@/store/boot'
+
 /**
  * Mbiling user builds: signing out (or a session the server no longer accepts) ends the use of the app,
  * not just the cookies. The account's session is dropped, then the connection falls back to "local",
@@ -19,6 +21,8 @@ export async function signOutOfAccount(): Promise<void> {
   }
 
   await desktop.applyConnectionConfig({ mode: 'local' })
+  // The failed boot of the dropped connection ("session expired") is over: its card must not stay up.
+  clearDesktopBootFailure()
 
   // Leave whatever page was open (settings, a chat): the next screen is the sign-in.
   window.location.hash = '#/'

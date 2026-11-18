@@ -17,7 +17,7 @@ import { reestablishCloudAgentSession } from '@/lib/cloud-agent-session'
 import { DESKTOP_DOCS_URL } from '@/lib/docs'
 import { openExternalLink } from '@/lib/external-link'
 import { ChevronLeft, ExternalLink, FileText, Loader2, LogIn, RefreshCw, SlidersHorizontal, Wrench } from '@/lib/icons'
-import { $desktopBoot } from '@/store/boot'
+import { $desktopBoot, $signInScreenShown } from '@/store/boot'
 import { notify, notifyError } from '@/store/notifications'
 import { $desktopOnboarding } from '@/store/onboarding'
 
@@ -275,6 +275,7 @@ export function BootFailureOverlay() {
   // Keyed on the setting loaded at startup (false until known), never on the "safe" UI default above:
   // a team build must not be signed out while its setting is still loading.
   const signOutOnLapse = useStore($accountOnlyBuild)
+  const signInShown = useStore($signInScreenShown)
 
   useEffect(() => {
     if (signOutOnLapse && remoteReauth && visible) {
@@ -282,7 +283,8 @@ export function BootFailureOverlay() {
     }
   }, [signOutOnLapse, remoteReauth, visible, t.boot.failure.signInFailed])
 
-  if (!visible || suppressed) {
+  // The sign-in page owns the window: nothing to recover until the user signs in again.
+  if (!visible || suppressed || signInShown) {
     return null
   }
 

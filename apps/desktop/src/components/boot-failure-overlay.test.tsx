@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { en } from '@/i18n/en'
 import { $accountOnlyBuild } from '@/lib/account-only-build'
 import { WEBAPP_LAUNCH_REQUIRED } from '@/lib/browser-launch-session'
-import { $desktopBoot } from '@/store/boot'
+import { $desktopBoot, $signInScreenShown } from '@/store/boot'
 import { $notifications } from '@/store/notifications'
 import { $desktopOnboarding } from '@/store/onboarding'
 
@@ -543,9 +543,24 @@ describe('BootFailureOverlay in Mbiling user builds (account only)', () => {
       render(<BootFailureOverlay />)
       await waitFor(() => expect(apply).toHaveBeenCalledWith({ mode: 'local' }))
       expect(logout).toHaveBeenCalledWith(gatewayUrl)
+      // The expired-session card is gone: the sign-in page is the only thing left on screen.
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
     } finally {
       restore()
       $accountOnlyBuild.set(false)
+    }
+  })
+
+  it('never covers the sign-in page', () => {
+    const restore = stubDesktop(localConfig)
+    $signInScreenShown.set(true)
+
+    try {
+      render(<BootFailureOverlay />)
+      expect(screen.queryByRole('dialog')).toBeNull()
+    } finally {
+      $signInScreenShown.set(false)
+      restore()
     }
   })
 
