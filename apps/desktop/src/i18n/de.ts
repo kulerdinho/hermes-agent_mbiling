@@ -2419,7 +2419,7 @@ export const deOverrides = {
         needsSetupConfirmAction: 'Trotzdem auswählen',
         unavailableTitle: 'Terminalbefehle sind nicht verfügbar',
         unavailableMessage: backend =>
-          `Mbiling kann gerade keine Shell-Befehle ausführen: ${backend} ist nicht bereit. Wechseln Sie zu Lokal oder schließen Sie die Einrichtung von ${backend} ab und versuchen Sie es erneut.`,
+          `Mbiling kann gerade keine Shell-Befehle ausführen: ${backend} ist nicht bereit. Schließen Sie die Einrichtung von ${backend} ab und versuchen Sie es erneut.`,
         openBackendSettings: 'Terminal-Einstellungen öffnen',
         useLocal: 'Lokal verwenden',
         switchedToLocal: 'Terminalbefehle laufen jetzt lokal. Gilt für neue Sessions.'

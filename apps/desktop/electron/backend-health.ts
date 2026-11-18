@@ -59,7 +59,7 @@ export const REMOTE_SESSION_EXPIRED_MESSAGE =
 
 export const REMOTE_UNSIGNED_OAUTH_MESSAGE =
   'Remote Mbiling gateway uses OAuth, but you are not signed in. ' +
-  'Open Settings → Gateway and click "Sign in", or switch back to Local.'
+  'Open Settings → Gateway and click "Sign in".'
 
 /**
  * True for HTTP 502/503/504 from the backend — a server-side fault, not a

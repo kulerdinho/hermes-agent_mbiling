@@ -145,7 +145,7 @@ const PASSWORD_PROVIDER_NAMES = new Set(['basic'])
 
 const OAUTH_NOT_SIGNED_IN_MESSAGE =
   'Remote Mbiling gateway uses OAuth, but you are not signed in. ' +
-  'Open Settings → Gateway and click "Sign in", or switch back to Local.'
+  'Open Settings → Gateway and click "Sign in".'
 
 const OAUTH_SESSION_EXPIRED_MESSAGE =
   'Your remote gateway session has expired. Open Settings → Gateway and click "Sign in" again.'

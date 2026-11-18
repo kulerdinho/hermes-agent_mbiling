@@ -55,7 +55,7 @@ export const esBoot = {
       openLogs: 'Abrir registros',
       repairHint: 'La reparación vuelve a ejecutar el instalador y puede tardar unos minutos en una máquina nueva.',
       remoteSignInHint: signInLabel =>
-        `Cierra la sesión guardada del navegador remoto y abre ${signInLabel}. Usa el gateway local para cambiar al backend incluido.`,
+        `Cierra la sesión guardada del navegador remoto y abre ${signInLabel}.`,
       signOutAndSignIn: 'Cerrar sesión e iniciar sesión',
       remoteFailureHint: 'Revisa la URL e inicia sesión en Configuración del gateway, o cambia al gateway local.',
       cloudDownTitle: 'El agente de Nous Cloud no está disponible',
