@@ -1,10 +1,10 @@
 /**
  * Mbiling Desktop settings files (connection proposed at first launch, the Mains, the local
  * policy). Defaults ship in `resources/mbiling-config` (apps/desktop/config in a dev checkout);
- * on first use each one is copied into userData, where the user's copy wins. Server addresses are
- * the exception: they always come from the shipped files (the connection file is never copied, and
- * the Mains relay address is read from the shipped mains.json), so an update that changes the server
- * is never undone by a copy left by an older version. No value is written in code: see
+ * on first use each one is copied into userData, where the user's copy wins. The connection settings
+ * (server and relay addresses) are the exception: they are baked into the app at build time and never
+ * ship as a file, so no server address sits on the PC and an update that changes the server is never
+ * undone by a copy left by an older version. No value is written in code: see
  * apps/desktop/config/LISEZMOI.md.
  */
 import fs from 'node:fs'
@@ -39,8 +39,27 @@ function parseConfig<T>(file: string): T {
   return JSON.parse(fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, '')) as T
 }
 
+/**
+ * The connection settings (server and relay addresses, display name, sign-in options) are baked into
+ * the main bundle at build time (scripts/bundle-electron-main.mjs): no file carrying a server address
+ * ships with the app. Dev runs and tests, which are not bundled, read apps/desktop/config instead.
+ */
+declare const __MBILING_BAKED_CONNEXION__: string | undefined
+
+function bakedConnexion<T>(): T | null {
+  return typeof __MBILING_BAKED_CONNEXION__ === 'string' ? (JSON.parse(__MBILING_BAKED_CONNEXION__) as T) : null
+}
+
 /** Reads the default shipped with the app, ignoring any user copy. */
 export function readShippedConfig<T>(name: MbilingConfigName): T {
+  if (name === 'connexion') {
+    const baked = bakedConnexion<T>()
+
+    if (baked) {
+      return baked
+    }
+  }
+
   return parseConfig<T>(path.join(shippedConfigDir(), MBILING_CONFIG_FILES[name]))
 }
 

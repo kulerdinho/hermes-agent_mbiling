@@ -1,5 +1,6 @@
 {
   "adresse": "https://mbiling.chloe-consulting.bid",
+  "relais_url": "wss://mbiling.chloe-consulting.bid/mains",
   "nom": "Mbiling",
   "connexion_avancee": false,
   "fournisseurs": []

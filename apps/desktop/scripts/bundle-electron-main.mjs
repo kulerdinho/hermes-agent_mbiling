@@ -27,6 +27,23 @@ function productIdentity(source, stamp) {
   }).trim()
 }
 
+/**
+ * The connection settings baked into the app: server and relay addresses, display name, sign-in
+ * options. They come from MBILING_CONFIG_DIR when the build sets it (the configuration kept on our
+ * server), else from apps/desktop/config. Never shipped as a file: see electron-builder.config.cjs.
+ */
+export function bakedConnexion(source) {
+  const dir = process.env.MBILING_CONFIG_DIR || join(source, 'apps/desktop/config')
+  const file = join(dir, 'connexion-par-defaut.json')
+  const settings = JSON.parse(readFileSync(file, 'utf8').replace(/^﻿/, ''))
+  for (const key of ['adresse', 'relais_url']) {
+    if (typeof settings[key] !== 'string' || !settings[key].trim()) {
+      throw new Error(`${file}: "${key}" is required to build Mbiling Desktop`)
+    }
+  }
+  return JSON.stringify(settings)
+}
+
 /** Every file bundleElectronMain writes: the only outputs that bake the install stamp. */
 export const electronOutputs = Object.freeze({
   main: 'electron-main.mjs', preload: 'electron-preload.js', previewGuestPreload: 'preview-guest-preload.js',
@@ -51,6 +68,7 @@ export async function bundleElectronMain({ source, out, stamp, dev = false }) {
     bakedStamp = metadata.builtAt ?? null
     define['process.env.MBILING_DESKTOP_IS_PACKAGED'] = JSON.stringify(true)
     define.__MBILING_INSTALL_STAMP__ = raw
+    define.__MBILING_BAKED_CONNEXION__ = JSON.stringify(bakedConnexion(source))
     define.__MBILING_PRODUCT_IDENTITY__ = productIdentity(source, metadata)
   }
   mkdirSync(out, { recursive: true })
