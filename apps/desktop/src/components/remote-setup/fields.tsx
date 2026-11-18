@@ -35,6 +35,8 @@ interface RemoteSetupFieldsProps {
   urlOnly?: boolean
   /** Mbiling user builds: the server address comes from the settings file, never typed or shown. */
   hideUrl?: boolean
+  /** Replaces the plain session sign-out (Mbiling user builds sign out of the whole app). */
+  onSignOut?: () => void
   onUrlChange?: () => void
 }
 
@@ -44,6 +46,7 @@ export function RemoteSetupFields({
   urlDisabled = false,
   urlOnly = false,
   hideUrl = false,
+  onSignOut,
   onUrlChange
 }: RemoteSetupFieldsProps): ReactElement {
   const { t } = useI18n()
@@ -121,7 +124,11 @@ export function RemoteSetupFields({
                 {firstRun ? t.install.connected : g.signedIn}
               </Pill>
               {setup.host === 'settings' ? (
-                <Button disabled={disabled || setup.signingIn} onClick={() => void setup.signOut()} variant="outline">
+                <Button
+                  disabled={disabled || setup.signingIn}
+                  onClick={() => (onSignOut ? onSignOut() : void setup.signOut())}
+                  variant="outline"
+                >
                   {g.signOut}
                 </Button>
               ) : null}

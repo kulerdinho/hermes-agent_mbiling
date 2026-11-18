@@ -19,6 +19,7 @@ import { writeClipboardText } from '@/lib/clipboard'
 import { AlertCircle, ChevronDown, ChevronRight, Globe, iconSize, Loader2, Monitor } from '@/lib/icons'
 import { capitalize } from '@/lib/text'
 import { cn } from '@/lib/utils'
+import { $signInScreenShown } from '@/store/boot'
 
 import { localCardPresentation } from './desktop-install-local-card'
 import { FirstRunRemoteSetup } from './remote-setup/first-run'
@@ -459,6 +460,21 @@ export function DesktopInstallOverlay({ enabled = true }: DesktopInstallOverlayP
     return false
   }, [enabled, state.active, state.error, state.setupChoice, state.unsupportedPlatform])
 
+  const signInScreen = Boolean(
+    shouldShow &&
+      state.setupChoice &&
+      defaults &&
+      (defaults.adresse || !defaults.connexionAvancee) &&
+      !advanced &&
+      !remoteOpen
+  )
+
+  useEffect(() => {
+    $signInScreenShown.set(signInScreen)
+  }, [signInScreen])
+
+  useEffect(() => () => $signInScreenShown.set(false), [])
+
   if (!shouldShow) {
     return null
   }
@@ -468,7 +484,7 @@ export function DesktopInstallOverlay({ enabled = true }: DesktopInstallOverlayP
     return null
   }
 
-  if (state.setupChoice && defaults && (defaults.adresse || !defaults.connexionAvancee) && !advanced && !remoteOpen) {
+  if (signInScreen && defaults) {
     return <FirstRunSignIn onAdvanced={defaults.connexionAvancee ? () => setAdvanced(true) : undefined} />
   }
 

@@ -30,6 +30,7 @@ import { composerFocusKeysAllowed, isComposerFocusSoftCombo, typeToFocusChar } f
 import { markKeybindHandled } from '@/lib/keybinds/handled-keys'
 import { registerBuiltinActionRunner } from '@/lib/keybinds/plugin-actions'
 import { stepReasoningEffort, writeSessionReasoningEffort } from '@/lib/reasoning-step'
+import { $signInScreenShown } from '@/store/boot'
 import { openWorktreeDialog } from '@/store/coding-status'
 import { $commandPaletteOpen, openCommandPalettePage, toggleCommandPalette } from '@/store/command-palette'
 import { recordAction, recordDislike } from '@/store/desktop-metrics'
@@ -661,25 +662,39 @@ export function useKeybinds(deps: KeybindRuntimeDeps): void {
       }
     }
 
-    window.addEventListener('keydown', onKeyDown, { capture: true })
+    // Signed out (Mbiling sign-in page up), the app's shortcuts are off: typed keys and pastes must
+    // not reach the chat composer through type-to-focus, and no chord may open another surface.
+    const signedIn =
+      <E extends Event>(handler: (event: E) => void) =>
+      (event: E) => {
+        if (!$signInScreenShown.get()) {
+          handler(event)
+        }
+      }
+
+    const keyDown = signedIn(onKeyDown)
+    const paste = signedIn(handleWindowPaste)
+    const focusChord = signedIn(handleComposerFocusChord)
+
+    window.addEventListener('keydown', keyDown, { capture: true })
     window.addEventListener('keyup', onKeyUp, { capture: true })
     window.addEventListener('blur', onBlur)
     window.addEventListener('contextmenu', onContextMenu, { capture: true })
     // Paste twin of type-to-focus: ⌘V on non-editable chrome routes the
     // clipboard (text AND images) into the active composer. Bubble phase so
     // editables' own paste handlers run first and mark the event handled.
-    window.addEventListener('paste', handleWindowPaste)
+    window.addEventListener('paste', paste)
     // ⌘/Ctrl+L moves focus to the composer. Bubble phase so capture-phase
     // claimants run first; the priority ladder lives in focus-chord.ts.
-    window.addEventListener('keydown', handleComposerFocusChord)
+    window.addEventListener('keydown', focusChord)
 
     return () => {
-      window.removeEventListener('keydown', onKeyDown, { capture: true })
+      window.removeEventListener('keydown', keyDown, { capture: true })
       window.removeEventListener('keyup', onKeyUp, { capture: true })
       window.removeEventListener('blur', onBlur)
       window.removeEventListener('contextmenu', onContextMenu, { capture: true })
-      window.removeEventListener('paste', handleWindowPaste)
-      window.removeEventListener('keydown', handleComposerFocusChord)
+      window.removeEventListener('paste', paste)
+      window.removeEventListener('keydown', focusChord)
     }
   }, [])
 }

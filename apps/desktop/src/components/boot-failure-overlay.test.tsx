@@ -2,8 +2,9 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-libra
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { en } from '@/i18n/en'
+import { $accountOnlyBuild } from '@/lib/account-only-build'
 import { WEBAPP_LAUNCH_REQUIRED } from '@/lib/browser-launch-session'
-import { $desktopBoot } from '@/store/boot'
+import { $desktopBoot, $signInScreenShown } from '@/store/boot'
 import { $notifications } from '@/store/notifications'
 import { $desktopOnboarding } from '@/store/onboarding'
 
@@ -518,6 +519,50 @@ describe('BootFailureOverlay in Mbiling user builds (account only)', () => {
     await waitFor(() => expect(screen.queryByText(en.boot.failure.gatewaySettings)).toBeNull())
     expect(screen.queryByText(en.boot.failure.useLocalGateway)).toBeNull()
     restore()
+  })
+
+  // A lapsed session must not leave a recovery card the user can dismiss to keep using the app: the
+  // account is signed out and the app falls back to the sign-in screen.
+  it('a lapsed session sends the user back to the sign-in screen', async () => {
+    const gatewayUrl = 'https://api.mbiling.test'
+    const logout = vi.fn().mockResolvedValue({ ok: true, connected: false })
+    const apply = vi.fn().mockResolvedValue({})
+    $accountOnlyBuild.set(true)
+
+    const restore = stubDesktop(
+      { ...remoteToken, remoteAuthMode: 'oauth', remoteOauthConnected: false, remoteTokenSet: false, remoteUrl: gatewayUrl },
+      {
+        ...accountOnly,
+        applyConnectionConfig: apply,
+        oauthLogoutConnectionConfig: logout,
+        probeConnectionConfig: vi.fn().mockResolvedValue({ providers: [{ id: 'basic', type: 'password' }] })
+      }
+    )
+
+    try {
+      render(<BootFailureOverlay />)
+      await waitFor(() => expect(apply).toHaveBeenCalledWith({ mode: 'local' }))
+      expect(logout).toHaveBeenCalledWith(gatewayUrl)
+      // The expired-session card is gone: the sign-in page is the only thing left on screen.
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    } finally {
+      restore()
+      $accountOnlyBuild.set(false)
+    }
+  })
+
+  it('never covers the sign-in page', () => {
+    const restore = stubDesktop(localConfig)
+
+    $signInScreenShown.set(true)
+
+    try {
+      render(<BootFailureOverlay />)
+      expect(screen.queryByRole('dialog')).toBeNull()
+    } finally {
+      $signInScreenShown.set(false)
+      restore()
+    }
   })
 
   it('team builds keep every recovery action', async () => {

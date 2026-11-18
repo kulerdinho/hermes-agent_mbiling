@@ -870,4 +870,35 @@ describe('GatewaySettings in Mbiling user builds (account only)', () => {
     expect(screen.queryByRole('textbox', { name: 'Remote URL' })).toBeNull()
     expect(screen.queryByRole('button', { name: 'Save and reconnect' })).toBeNull()
   })
+
+  // Signing out must end the use of the app (the server connection is dropped and the sign-in screen
+  // comes back), not only clear the session while chats keep working.
+  it('signing out drops the account connection, not just the session cookies', async () => {
+    getConnectionConfig.mockResolvedValue({
+      ...localConnection,
+      mode: 'remote',
+      remoteAuthMode: 'oauth',
+      remoteOauthConnected: true,
+      remoteUrl: 'https://api.mbiling.test'
+    })
+    const oauthLogoutConnectionConfig = vi.fn().mockResolvedValue({ ok: true, connected: false })
+    const applyConnectionConfig = vi.fn().mockResolvedValue(localConnection)
+    Object.assign(window.mbilingDesktop, {
+      applyConnectionConfig,
+      getDefaultConnection: vi.fn().mockResolvedValue({
+        adresse: 'https://api.mbiling.test',
+        clientLeger: true,
+        connexionAvancee: false,
+        fournisseurs: []
+      }),
+      oauthLogoutConnectionConfig,
+      probeConnectionConfig: vi.fn().mockResolvedValue({ reachable: true, authMode: 'oauth', providers: [] })
+    })
+
+    render(<GatewaySettings />)
+    fireEvent.click(await screen.findByRole('button', { name: 'Sign out' }))
+
+    await waitFor(() => expect(applyConnectionConfig).toHaveBeenCalledWith({ mode: 'local' }))
+    expect(oauthLogoutConnectionConfig).toHaveBeenCalledWith('https://api.mbiling.test')
+  })
 })

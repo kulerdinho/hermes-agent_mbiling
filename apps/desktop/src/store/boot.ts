@@ -21,6 +21,12 @@ const INITIAL_BOOT_STATE: DesktopBootState = {
 
 export const $desktopBoot = atom<DesktopBootState>(INITIAL_BOOT_STATE)
 
+/**
+ * The full-screen "Sign in" page is up (no account connection): it owns the window, so no boot
+ * failure card may cover it.
+ */
+export const $signInScreenShown = atom(false)
+
 /** A Webapp tab whose sign-in ended: the sign-in view covers it until it signs in again. */
 export const $webappSignedOut = computed($desktopBoot, boot => Boolean(boot.error?.includes(WEBAPP_LAUNCH_REQUIRED)))
 
@@ -108,6 +114,12 @@ export function completeDesktopBoot(message = translateNow('boot.ready')) {
     timestamp: Date.now(),
     visible: false
   })
+}
+
+/** Signing out ends the failed boot of the account connection: its error must not come back. */
+export function clearDesktopBootFailure() {
+  const current = $desktopBoot.get()
+  $desktopBoot.set({ ...current, error: null, running: false, timestamp: Date.now(), visible: false })
 }
 
 export function failDesktopBoot(message: string) {
