@@ -13,6 +13,8 @@ import { useI18n } from '@/i18n'
 import { WEBAPP_LAUNCH_REQUIRED } from '@/lib/browser-launch-session'
 import { reestablishCloudAgentSession } from '@/lib/cloud-agent-session'
 import { DESKTOP_DOCS_URL } from '@/lib/docs'
+import { $accountOnlyBuild } from '@/lib/account-only-build'
+import { signOutOfAccount } from '@/lib/account-sign-out'
 import { openExternalLink } from '@/lib/external-link'
 import { ChevronLeft, ExternalLink, FileText, Loader2, LogIn, RefreshCw, SlidersHorizontal, Wrench } from '@/lib/icons'
 import { $desktopBoot } from '@/store/boot'
@@ -267,6 +269,18 @@ export function BootFailureOverlay() {
       cancelled = true
     }
   }, [boot.error, visible])
+
+  // Mbiling user builds: a session the server no longer accepts ends the use of the app. Instead of a
+  // recovery card the user could dismiss to keep browsing, go straight back to the sign-in screen.
+  // Keyed on the setting loaded at startup (false until known), never on the "safe" UI default above:
+  // a team build must not be signed out while its setting is still loading.
+  const signOutOnLapse = useStore($accountOnlyBuild)
+
+  useEffect(() => {
+    if (signOutOnLapse && remoteReauth && visible) {
+      void signOutOfAccount().catch(error => notifyError(error, t.boot.failure.signInFailed))
+    }
+  }, [signOutOnLapse, remoteReauth, visible, t.boot.failure.signInFailed])
 
   if (!visible || suppressed) {
     return null

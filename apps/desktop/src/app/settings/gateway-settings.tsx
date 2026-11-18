@@ -17,6 +17,7 @@ import type {
 } from '@/global'
 import { useI18n } from '@/i18n'
 import { accountOnlyBuild, isAccountOnlyBuild } from '@/lib/account-only-build'
+import { signOutOfAccount } from '@/lib/account-sign-out'
 import { reestablishCloudAgentSession } from '@/lib/cloud-agent-session'
 import { ExternalLink } from '@/lib/external-link'
 import { hostHas } from '@/lib/host-capabilities'
@@ -1309,7 +1310,14 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
           back in (#114856). The URL input and Save/Test stay env-gated. */}
       {state.mode === 'remote' ? (
         <div className="mt-5">
-          <RemoteSetupFields disabled={saving} hideUrl={accountOnly} setup={remote} urlDisabled={state.envOverride} />
+          <RemoteSetupFields
+            disabled={saving}
+            hideUrl={accountOnly}
+            // Mbiling user builds: signing out leaves the app for the sign-in screen.
+            onSignOut={accountOnly ? () => void signOutOfAccount().catch(err => notifyError(err, g.signOut)) : undefined}
+            setup={remote}
+            urlDisabled={state.envOverride}
+          />
           {remote.credentials.authMode === 'token' && state.remoteTokenPlainText ? (
             <div className="mt-2 text-sm text-destructive">
               <div className="font-medium">{g.plainTextStoredTitle}</div>
