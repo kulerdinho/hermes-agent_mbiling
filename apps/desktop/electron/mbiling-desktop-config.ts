@@ -1,10 +1,10 @@
 /**
  * Mbiling Desktop settings files (connection proposed at first launch, the Mains, the local
  * policy). Defaults ship in `resources/mbiling-config` (apps/desktop/config in a dev checkout);
- * on first use each one is copied into userData, where the user's copy wins. Server addresses are
- * the exception: they always come from the shipped files (the connection file is never copied, and
- * the Mains relay address is read from the shipped mains.json), so an update that changes the server
- * is never undone by a copy left by an older version. No value is written in code: see
+ * on first use each one is copied into userData, where the user's copy wins. The connection settings
+ * (server and relay addresses) are the exception: they are baked into the app at build time and never
+ * ship as a file, so no server address sits on the PC and an update that changes the server is never
+ * undone by a copy left by an older version. No value is written in code: see
  * apps/desktop/config/LISEZMOI.md.
  */
 import fs from 'node:fs'
@@ -39,8 +39,27 @@ function parseConfig<T>(file: string): T {
   return JSON.parse(fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, '')) as T
 }
 
+/**
+ * The connection settings (server and relay addresses, display name, sign-in options) are baked into
+ * the main bundle at build time (scripts/bundle-electron-main.mjs): no file carrying a server address
+ * ships with the app. Dev runs and tests, which are not bundled, read apps/desktop/config instead.
+ */
+declare const __MBILING_BAKED_CONNEXION__: string | undefined
+
+function bakedConnexion<T>(): T | null {
+  return typeof __MBILING_BAKED_CONNEXION__ === 'string' ? (JSON.parse(__MBILING_BAKED_CONNEXION__) as T) : null
+}
+
 /** Reads the default shipped with the app, ignoring any user copy. */
 export function readShippedConfig<T>(name: MbilingConfigName): T {
+  if (name === 'connexion') {
+    const baked = bakedConnexion<T>()
+
+    if (baked) {
+      return baked
+    }
+  }
+
   return parseConfig<T>(path.join(shippedConfigDir(), MBILING_CONFIG_FILES[name]))
 }
 
@@ -116,5 +135,66 @@ export function accountOnly(): boolean {
     return readMbilingConfig<{ connexion_avancee?: unknown }>('connexion').connexion_avancee !== true
   } catch {
     return true
+  }
+}
+
+/** The name user builds show wherever a connection would be named ("nom" in the settings file). */
+export function accountDisplayName(): string {
+  try {
+    const nom = String(readMbilingConfig<{ nom?: unknown }>('connexion').nom ?? '').trim()
+
+    if (nom) {
+      return nom
+    }
+  } catch {
+    // An unreadable settings file falls back to the app's own name.
+  }
+
+  return app.getName()
+}
+
+interface RegistryLike<C> {
+  primary: string
+  lastUsed?: string | null
+  connections: C[]
+}
+
+/**
+ * What user builds let leave the main process about the connection registry: never the local engine
+ * (it is never installed), never a server address, never the hostname used as a label. `stripAddress`
+ * is false where the registry is still needed to DIAL (roster enumeration): the address stays in this
+ * process and only the labels change.
+ */
+export function accountOnlyRegistryView<C extends { kind: string; label?: string }, R extends RegistryLike<C>>(
+  registry: R,
+  { localId, stripAddress }: { localId: string; stripAddress: boolean }
+): R {
+  if (!accountOnly()) {
+    return registry
+  }
+
+  const hideLocal = registry.primary !== localId
+  const name = accountDisplayName()
+
+  const connections = registry.connections
+    .filter(connection => !(hideLocal && connection.kind === 'local'))
+    .map(connection => {
+      const view: Record<string, unknown> = { ...connection, label: name }
+
+      if (stripAddress) {
+        view.url = ''
+
+        for (const key of ['host', 'user', 'port', 'org', 'remoteMbilingPath', 'remoteProfile']) {
+          delete view[key]
+        }
+      }
+
+      return view as unknown as C
+    })
+
+  return {
+    ...registry,
+    lastUsed: hideLocal && registry.lastUsed === localId ? registry.primary : registry.lastUsed,
+    connections
   }
 }

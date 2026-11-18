@@ -142,7 +142,9 @@ module.exports = {
     { from: '../../LICENSE', to: 'LICENSE.txt' },
     { from: '../../NOTICE', to: 'NOTICE.txt' },
     // Mbiling: default settings (first-launch address, the Mains, the local policy).
-    { from: 'config', to: 'mbiling-config', filter: ['*.json'] },
+    // The connection settings (server and relay addresses) are baked into the main bundle at build
+    // time, never shipped as a file on the PC.
+    { from: 'config', to: 'mbiling-config', filter: ['*.json', '!connexion-par-defaut.json'] },
     // Mbiling: Git for Windows (portable), the Mains' bash. Present only after
     // `node scripts/fetch-portable-git.mjs` (Windows builds).
     ...(fs.existsSync(path.join(__dirname, 'build', 'portable-git', 'bin', 'bash.exe'))

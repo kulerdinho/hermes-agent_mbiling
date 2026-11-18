@@ -169,11 +169,14 @@ function readToken(): string | null {
   }
 }
 
-/** The user's settings, except the relay address, which always comes from the app (see readShippedConfig). */
+/**
+ * The user's settings, except the relay address: it belongs to the connection settings baked into the
+ * app (see readShippedConfig), never to a file on the PC.
+ */
 function readSettings(): MainsDesktopSettings {
   const settings = readMbilingConfig<MainsDesktopSettings>('mains')
 
-  return { ...settings, relais_url: readShippedConfig<MainsDesktopSettings>('mains').relais_url }
+  return { ...settings, relais_url: String(readShippedConfig<{ relais_url?: unknown }>('connexion').relais_url ?? '') }
 }
 
 function writeSettings(patch: Partial<Omit<MainsDesktopSettings, 'relais_url'>>): void {

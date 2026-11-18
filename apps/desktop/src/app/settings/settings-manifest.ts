@@ -5,7 +5,7 @@ import { canUseQuickEntry } from '@/store/quick-entry'
 import { TRANSLUCENCY_SUPPORTED } from '@/store/translucency'
 
 import type { AppearanceSubpageId } from './appearance-subpages'
-import { nativeHostOnly } from './other-subpages'
+import { connectionManagementOnly, nativeHostOnly } from './other-subpages'
 import type { SettingsView } from './types'
 
 interface SettingCopy {
@@ -245,7 +245,7 @@ export const SETTINGS_MANIFEST = {
   },
   gateway: {
     connectionMode: {
-      available: nativeHostOnly,
+      available: connectionManagementOnly,
       subpage: 'connection',
       keywords: ['gateway', 'connection', 'local', 'cloud', 'remote', 'ssh', 'url', 'token', 'host', 'port', 'key'],
       copy: t => ({ label: t.settings.gateway.modeTitle, description: t.settings.gateway.intro })

@@ -381,7 +381,7 @@ import {
   waitForManagedSshBootstrapFence,
   waitForManagedUpdateOperations
 } from './managed-ssh-update'
-import { accountOnly, registerDefaultConnectionIpc } from './mbiling-desktop-config'
+import { accountOnly, accountOnlyRegistryView, registerDefaultConnectionIpc } from './mbiling-desktop-config'
 import { registerMcpOauthCallbackIpc } from './mcp-oauth-callback-ipc'
 import { isMediaCapturePermission } from './media-capture-permission'
 import { createMediaProtocolHandler, MEDIA_PROTOCOL, mediaProtocolDownloadName } from './media-protocol'
@@ -8621,24 +8621,21 @@ function sanitizeRegistryConnection(entry) {
   }
 }
 
-function sanitizeConnectionsRegistry(registry = readDesktopConnectionsRegistry()) {
+function sanitizeConnectionsRegistry(rawRegistry = readDesktopConnectionsRegistry()) {
   // Same keyring signal the v1 sanitize exposes: lets the Connections panel
   // offer the plain-text opt-in on keyring-less Linux instead of failing.
   // Policy-aware: never touches safeStorage while encryption is opted out.
   const secureTokenStorage = probeSecureTokenStorage()
-  // Mbiling user builds only work signed in to the cloud account: once that account is the
-  // primary, "This device" (a local engine these builds never install) is not offered anywhere.
-  const hideLocal = accountOnly() && registry.primary !== LOCAL_CONNECTION_ID
+  // Mbiling user builds: no local engine, no server address, no hostname reaches the renderer.
+  const registry = accountOnlyRegistryView(rawRegistry, { localId: LOCAL_CONNECTION_ID, stripAddress: true })
 
   return {
     version: registry.version,
     primary: registry.primary,
     launchMode: registry.launchMode,
-    lastUsed: hideLocal && registry.lastUsed === LOCAL_CONNECTION_ID ? registry.primary : registry.lastUsed,
+    lastUsed: registry.lastUsed,
     secureTokenStorage,
-    connections: registry.connections
-      .filter(connection => !(hideLocal && connection.kind === 'local'))
-      .map(sanitizeRegistryConnection),
+    connections: registry.connections.map(sanitizeRegistryConnection),
     // Surface quarantined-entry NOTICES only (reason + best-effort label) —
     // the raw entries can carry token envelopes and stay in the file (#94246).
     quarantined: (registry.quarantined || []).map(q => ({
@@ -14517,7 +14514,11 @@ ipcMain.handle('mbiling:plugin-profile-routes', async (_event, rawProfileNames) 
         .slice(0, 256)
     : []
 
-  const registry = readDesktopConnectionsRegistry()
+  // User builds: the address stays here to dial; only the neutral name reaches the renderer.
+  const registry = accountOnlyRegistryView(readDesktopConnectionsRegistry(), {
+    localId: LOCAL_CONNECTION_ID,
+    stripAddress: false
+  })
   const enumerations = await enumerateRegistryAgentSources(registry)
   let agents = buildAgentRoster(enumerations, { primaryConnectionId: registry.primary })
 
@@ -15033,7 +15034,11 @@ async function enumerateRegistryAgentSources(registry = readDesktopConnectionsRe
 }
 
 ipcMain.handle('mbiling:agents:roster', async () => {
-  const registry = readDesktopConnectionsRegistry()
+  // User builds: the address stays here to dial; only the neutral name reaches the renderer.
+  const registry = accountOnlyRegistryView(readDesktopConnectionsRegistry(), {
+    localId: LOCAL_CONNECTION_ID,
+    stripAddress: false
+  })
   const enumerations = await enumerateRegistryAgentSources(registry)
 
   return {

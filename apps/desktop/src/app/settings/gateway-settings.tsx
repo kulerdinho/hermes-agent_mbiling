@@ -16,6 +16,7 @@ import type {
   DesktopRegistryConnection
 } from '@/global'
 import { useI18n } from '@/i18n'
+import { accountOnlyBuild, isAccountOnlyBuild } from '@/lib/account-only-build'
 import { reestablishCloudAgentSession } from '@/lib/cloud-agent-session'
 import { ExternalLink } from '@/lib/external-link'
 import { hostHas } from '@/lib/host-capabilities'
@@ -182,6 +183,12 @@ export function GatewaySettings({ embedded = false, subpage }: GatewaySettingsPr
     return <WebappGatewaySettings embedded={embedded} />
   }
 
+  // Mbiling user builds: a deep link to the saved connections or remote updates lands on the
+  // account page, never on a form that adds, edits or shows a gateway.
+  if (isAccountOnlyBuild()) {
+    return <GatewayConnectionSettings embedded={embedded} standalone={subpage !== undefined} />
+  }
+
   // Recovery always keeps the complete connection form, regardless of a
   // settings destination. Other tasks never mount that form or its probes.
   if (!embedded && subpage === 'devices') {
@@ -266,6 +273,14 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
   const [saving, setSaving] = useState(false)
   const [testing, setTesting] = useState(false)
   const [state, setState] = useState<GatewaySettingsState>(EMPTY_STATE)
+  // Mbiling user builds only work signed in to the cloud account: no connection mode to pick, no
+  // address to type, nothing to test or save. Only the account (signed in / sign out) remains.
+  // Safe default while the setting loads; team builds get the full form back.
+  const [accountOnly, setAccountOnly] = useState(true)
+
+  useEffect(() => {
+    void accountOnlyBuild().then(setAccountOnly)
+  }, [])
 
   const remote = useRemoteSetup({
     host: 'settings',
@@ -1056,49 +1071,51 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
         </div>
       ) : null}
 
-      <div className="mb-5 grid gap-2" id={settingElementId(SETTING_IDS.gateway.connectionMode)}>
-        <div className="text-[length:var(--conversation-caption-font-size)] font-medium text-(--ui-text-secondary)">
-          {g.modeTitle}
-        </div>
-        <div className="grid auto-rows-fr grid-cols-1 gap-2 sm:grid-cols-2 min-[72rem]:grid-cols-4">
-          <ModeCard
-            active={state.mode === 'local'}
-            description={g.localDesc}
-            disabled={state.envOverride}
-            icon={Monitor}
-            onSelect={() => setState(current => ({ ...current, mode: 'local' }))}
-            title={g.localTitle}
-          />
-          {NOUS_ENABLED || state.mode === 'cloud' ? (
+      {accountOnly ? null : (
+        <div className="mb-5 grid gap-2" id={settingElementId(SETTING_IDS.gateway.connectionMode)}>
+          <div className="text-[length:var(--conversation-caption-font-size)] font-medium text-(--ui-text-secondary)">
+            {g.modeTitle}
+          </div>
+          <div className="grid auto-rows-fr grid-cols-1 gap-2 sm:grid-cols-2 min-[72rem]:grid-cols-4">
             <ModeCard
-              active={state.mode === 'cloud'}
-              description={g.cloudDesc}
+              active={state.mode === 'local'}
+              description={g.localDesc}
               disabled={state.envOverride}
-              icon={Cloud}
-              onSelect={() => setState(current => ({ ...current, mode: 'cloud' }))}
-              title={g.cloudTitle}
+              icon={Monitor}
+              onSelect={() => setState(current => ({ ...current, mode: 'local' }))}
+              title={g.localTitle}
             />
-          ) : null}
-          <ModeCard
-            active={state.mode === 'remote'}
-            description={g.remoteDesc}
-            disabled={state.envOverride}
-            hint={g.remoteAuthHint}
-            icon={Globe}
-            onSelect={() => setState(current => ({ ...current, mode: 'remote' }))}
-            title={g.remoteTitle}
-          />
-          <ModeCard
-            active={state.mode === 'ssh'}
-            description={g.sshDesc}
-            disabled={state.envOverride}
-            hint={g.sshTrustHint}
-            icon={Terminal}
-            onSelect={() => setState(current => ({ ...current, mode: 'ssh' }))}
-            title={g.sshTitle}
-          />
+            {NOUS_ENABLED || state.mode === 'cloud' ? (
+              <ModeCard
+                active={state.mode === 'cloud'}
+                description={g.cloudDesc}
+                disabled={state.envOverride}
+                icon={Cloud}
+                onSelect={() => setState(current => ({ ...current, mode: 'cloud' }))}
+                title={g.cloudTitle}
+              />
+            ) : null}
+            <ModeCard
+              active={state.mode === 'remote'}
+              description={g.remoteDesc}
+              disabled={state.envOverride}
+              hint={g.remoteAuthHint}
+              icon={Globe}
+              onSelect={() => setState(current => ({ ...current, mode: 'remote' }))}
+              title={g.remoteTitle}
+            />
+            <ModeCard
+              active={state.mode === 'ssh'}
+              description={g.sshDesc}
+              disabled={state.envOverride}
+              hint={g.sshTrustHint}
+              icon={Terminal}
+              onSelect={() => setState(current => ({ ...current, mode: 'ssh' }))}
+              title={g.sshTitle}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Mbiling Cloud panel: one portal sign-in, then a discovered-agent picker
           whose selection drives the silent per-agent cascade + a cloud
@@ -1292,7 +1309,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
           back in (#114856). The URL input and Save/Test stay env-gated. */}
       {state.mode === 'remote' ? (
         <div className="mt-5">
-          <RemoteSetupFields disabled={saving} setup={remote} urlDisabled={state.envOverride} />
+          <RemoteSetupFields disabled={saving} hideUrl={accountOnly} setup={remote} urlDisabled={state.envOverride} />
           {remote.credentials.authMode === 'token' && state.remoteTokenPlainText ? (
             <div className="mt-2 text-sm text-destructive">
               <div className="font-medium">{g.plainTextStoredTitle}</div>
@@ -1417,7 +1434,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
       {/* Test/Save apply to local + remote. Cloud connects via the agent picker
           above (which applies a cloud connection on select), so its only
           bottom-row action would be redundant — hidden in cloud mode. */}
-      {state.mode !== 'cloud' ? (
+      {state.mode !== 'cloud' && !accountOnly ? (
         <div className="mt-6 flex flex-wrap items-center justify-end gap-4">
           {state.mode === 'remote' ? (
             <Button
@@ -1478,7 +1495,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
 
       {/* Preserve the full legacy page outside subpage navigation, without
           mounting registry editors in connection-only or recovery views. */}
-      {embedded || standalone ? null : (
+      {embedded || standalone || accountOnly ? null : (
         <>
           <ConnectionsRegistrySection />
           {/* Per-connection driver for the transactional managed SSH update

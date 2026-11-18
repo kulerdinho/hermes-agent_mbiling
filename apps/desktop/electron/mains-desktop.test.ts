@@ -63,7 +63,7 @@ beforeEach(() => {
   fs.mkdirSync(path.join(dirs.root, 'userData'))
   writeShipped('mains.json', SETTINGS)
   writeShipped('mains-politique.json', POLICY)
-  writeShipped('connexion-par-defaut.json', { adresse: 'https://api.mbiling.test' })
+  writeShipped('connexion-par-defaut.json', { adresse: 'https://api.mbiling.test', relais_url: SETTINGS.relais_url })
   electron.handlers.clear()
   core.demarrer.mockReset()
   core.demarrer.mockImplementation(() => ({ arreter: vi.fn() }))

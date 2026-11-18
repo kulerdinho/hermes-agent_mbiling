@@ -33,6 +33,8 @@ interface RemoteSetupFieldsProps {
   /** Pins only the URL input: an env-owned remote (MBILING_DESKTOP_REMOTE_URL) still signs in here. */
   urlDisabled?: boolean
   urlOnly?: boolean
+  /** Mbiling user builds: the server address comes from the settings file, never typed or shown. */
+  hideUrl?: boolean
   onUrlChange?: () => void
 }
 
@@ -41,6 +43,7 @@ export function RemoteSetupFields({
   disabled = false,
   urlDisabled = false,
   urlOnly = false,
+  hideUrl = false,
   onUrlChange
 }: RemoteSetupFieldsProps): ReactElement {
   const { t } = useI18n()
@@ -65,19 +68,21 @@ export function RemoteSetupFields({
 
   return (
     <div className="grid gap-3">
-      <Field description={registry ? undefined : copy.remoteUrlDesc} stacked={firstRun} title={urlTitle}>
-        <Input
-          aria-label={urlTitle}
-          autoComplete="url"
-          disabled={disabled || urlDisabled}
-          onChange={event => {
-            setup.setUrl(event.target.value)
-            onUrlChange?.()
-          }}
-          placeholder={registry ? 'http://homelab.lan:9119' : t.install.remoteUrlPlaceholder}
-          value={credentials.url}
-        />
-      </Field>
+      {hideUrl ? null : (
+        <Field description={registry ? undefined : copy.remoteUrlDesc} stacked={firstRun} title={urlTitle}>
+          <Input
+            aria-label={urlTitle}
+            autoComplete="url"
+            disabled={disabled || urlDisabled}
+            onChange={event => {
+              setup.setUrl(event.target.value)
+              onUrlChange?.()
+            }}
+            placeholder={registry ? 'http://homelab.lan:9119' : t.install.remoteUrlPlaceholder}
+            value={credentials.url}
+          />
+        </Field>
+      )}
       {!registry && setup.probeStatus === 'probing' ? (
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="size-4 animate-spin" />
