@@ -209,7 +209,8 @@ import {
   shouldDeferLocalEnumeration,
   shouldRetrySshInventory,
   updateEligibility,
-  upsertConnection
+  upsertConnection,
+  LOCAL_CONNECTION_ID
 } from './connection-registry'
 import type { RegistryConnection } from './connection-registry'
 import type { RosterProfileMetadata } from './connection-registry'
@@ -8625,14 +8626,19 @@ function sanitizeConnectionsRegistry(registry = readDesktopConnectionsRegistry()
   // offer the plain-text opt-in on keyring-less Linux instead of failing.
   // Policy-aware: never touches safeStorage while encryption is opted out.
   const secureTokenStorage = probeSecureTokenStorage()
+  // Mbiling user builds only work signed in to the cloud account: once that account is the
+  // primary, "This device" (a local engine these builds never install) is not offered anywhere.
+  const hideLocal = accountOnly() && registry.primary !== LOCAL_CONNECTION_ID
 
   return {
     version: registry.version,
     primary: registry.primary,
     launchMode: registry.launchMode,
-    lastUsed: registry.lastUsed,
+    lastUsed: hideLocal && registry.lastUsed === LOCAL_CONNECTION_ID ? registry.primary : registry.lastUsed,
     secureTokenStorage,
-    connections: registry.connections.map(sanitizeRegistryConnection),
+    connections: registry.connections
+      .filter(connection => !(hideLocal && connection.kind === 'local'))
+      .map(sanitizeRegistryConnection),
     // Surface quarantined-entry NOTICES only (reason + best-effort label) —
     // the raw entries can carry token envelopes and stay in the file (#94246).
     quarantined: (registry.quarantined || []).map(q => ({
@@ -9151,7 +9157,7 @@ async function buildRemoteConnection(
   if (!token) {
     throw new Error(
       'Remote Mbiling gateway is selected, but no session token is saved. ' +
-        'Open Settings → Gateway and save a token, or switch back to Local.'
+        'Open Settings → Gateway and save a token.'
     )
   }
 

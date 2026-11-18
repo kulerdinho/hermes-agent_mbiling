@@ -2407,7 +2407,7 @@ export const esOverrides = {
         needsSetupConfirmAction: 'Seleccionar de todos modos',
         unavailableTitle: 'Los comandos de terminal no están disponibles',
         unavailableMessage: (backend: string) =>
-          `Mbiling no puede ejecutar comandos de shell ahora mismo: ${backend} no está listo. Cambia a Local o termina de configurar ${backend} y vuelve a intentarlo.`,
+          `Mbiling no puede ejecutar comandos de shell ahora mismo: ${backend} no está listo. Termina de configurar ${backend} y vuelve a intentarlo.`,
         openBackendSettings: 'Abrir ajustes del terminal',
         useLocal: 'Usar Local',
         switchedToLocal: 'Los comandos de terminal ahora se ejecutan localmente. Se aplica a las sesiones nuevas.'

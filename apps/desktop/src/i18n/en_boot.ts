@@ -62,7 +62,7 @@ export const enBoot = {
         'This bundled install can’t repair itself from inside the app — reinstall the app to restore its backend.',
       reinstallApp: 'Reinstall the app',
       remoteSignInHint: signInLabel =>
-        `Signs out of the saved remote browser session, then opens ${signInLabel}. Use local gateway to switch to the bundled backend instead.`,
+        `Signs out of the saved remote browser session, then opens ${signInLabel}.`,
       signOutAndSignIn: 'Sign out & sign in',
       remoteFailureHint: 'Check the gateway URL and sign-in under Gateway settings, or switch to the local gateway.',
       cloudDownTitle: 'Nous Cloud agent is down',

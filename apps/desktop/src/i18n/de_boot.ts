@@ -57,7 +57,7 @@ export const deBoot = {
       repairHint:
         'Die Reparatur führt den Installer erneut aus und kann auf einem frischen Computer ein paar Minuten dauern.',
       remoteSignInHint: signInLabel =>
-        `Meldet Sie von der gespeicherten Remote-Browser-Session ab und öffnet dann ${signInLabel}. Verwenden Sie das lokale Gateway, um stattdessen zum integrierten Backend zu wechseln.`,
+        `Meldet Sie von der gespeicherten Remote-Browser-Session ab und öffnet dann ${signInLabel}.`,
       signOutAndSignIn: 'Abmelden & anmelden',
       remoteFailureHint:
         'Überprüfen Sie die Gateway-URL und die Anmeldung in den Gateway-Einstellungen, oder wechseln Sie zum lokalen Gateway.',

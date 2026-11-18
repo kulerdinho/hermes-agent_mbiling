@@ -38,7 +38,7 @@ export const zhHantBoot = {
       openLogs: '開啟記錄',
       repairHint: '修復會重新執行安裝程式，在新機器上可能需要幾分鐘。',
       remoteSignInHint: signInLabel =>
-        `先登出已儲存的遠端瀏覽器工作階段，然後開啟${signInLabel}。使用本機閘道可切換至內建後端。`,
+        `先登出已儲存的遠端瀏覽器工作階段，然後開啟${signInLabel}。`,
       signOutAndSignIn: '登出並重新登入',
       remoteFailureHint: '在「閘道設定」中檢查閘道 URL 與登入，或切換至本機閘道。',
       cloudDownTitle: 'Nous Cloud 代理已停機',

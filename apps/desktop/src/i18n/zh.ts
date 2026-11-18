@@ -171,7 +171,7 @@ export const zhOverrides = {
       bundledReinstallHint: '捆绑安装无法从应用内部自修复——重新安装 Mbiling Desktop 以恢复其后端。',
       reinstallApp: '重新安装 Mbiling Desktop',
       remoteSignInHint: signInLabel =>
-        `先退出已保存的远程浏览器会话，然后打开${signInLabel}。也可以使用本地网关切换到随应用提供的后端。`,
+        `先退出已保存的远程浏览器会话，然后打开${signInLabel}。`,
       signOutAndSignIn: '退出并重新登录',
       remoteFailureHint: '在“网关设置”中检查网关 URL 和登录，或切换到本地网关。',
       cloudDownTitle: 'Nous Cloud 代理已宕机',

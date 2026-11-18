@@ -56,7 +56,7 @@ export const frBoot = {
       openLogs: 'Ouvrir les journaux',
       repairHint: "La réparation relance l'installateur et peut prendre quelques minutes sur une machine neuve.",
       remoteSignInHint: signInLabel =>
-        `Déconnecte la session navigateur distante enregistrée, puis ouvre ${signInLabel}. Utilisez le gateway local pour passer au backend intégré.`,
+        `Déconnecte la session navigateur distante enregistrée, puis ouvre ${signInLabel}.`,
       signOutAndSignIn: 'Se déconnecter et se reconnecter',
       remoteFailureHint:
         "Vérifiez l'URL du gateway et la connexion dans les paramètres du gateway, ou passez au gateway local.",
