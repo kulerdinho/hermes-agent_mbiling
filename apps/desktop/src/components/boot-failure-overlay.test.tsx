@@ -553,6 +553,7 @@ describe('BootFailureOverlay in Mbiling user builds (account only)', () => {
 
   it('never covers the sign-in page', () => {
     const restore = stubDesktop(localConfig)
+
     $signInScreenShown.set(true)
 
     try {
