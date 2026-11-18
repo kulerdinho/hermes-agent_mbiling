@@ -1065,53 +1065,51 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
         </div>
       ) : null}
 
-      <div
-        className="mb-5 grid gap-2"
-        hidden={accountOnly}
-        id={settingElementId(SETTING_IDS.gateway.connectionMode)}
-      >
-        <div className="text-[length:var(--conversation-caption-font-size)] font-medium text-(--ui-text-secondary)">
-          {g.modeTitle}
-        </div>
-        <div className="grid auto-rows-fr grid-cols-1 gap-2 sm:grid-cols-2 min-[72rem]:grid-cols-4">
-          <ModeCard
-            active={state.mode === 'local'}
-            description={g.localDesc}
-            disabled={state.envOverride}
-            icon={Monitor}
-            onSelect={() => setState(current => ({ ...current, mode: 'local' }))}
-            title={g.localTitle}
-          />
-          {NOUS_ENABLED || state.mode === 'cloud' ? (
+      {accountOnly ? null : (
+        <div className="mb-5 grid gap-2" id={settingElementId(SETTING_IDS.gateway.connectionMode)}>
+          <div className="text-[length:var(--conversation-caption-font-size)] font-medium text-(--ui-text-secondary)">
+            {g.modeTitle}
+          </div>
+          <div className="grid auto-rows-fr grid-cols-1 gap-2 sm:grid-cols-2 min-[72rem]:grid-cols-4">
             <ModeCard
-              active={state.mode === 'cloud'}
-              description={g.cloudDesc}
+              active={state.mode === 'local'}
+              description={g.localDesc}
               disabled={state.envOverride}
-              icon={Cloud}
-              onSelect={() => setState(current => ({ ...current, mode: 'cloud' }))}
-              title={g.cloudTitle}
+              icon={Monitor}
+              onSelect={() => setState(current => ({ ...current, mode: 'local' }))}
+              title={g.localTitle}
             />
-          ) : null}
-          <ModeCard
-            active={state.mode === 'remote'}
-            description={g.remoteDesc}
-            disabled={state.envOverride}
-            hint={g.remoteAuthHint}
-            icon={Globe}
-            onSelect={() => setState(current => ({ ...current, mode: 'remote' }))}
-            title={g.remoteTitle}
-          />
-          <ModeCard
-            active={state.mode === 'ssh'}
-            description={g.sshDesc}
-            disabled={state.envOverride}
-            hint={g.sshTrustHint}
-            icon={Terminal}
-            onSelect={() => setState(current => ({ ...current, mode: 'ssh' }))}
-            title={g.sshTitle}
-          />
+            {NOUS_ENABLED || state.mode === 'cloud' ? (
+              <ModeCard
+                active={state.mode === 'cloud'}
+                description={g.cloudDesc}
+                disabled={state.envOverride}
+                icon={Cloud}
+                onSelect={() => setState(current => ({ ...current, mode: 'cloud' }))}
+                title={g.cloudTitle}
+              />
+            ) : null}
+            <ModeCard
+              active={state.mode === 'remote'}
+              description={g.remoteDesc}
+              disabled={state.envOverride}
+              hint={g.remoteAuthHint}
+              icon={Globe}
+              onSelect={() => setState(current => ({ ...current, mode: 'remote' }))}
+              title={g.remoteTitle}
+            />
+            <ModeCard
+              active={state.mode === 'ssh'}
+              description={g.sshDesc}
+              disabled={state.envOverride}
+              hint={g.sshTrustHint}
+              icon={Terminal}
+              onSelect={() => setState(current => ({ ...current, mode: 'ssh' }))}
+              title={g.sshTitle}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Mbiling Cloud panel: one portal sign-in, then a discovered-agent picker
           whose selection drives the silent per-agent cascade + a cloud
@@ -1305,12 +1303,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
           back in (#114856). The URL input and Save/Test stay env-gated. */}
       {state.mode === 'remote' ? (
         <div className="mt-5">
-          <RemoteSetupFields
-            disabled={saving}
-            hideUrl={accountOnly}
-            setup={remote}
-            urlDisabled={state.envOverride}
-          />
+          <RemoteSetupFields disabled={saving} hideUrl={accountOnly} setup={remote} urlDisabled={state.envOverride} />
           {remote.credentials.authMode === 'token' && state.remoteTokenPlainText ? (
             <div className="mt-2 text-sm text-destructive">
               <div className="font-medium">{g.plainTextStoredTitle}</div>
