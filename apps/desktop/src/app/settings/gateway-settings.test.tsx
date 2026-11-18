@@ -841,3 +841,33 @@ describe('GatewaySettings', () => {
     expect(await screen.findByText('Status: active')).toBeTruthy()
   })
 })
+
+// Mbiling user builds only work signed in to the cloud account: the Gateway page must not offer a
+// local engine, SSH, an address to type or a form to save, only the account itself.
+describe('GatewaySettings in Mbiling user builds (account only)', () => {
+  it('shows the account but no connection mode, address or save buttons', async () => {
+    getConnectionConfig.mockResolvedValue({
+      ...localConnection,
+      mode: 'remote',
+      remoteAuthMode: 'oauth',
+      remoteOauthConnected: true,
+      remoteUrl: 'https://api.mbiling.test'
+    })
+    Object.assign(window.mbilingDesktop, {
+      getDefaultConnection: vi.fn().mockResolvedValue({
+        adresse: 'https://api.mbiling.test',
+        clientLeger: true,
+        connexionAvancee: false,
+        fournisseurs: []
+      }),
+      probeConnectionConfig: vi.fn().mockResolvedValue({ reachable: true, authMode: 'oauth', providers: [] })
+    })
+
+    render(<GatewaySettings />)
+
+    expect(await screen.findByRole('button', { name: 'Sign out' })).toBeTruthy()
+    expect(screen.queryByText('Local gateway')).toBeNull()
+    expect(screen.queryByRole('textbox', { name: 'Remote URL' })).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Save and reconnect' })).toBeNull()
+  })
+})

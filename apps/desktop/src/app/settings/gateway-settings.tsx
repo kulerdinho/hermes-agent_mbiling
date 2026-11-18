@@ -16,6 +16,7 @@ import type {
   DesktopRegistryConnection
 } from '@/global'
 import { useI18n } from '@/i18n'
+import { accountOnlyBuild } from '@/lib/account-only-build'
 import { reestablishCloudAgentSession } from '@/lib/cloud-agent-session'
 import { ExternalLink } from '@/lib/external-link'
 import { hostHas } from '@/lib/host-capabilities'
@@ -266,6 +267,14 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
   const [saving, setSaving] = useState(false)
   const [testing, setTesting] = useState(false)
   const [state, setState] = useState<GatewaySettingsState>(EMPTY_STATE)
+  // Mbiling user builds only work signed in to the cloud account: no connection mode to pick, no
+  // address to type, nothing to test or save. Only the account (signed in / sign out) remains.
+  // Safe default while the setting loads; team builds get the full form back.
+  const [accountOnly, setAccountOnly] = useState(true)
+
+  useEffect(() => {
+    void accountOnlyBuild().then(setAccountOnly)
+  }, [])
 
   const remote = useRemoteSetup({
     host: 'settings',
@@ -1056,7 +1065,11 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
         </div>
       ) : null}
 
-      <div className="mb-5 grid gap-2" id={settingElementId(SETTING_IDS.gateway.connectionMode)}>
+      <div
+        className="mb-5 grid gap-2"
+        hidden={accountOnly}
+        id={settingElementId(SETTING_IDS.gateway.connectionMode)}
+      >
         <div className="text-[length:var(--conversation-caption-font-size)] font-medium text-(--ui-text-secondary)">
           {g.modeTitle}
         </div>
@@ -1292,7 +1305,12 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
           back in (#114856). The URL input and Save/Test stay env-gated. */}
       {state.mode === 'remote' ? (
         <div className="mt-5">
-          <RemoteSetupFields disabled={saving} setup={remote} urlDisabled={state.envOverride} />
+          <RemoteSetupFields
+            disabled={saving}
+            hideUrl={accountOnly}
+            setup={remote}
+            urlDisabled={state.envOverride}
+          />
           {remote.credentials.authMode === 'token' && state.remoteTokenPlainText ? (
             <div className="mt-2 text-sm text-destructive">
               <div className="font-medium">{g.plainTextStoredTitle}</div>
@@ -1417,7 +1435,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
       {/* Test/Save apply to local + remote. Cloud connects via the agent picker
           above (which applies a cloud connection on select), so its only
           bottom-row action would be redundant — hidden in cloud mode. */}
-      {state.mode !== 'cloud' ? (
+      {state.mode !== 'cloud' && !accountOnly ? (
         <div className="mt-6 flex flex-wrap items-center justify-end gap-4">
           {state.mode === 'remote' ? (
             <Button
