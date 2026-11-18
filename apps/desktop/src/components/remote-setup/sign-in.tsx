@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ReactElement } from 'react'
 
 import { BrandMark } from '@/components/brand-mark'
@@ -63,6 +63,38 @@ export function FirstRunSignIn({ onAdvanced, onConnected }: FirstRunSignInProps)
   const [offerAdvanced, setOfferAdvanced] = useState(false)
   // "Continue with Google / Apple": listed in connexion-par-defaut.json (fournisseurs).
   const [providers, setProviders] = useState<SocialProvider[]>([])
+  const screenRef = useRef<HTMLDivElement | null>(null)
+
+  // Signed out, nothing but this page may be used: the rest of the window goes inert (no focus, no
+  // typing, no clicks), so text cannot keep landing in the chat composer that had the focus.
+  useEffect(() => {
+    const screen = screenRef.current
+
+    if (!screen) {
+      return
+    }
+
+    const silenced: Element[] = []
+
+    for (let node: Element | null = screen; node && node !== document.body; node = node.parentElement) {
+      for (const sibling of node.parentElement?.children ?? []) {
+        if (sibling !== node && !sibling.hasAttribute('inert')) {
+          sibling.setAttribute('inert', '')
+          silenced.push(sibling)
+        }
+      }
+    }
+
+    if (document.activeElement instanceof HTMLElement && !screen.contains(document.activeElement)) {
+      document.activeElement.blur()
+    }
+
+    return () => {
+      for (const element of silenced) {
+        element.removeAttribute('inert')
+      }
+    }
+  }, [])
 
   useEffect(() => {
     void window.mbilingDesktop
@@ -129,7 +161,10 @@ export function FirstRunSignIn({ onAdvanced, onConnected }: FirstRunSignInProps)
   const busy = step !== 'idle'
 
   return (
-    <div className="fixed inset-0 z-(--z-setup) flex items-center justify-center bg-background/90 p-4 backdrop-blur-md">
+    <div
+      className="fixed inset-0 z-(--z-setup) flex items-center justify-center bg-background/90 p-4 backdrop-blur-md"
+      ref={screenRef}
+    >
       <div className="flex w-full max-w-md flex-col items-center rounded-xl border border-(--stroke-nous) bg-card p-8 text-center shadow-nous">
         <BrandMark className="size-16" />
         <h2 className="mt-5 text-xl font-semibold tracking-tight">{copy.title}</h2>
