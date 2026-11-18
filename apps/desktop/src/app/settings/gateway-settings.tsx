@@ -16,7 +16,7 @@ import type {
   DesktopRegistryConnection
 } from '@/global'
 import { useI18n } from '@/i18n'
-import { accountOnlyBuild } from '@/lib/account-only-build'
+import { accountOnlyBuild, isAccountOnlyBuild } from '@/lib/account-only-build'
 import { reestablishCloudAgentSession } from '@/lib/cloud-agent-session'
 import { ExternalLink } from '@/lib/external-link'
 import { hostHas } from '@/lib/host-capabilities'
@@ -181,6 +181,12 @@ export function GatewaySettings({ embedded = false, subpage }: GatewaySettingsPr
 
   if (!hostHas('gatewayManagement')) {
     return <WebappGatewaySettings embedded={embedded} />
+  }
+
+  // Mbiling user builds: a deep link to the saved connections or remote updates lands on the
+  // account page, never on a form that adds, edits or shows a gateway.
+  if (isAccountOnlyBuild()) {
+    return <GatewayConnectionSettings embedded={embedded} standalone={subpage !== undefined} />
   }
 
   // Recovery always keeps the complete connection form, regardless of a
@@ -1489,7 +1495,7 @@ function GatewayConnectionSettings({ embedded, standalone }: { embedded: boolean
 
       {/* Preserve the full legacy page outside subpage navigation, without
           mounting registry editors in connection-only or recovery views. */}
-      {embedded || standalone ? null : (
+      {embedded || standalone || accountOnly ? null : (
         <>
           <ConnectionsRegistrySection />
           {/* Per-connection driver for the transactional managed SSH update

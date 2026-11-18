@@ -579,7 +579,8 @@ export function BootFailureOverlay() {
         <div className="grid gap-4 p-5 pt-0">
           <div className="rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-xs text-destructive">
             {failureCopy.headline}
-            {failureCopy.rawDetail ? (
+            {/* Mbiling user builds: raw errors and log lines can carry the server's address. */}
+            {failureCopy.rawDetail && !accountOnly ? (
               <details className="mt-2 text-muted-foreground">
                 <summary className="cursor-pointer select-none font-medium">{copy.details}</summary>
                 <pre
@@ -608,7 +609,7 @@ export function BootFailureOverlay() {
             {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
           </div>
 
-          {logs.length > 0 ? (
+          {logs.length > 0 && !accountOnly ? (
             <div className="grid gap-2">
               <Button
                 className="-ml-2 self-start font-medium"

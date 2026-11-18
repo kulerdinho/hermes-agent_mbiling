@@ -118,3 +118,64 @@ export function accountOnly(): boolean {
     return true
   }
 }
+
+/** The name user builds show wherever a connection would be named ("nom" in the settings file). */
+export function accountDisplayName(): string {
+  try {
+    const nom = String(readMbilingConfig<{ nom?: unknown }>('connexion').nom ?? '').trim()
+
+    if (nom) {
+      return nom
+    }
+  } catch {
+    // An unreadable settings file falls back to the app's own name.
+  }
+
+  return app.getName()
+}
+
+interface RegistryLike<C> {
+  primary: string
+  lastUsed?: string | null
+  connections: C[]
+}
+
+/**
+ * What user builds let leave the main process about the connection registry: never the local engine
+ * (it is never installed), never a server address, never the hostname used as a label. `stripAddress`
+ * is false where the registry is still needed to DIAL (roster enumeration): the address stays in this
+ * process and only the labels change.
+ */
+export function accountOnlyRegistryView<C extends { kind: string; label?: string }, R extends RegistryLike<C>>(
+  registry: R,
+  { localId, stripAddress }: { localId: string; stripAddress: boolean }
+): R {
+  if (!accountOnly()) {
+    return registry
+  }
+
+  const hideLocal = registry.primary !== localId
+  const name = accountDisplayName()
+
+  const connections = registry.connections
+    .filter(connection => !(hideLocal && connection.kind === 'local'))
+    .map(connection => {
+      const view: Record<string, unknown> = { ...connection, label: name }
+
+      if (stripAddress) {
+        view.url = ''
+
+        for (const key of ['host', 'user', 'port', 'org', 'remoteMbilingPath', 'remoteProfile']) {
+          delete view[key]
+        }
+      }
+
+      return view as unknown as C
+    })
+
+  return {
+    ...registry,
+    lastUsed: hideLocal && registry.lastUsed === localId ? registry.primary : registry.lastUsed,
+    connections
+  }
+}

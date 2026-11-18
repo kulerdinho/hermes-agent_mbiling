@@ -46,6 +46,7 @@ import { Tip, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@
 import type { DesktopRegistryConnection } from '@/global'
 import { useResizeObserver } from '@/hooks/use-resize-observer'
 import { type Translations, useI18n } from '@/i18n'
+import { $accountOnlyBuild } from '@/lib/account-only-build'
 import { sortConnectionsForDisplay } from '@/lib/connection-display'
 import { triggerHaptic } from '@/lib/haptics'
 import { hostHas } from '@/lib/host-capabilities'
@@ -222,6 +223,8 @@ export function ProfileRail() {
   const colors = useStore($profileColors)
   const remoteOverrides = useStore($profileRemoteOverrides)
   const multipleConnections = useStore($hasMultipleConnections)
+  // Mbiling user builds: no other gateway to plug in, no per-profile server address to type.
+  const accountOnly = useStore($accountOnlyBuild)
   const registry = useStore($connectionsRegistry)
   const activeConnectionId = useStore($activeConnectionId)
   const roster = useStore($fleetRoster)
@@ -511,13 +514,15 @@ export function ProfileRail() {
                   // gateway registry; once the rail shows machines directly
                   // it only confuses, so it is offered on single-gateway
                   // setups only.
-                  onConnectRemote={multipleConnections ? undefined : () => openRemoteOverrideDialog(profile.name)}
+                  onConnectRemote={
+                    multipleConnections || accountOnly ? undefined : () => openRemoteOverrideDialog(profile.name)
+                  }
                   onDelete={() => setPendingDelete(profile)}
                   onEditSoul={() => setPendingSoul(profile.name)}
                   onRecolor={color => setProfileColor(profile.name, color)}
                   onRename={() => setPendingRename(profile)}
                   onSelect={() => selectProfile(profile.name)}
-                  remoteHost={remoteOverrides[normalizeProfileKey(profile.name)]?.host ?? null}
+                  remoteHost={accountOnly ? null : (remoteOverrides[normalizeProfileKey(profile.name)]?.host ?? null)}
                 />
               ))}
             </div>
@@ -681,7 +686,7 @@ export function ProfileRail() {
       {/* Multi-gateway discoverability: before a second source exists, a plug
           pinned beside Manage deep-links to the unified Gateways page. Once
           there are several sources, the same action lives in their selector. */}
-      {!multipleConnections && (
+      {!multipleConnections && !accountOnly && (
         <ProfilePill
           active={false}
           glyph="plug"

@@ -1,3 +1,4 @@
+import { isAccountOnlyBuild } from '@/lib/account-only-build'
 import { hostHas } from '@/lib/host-capabilities'
 
 import type { SettingsSubpage } from './subpages'
@@ -6,14 +7,18 @@ import type { SettingsSubpage } from './subpages'
 // Gateways page is just its serving host (see WebappGatewaySettings).
 export const nativeHostOnly = () => hostHas('gatewayManagement')
 
+// Mbiling user builds only work signed in to the cloud account: no saved connections to add, edit or
+// test, no SSH gateways to update, no connection mode to search for. Only the account page remains.
+export const connectionManagementOnly = () => nativeHostOnly() && !isAccountOnlyBuild()
+
 // Pages with separate tasks expose content-only subpages. Billing keeps its
 // existing capability-gated bview=overview|plans flow rather than adding a
 // second route parameter that could disagree with a pending financial action.
 export const OTHER_SUBPAGES: Record<string, SettingsSubpage[]> = {
   gateway: [
     { id: 'connection', labelKey: 'gatewayConnection', available: nativeHostOnly },
-    { id: 'devices', labelKey: 'gatewayDevices', available: nativeHostOnly },
-    { id: 'managed-updates', labelKey: 'gatewayManagedUpdates', available: nativeHostOnly }
+    { id: 'devices', labelKey: 'gatewayDevices', available: connectionManagementOnly },
+    { id: 'managed-updates', labelKey: 'gatewayManagedUpdates', available: connectionManagementOnly }
   ],
   keybinds: [
     { id: 'shortcuts', labelKey: 'keyboardShortcuts' },

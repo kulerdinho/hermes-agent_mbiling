@@ -1,9 +1,11 @@
+import { useStore } from '@nanostores/react'
 import { useCallback, useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import type { MbilingMainsStatus } from '@/global'
 import { useI18n } from '@/i18n'
+import { $accountOnlyBuild } from '@/lib/account-only-build'
 import { Globe, Monitor } from '@/lib/icons'
 
 import { ListRow, SectionHeading, SettingsContent, ToggleRow } from './primitives'
@@ -29,6 +31,7 @@ export function MainsSettings() {
   // Signed in to a Mbiling server, this PC is linked automatically; typing a token is a support path.
   const [manual, setManual] = useState(false)
   const [site, setSite] = useState('')
+  const accountOnly = useStore($accountOnlyBuild)
   const browser = status?.navigateur
 
   const refresh = useCallback(async () => {
@@ -96,7 +99,8 @@ export function MainsSettings() {
         onChange={on => void run(() => window.mbilingDesktop.mains.setActive(on))}
       />
 
-      <ListRow description={status?.relais || '—'} title={copy.relay} />
+      {/* Mbiling user builds never show a server address, the relay's included. */}
+      {accountOnly ? null : <ListRow description={status?.relais || '—'} title={copy.relay} />}
 
       {status?.inscriptionAutomatique && !manual ? (
         <ListRow

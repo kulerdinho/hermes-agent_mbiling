@@ -34,6 +34,7 @@ import { RootErrorBoundary } from './components/error-boundary'
 import { HapticsProvider } from './components/haptics-provider'
 import { RootTooltipProvider } from './components/ui/tooltip'
 import { ProfileI18nProvider as I18nProvider } from './i18n/profile-provider'
+import { accountOnlyBuild } from './lib/account-only-build'
 import { installClipboardShim } from './lib/clipboard'
 import { queryClient } from './lib/query-client'
 import { installRendererAnimationPauseState } from './lib/renderer-loop-pause'
@@ -52,6 +53,8 @@ installSelectionCopyColorGuard()
 installBrowserTabTitle()
 // One preferences store per machine, shared by native Desktop and its Webapp (#145213).
 startUiPreferencesSync(window.mbilingDesktop?.uiPreferences)
+// Mbiling user builds: settings navigation, search and the palette hide every connection option.
+void accountOnlyBuild()
 
 // The perf probe ships in dev, and in a production build ONLY when explicitly
 // opted in (VITE_PERF_PROBE=1) — this lets the perf harness measure a real,

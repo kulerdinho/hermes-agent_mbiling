@@ -144,7 +144,8 @@ export async function connectPrimaryRemote<State extends object>(
 ) {
   options.signal?.throwIfAborted()
   options.assertCurrentAttempt()
-  await options.advanceBootProgress('backend.remote', `Connecting to remote Mbiling backend at ${remote.baseUrl}`, 24)
+  // The boot screen shows this message as is: it never names the server's address.
+  await options.advanceBootProgress('backend.remote', 'Connecting to the Mbiling server', 24)
   await options.waitForRemote(remote)
   options.signal?.throwIfAborted()
   options.assertCurrentAttempt()
