@@ -1,0 +1,11 @@
+{
+  "_note": "Rôles de Management et leurs permissions (valeurs de départ). Les rôles sont des rôles du royaume « mbiling » du serveur de comptes. « * » = toutes les permissions.",
+  "session_minutes": 480,
+  "journal_lignes": 200,
+  "roles": {
+    "management-superadmin": {"libelle": "Super-admin", "permissions": ["*"]},
+    "management-admin": {"libelle": "Admin", "permissions": ["accueil.voir", "email.voir", "email.modifier", "journal.voir"]},
+    "management-support": {"libelle": "Support", "permissions": ["accueil.voir", "email.voir", "journal.voir"]},
+    "management-lecteur": {"libelle": "Lecteur", "permissions": ["accueil.voir", "email.voir"]}
+  }
+}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block titre %}Accueil{% endblock %}
+{% block contenu %}
+<h1>Bonjour {{ session.nom }}</h1>
+<p class="aide">L'espace d'administration du Cloud Mbiling. Chaque action y est inscrite au journal.</p>
+<div class="cartes">
+  {% if session.peut("email.voir") %}
+  <a class="carte" href="{{ P }}/email">
+    <h2>Emails</h2>
+    <p>{% if smtp %}Envoi par {{ smtp.serveur }}, depuis {{ smtp.expediteur }}.{% else %}Aucun serveur d'envoi réglé : ni vérification d'adresse ni mot de passe oublié.{% endif %}</p>
+  </a>
+  {% endif %}
+  {% if session.peut("journal.voir") %}
+  <a class="carte" href="{{ P }}/journal">
+    <h2>Journal</h2>
+    <p>Qui a fait quoi, et quand.</p>
+  </a>
+  {% endif %}
+</div>
+{% endblock %}

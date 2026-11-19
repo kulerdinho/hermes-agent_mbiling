@@ -31,6 +31,12 @@
 		reverse_proxy comptes:8080
 	}
 
+	# Management : l'espace d'administration (accès réservé, vérifié par le service lui-même).
+	@management path /management /management/*
+	handle @management {
+		reverse_proxy management:8100
+	}
+
 	# Les Mains (PC de l'utilisateur) se connectent au Relais en WebSocket.
 	handle /mains {
 		reverse_proxy relais:8000

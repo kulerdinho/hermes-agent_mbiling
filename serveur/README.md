@@ -77,6 +77,23 @@ authentification et le mot de passe oublié. La cellule s'y branche par OpenID C
   `http://127.0.0.1:8091/comptes/admin`, identifiant `admin`, mot de passe `MBILING_COMPTES_ADMIN_MOT_DE_PASSE`.
 - **Sauvegarde :** la base des comptes est exportée chaque nuit (`pg_dump`) à côté de l'archive des données.
 
+## Management (espace d'administration)
+
+`https://MBILING_DOMAINE/management`, servi par le service `management` (code : `mbiling_cloud/management/`).
+
+- **Accès :** un compte du serveur de comptes avec un rôle `management-*`, et la double authentification
+  (demandée à chaque connexion, configurée au premier passage ; jamais de reprise d'une session ouverte ailleurs).
+- **Rôles et permissions :** Super-admin, Admin, Support, Lecteur (`mbiling_cloud/management/droits.json`).
+  Donner un rôle : `./comptes/donner-role.sh adresse@exemple.com admin` (`--retirer` pour l'enlever).
+- **Créer un compte sans connaître son mot de passe :** `./comptes/creer-compte.sh --par-email adresse@exemple.com "Prénom" "Nom"`
+  (la personne reçoit un email pour le choisir).
+- **Emails (SMTP) :** se règlent dans l'écran « Emails » (mot de passe chiffré, jamais réaffiché, email de test).
+  Les lignes `MBILING_EMAIL_*` de `.env` ne servent qu'à la première installation, puis on les vide.
+- **Journal d'audit :** chaque connexion (et refus) et chaque changement, sans aucun mot de passe. Inaltérable :
+  la base refuse modification et suppression, et chaque ligne est chaînée à la précédente.
+- **Secrets :** `MBILING_MANAGEMENT_CLE` chiffre les secrets et les sessions. La perdre rend les secrets
+  enregistrés illisibles (il faudra les ressaisir) ; elle est dans la sauvegarde de `.env`.
+
 ## Vérifier
 
 ```bash

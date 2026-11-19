@@ -20,7 +20,8 @@ done
 
 # Jetons internes : générés une seule fois, longs et aléatoires, conservés dans .env.
 for nom in MBILING_JETON_CELLULE MBILING_RELAIS_JETON_INTERNE MBILING_JETON_APPAREIL_PC_TEST_1 \
-	MBILING_COMPTES_ADMIN_MOT_DE_PASSE MBILING_COMPTES_DB_MOT_DE_PASSE MBILING_COMPTES_SECRET_CELLULE; do
+	MBILING_COMPTES_ADMIN_MOT_DE_PASSE MBILING_COMPTES_DB_MOT_DE_PASSE MBILING_COMPTES_SECRET_CELLULE \
+	MBILING_MANAGEMENT_CLIENT_SECRET MBILING_MANAGEMENT_API_SECRET MBILING_MANAGEMENT_CLE; do
 	if ! grep -qE "^$nom=.+" "$env_fichier"; then
 		sed -i "/^$nom=/d" "$env_fichier"
 		echo "$nom=$(openssl rand -base64 48 | tr -d '\n/+=' | cut -c1-48)" >>"$env_fichier"
@@ -95,6 +96,7 @@ sudo install -d -m 750 "$MBILING_DONNEES" "$MBILING_DONNEES/cellules" "$MBILING_
 sudo install -d -m 700 "$MBILING_SAUVEGARDES"
 if [ "${MBILING_COMPTES:-0}" = "1" ]; then
 	sudo install -d -m 700 "$MBILING_DONNEES/comptes"
+	sudo install -d -m 700 "$MBILING_DONNEES/management"
 fi
 
 # Le modèle d'IA de la cellule : un fournisseur direct (MBILING_MODELE au format fournisseur:modèle),

@@ -113,6 +113,39 @@ services:
     networks:
       - interne
 
+  # Management : l'espace d'administration du Cloud (https://MBILING_DOMAINE/management). Réservé aux
+  # comptes qui ont un rôle management-* et la double authentification. Même image que le moteur ;
+  # son code suit le dépôt (comme le Relais), sans reconstruire l'image.
+  management:
+    image: ${MBILING_IMAGE_MOTEUR:?voir .env.exemple}
+    profiles: ["comptes"]
+    restart: unless-stopped
+    command: ["/opt/mbiling/.venv/bin/python", "-m", "uvicorn", "mbiling_cloud.management.app:creer_app",
+              "--factory", "--host", "0.0.0.0", "--port", "8100", "--log-level", "warning", "--proxy-headers"]
+    environment:
+      MBILING_MANAGEMENT_URL: https://${MBILING_DOMAINE}/management
+      MBILING_MANAGEMENT_EMETTEUR: https://${MBILING_DOMAINE}/comptes/realms/mbiling
+      MBILING_MANAGEMENT_COMPTES_INTERNE: http://comptes:8080/comptes
+      MBILING_MANAGEMENT_ROYAUME: mbiling
+      MBILING_MANAGEMENT_CLIENT_SECRET: ${MBILING_MANAGEMENT_CLIENT_SECRET:?généré par installer.sh}
+      MBILING_MANAGEMENT_API_SECRET: ${MBILING_MANAGEMENT_API_SECRET:?généré par installer.sh}
+      MBILING_MANAGEMENT_CLE: ${MBILING_MANAGEMENT_CLE:?généré par installer.sh}
+      MBILING_MANAGEMENT_BASE: /opt/data/management.db
+      # Importés une seule fois, à la création de la base de Management (puis vidés dans .env).
+      MBILING_EMAIL_SERVEUR: ${MBILING_EMAIL_SERVEUR:-}
+      MBILING_EMAIL_PORT: ${MBILING_EMAIL_PORT:-}
+      MBILING_EMAIL_EXPEDITEUR: ${MBILING_EMAIL_EXPEDITEUR:-}
+      MBILING_EMAIL_IDENTIFIANT: ${MBILING_EMAIL_IDENTIFIANT:-}
+      MBILING_EMAIL_MOT_DE_PASSE: ${MBILING_EMAIL_MOT_DE_PASSE:-}
+    volumes:
+      - ../mbiling_cloud:/opt/mbiling/mbiling_cloud:ro
+      - ${MBILING_DONNEES}/management:/opt/data
+    mem_limit: 256m
+    depends_on:
+      - comptes
+    networks:
+      - interne
+
   comptes-db:
     image: ${MBILING_IMAGE_POSTGRES:?voir .env.exemple}
     profiles: ["comptes"]

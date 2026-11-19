@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block titre %}Emails{% endblock %}
+{% block contenu %}
+<h1>Emails (SMTP)</h1>
+<p class="aide">Le serveur qui envoie les emails de Mbiling : vérification de l'adresse à l'inscription, mot de passe oublié.
+Les réglages sont appliqués aussitôt au serveur de comptes.</p>
+{% set modifiable = session.peut("email.modifier") %}
+<form method="post" action="{{ P }}/email" class="formulaire">
+  <input type="hidden" name="csrf" value="{{ session.csrf }}">
+  <label>Serveur SMTP <input name="serveur" required value="{{ smtp.serveur if smtp else '' }}" placeholder="smtp.exemple.com" {% if not modifiable %}disabled{% endif %}></label>
+  <label>Port <input name="port" required inputmode="numeric" value="{{ smtp.port if smtp else 587 }}" {% if not modifiable %}disabled{% endif %}></label>
+  <label class="case"><input type="checkbox" name="starttls" {% if not smtp or smtp.starttls %}checked{% endif %} {% if not modifiable %}disabled{% endif %}> Chiffrement STARTTLS (port 587). Le port 465 utilise toujours SSL.</label>
+  <label>Adresse d'expéditeur <input name="expediteur" type="email" required value="{{ smtp.expediteur if smtp else '' }}" placeholder="no-reply@exemple.com" {% if not modifiable %}disabled{% endif %}></label>
+  <label>Nom affiché <input name="nom_affiche" value="{{ smtp.nom_affiche if smtp else 'Mbiling' }}" {% if not modifiable %}disabled{% endif %}></label>
+  <label>Identifiant SMTP <input name="identifiant" autocomplete="off" value="{{ smtp.identifiant if smtp else '' }}" {% if not modifiable %}disabled{% endif %}></label>
+  <label>Mot de passe SMTP
+    <input name="mot_de_passe" type="password" autocomplete="new-password" placeholder="{% if secret_present %}enregistré — laisser vide pour le garder{% else %}aucun{% endif %}" {% if not modifiable %}disabled{% endif %}>
+    <span class="aide">Chiffré sur le serveur, jamais réaffiché. Saisir un nouveau mot de passe le remplace.</span>
+  </label>
+  {% if modifiable %}<button type="submit">Enregistrer et appliquer</button>{% endif %}
+</form>
+{% if modifiable and smtp %}
+<form method="post" action="{{ P }}/email/essai" class="formulaire">
+  <input type="hidden" name="csrf" value="{{ session.csrf }}">
+  <button type="submit" class="secondaire">Envoyer un email de test à {{ session.email }}</button>
+</form>
+{% endif %}
+{% if smtp %}<p class="aide">Dernière modification : {{ smtp._modifie_par }}, {{ smtp._modifie_le | date }}.</p>{% endif %}
+{% endblock %}

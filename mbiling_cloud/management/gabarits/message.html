@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block titre %}{{ titre }}{% endblock %}
+{% block contenu %}
+<div class="carte seule">
+  <h1>{{ titre }}</h1>
+  <p>{{ texte }}</p>
+  {% if lien %}<p><a class="bouton" href="{{ lien }}">Se connecter</a></p>{% endif %}
+</div>
+{% endblock %}

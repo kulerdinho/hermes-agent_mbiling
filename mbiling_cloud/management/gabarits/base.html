@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{% block titre %}Management{% endblock %} — Mbiling</title>
+  <link rel="stylesheet" href="{{ P }}/style.css">
+</head>
+<body>
+  <header class="barre">
+    <a class="marque" href="{{ P }}/">Mbiling <span>Management</span></a>
+    {% if session %}
+    <nav>
+      {% if session.peut("accueil.voir") %}<a href="{{ P }}/">Accueil</a>{% endif %}
+      {% if session.peut("email.voir") %}<a href="{{ P }}/email">Emails</a>{% endif %}
+      {% if session.peut("journal.voir") %}<a href="{{ P }}/journal">Journal</a>{% endif %}
+    </nav>
+    <div class="moi">
+      <span>{{ session.email }}</span>
+      <span class="role">{% for r in session.roles %}{{ roles_connus[r].libelle }}{% if not loop.last %}, {% endif %}{% endfor %}</span>
+      <form method="post" action="{{ P }}/deconnexion">
+        <input type="hidden" name="csrf" value="{{ session.csrf }}">
+        <button type="submit" class="discret">Se déconnecter</button>
+      </form>
+    </div>
+    {% endif %}
+  </header>
+  <main>
+    {% if message %}<p class="ok">{{ message }}</p>{% endif %}
+    {% if erreurs %}<ul class="erreurs">{% for e in erreurs %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    {% block contenu %}{% endblock %}
+  </main>
+</body>
+</html>

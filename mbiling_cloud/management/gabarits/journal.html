@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block titre %}Journal{% endblock %}
+{% block contenu %}
+<h1>Journal d'audit</h1>
+{% if intact %}
+<p class="ok">Journal intact : aucune ligne modifiée ni supprimée.</p>
+{% else %}
+<p class="erreurs">Alerte : le journal a été altéré en dehors de Management.</p>
+{% endif %}
+<table>
+  <thead><tr><th>Date</th><th>Qui</th><th>Action</th><th>Détail</th><th>Adresse IP</th></tr></thead>
+  <tbody>
+  {% for l in lignes %}
+    <tr>
+      <td>{{ l.quand | date }}</td>
+      <td>{{ l.qui }}</td>
+      <td>{{ l.action }}</td>
+      <td><code>{{ l.detail | tojson }}</code></td>
+      <td>{{ l.ip or "" }}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="5">Aucune entrée.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
