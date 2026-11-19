@@ -21,6 +21,16 @@
 		respond 404
 	}
 
+	# Serveur de comptes (phase 1) : seules les pages des utilisateurs du royaume « mbiling »
+	# sortent. L'administration et le royaume d'administration (master) restent internes : on
+	# les ouvre par un tunnel SSH vers 127.0.0.1:MBILING_COMPTES_PORT_ADMIN.
+	handle /comptes/* {
+		@comptes_interne path /comptes/admin /comptes/admin/* /comptes/realms/master /comptes/realms/master/*
+		# « respond » passe avant « reverse_proxy » dans l'ordre des directives de Caddy.
+		respond @comptes_interne 404
+		reverse_proxy comptes:8080
+	}
+
 	# Les Mains (PC de l'utilisateur) se connectent au Relais en WebSocket.
 	handle /mains {
 		reverse_proxy relais:8000

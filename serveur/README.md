@@ -53,6 +53,30 @@ On relance ensuite `./installer.sh`.
 - **Ressources :** la cellule est plafonnée (`MBILING_CELLULE_MEMOIRE`, `MBILING_CELLULE_CPU`), et un relevé
   est noté toutes les 5 minutes : `journalctl -u mbiling-surveillance`.
 
+## Le serveur de comptes (phase 1, lot 1)
+
+Mbiling Comptes, partie identité : **Keycloak**, servi sous `https://MBILING_DOMAINE/comptes`, avec sa
+base PostgreSQL. Il gère l'inscription, la connexion (email, puis Google et Apple), la double
+authentification et le mot de passe oublié. La cellule s'y branche par OpenID Connect (fournisseur
+`self_hosted` du moteur), sans modifier le moteur.
+
+- **Démarrer :** `MBILING_COMPTES=1` dans `.env`, puis `./installer.sh`. Les mots de passe internes
+  (administration, base) et le secret de la cellule sont générés dans `.env`.
+- **Le royaume `mbiling`** (`comptes/royaume-mbiling.json`) n'est importé qu'à sa création.
+  `comptes/configurer.sh`, lancé par `installer.sh`, réaligne ensuite sur `.env` : adresse de retour
+  et secret de la cellule, inscription libre (`MBILING_COMPTES_INSCRIPTION_OUVERTE`), emails (`MBILING_EMAIL_*`).
+- **Inscription fermée par défaut :** tant qu'une seule cellule de test sert tous les comptes, un
+  inscrit aurait accès à cette cellule et à sa clé d'IA. Créer les comptes de test à la main :
+  `./comptes/creer-compte.sh adresse@exemple.com "Prénom" "Nom"` (mot de passe provisoire affiché une
+  fois, à changer à la première connexion).
+- **Passer la cellule sur les comptes :** `MBILING_CONNEXION=comptes`, puis `./installer.sh`. Le mot de
+  passe partagé de la phase 0 ne marche plus ; chacun se connecte avec son compte. Retour arrière :
+  `MBILING_CONNEXION=motdepasse`, puis `./installer.sh`.
+- **Administration :** jamais publique (la passerelle répond 404 sur `/comptes/admin` et le royaume
+  `master`). Depuis votre PC : `ssh -p <port> -L 8091:127.0.0.1:8091 <serveur>`, puis
+  `http://127.0.0.1:8091/comptes/admin`, identifiant `admin`, mot de passe `MBILING_COMPTES_ADMIN_MOT_DE_PASSE`.
+- **Sauvegarde :** la base des comptes est exportée chaque nuit (`pg_dump`) à côté de l'archive des données.
+
 ## Vérifier
 
 ```bash

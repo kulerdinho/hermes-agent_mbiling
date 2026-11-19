@@ -30,10 +30,16 @@ services:
     environment:
       MBILING_DASHBOARD: "1"
       MBILING_DASHBOARD_SESSION_TOKEN: ${MBILING_JETON_CELLULE:?généré par installer.sh}
-      # Connexion par identifiant et mot de passe (fournisseur « basic » du moteur).
-      MBILING_DASHBOARD_BASIC_AUTH_USERNAME: ${MBILING_CONNEXION_IDENTIFIANT:?voir .env.exemple}
-      MBILING_DASHBOARD_BASIC_AUTH_PASSWORD_HASH: ${MBILING_CONNEXION_EMPREINTE:?calculée par installer.sh}
+      # Connexion des utilisateurs, selon MBILING_CONNEXION (installer.sh remplit l'un des deux
+      # groupes et vide l'autre ; un fournisseur dont le réglage est vide ne s'active pas) :
+      #  - « motdepasse » : identifiant et mot de passe partagés (fournisseur « basic », phase 0) ;
+      #  - « comptes » : comptes personnels du serveur de comptes (fournisseur « self_hosted », OpenID Connect).
+      MBILING_DASHBOARD_BASIC_AUTH_USERNAME: ${MBILING_CELLULE_BASIC_IDENTIFIANT:-}
+      MBILING_DASHBOARD_BASIC_AUTH_PASSWORD_HASH: ${MBILING_CELLULE_BASIC_EMPREINTE:-}
       MBILING_DASHBOARD_BASIC_AUTH_SECRET: ${MBILING_CONNEXION_SECRET:?généré par installer.sh}
+      MBILING_DASHBOARD_OIDC_ISSUER: ${MBILING_CELLULE_OIDC_EMETTEUR:-}
+      MBILING_DASHBOARD_OIDC_CLIENT_ID: ${MBILING_CELLULE_OIDC_CLIENT:-}
+      MBILING_DASHBOARD_OIDC_CLIENT_SECRET: ${MBILING_CELLULE_OIDC_SECRET:-}
       MBILING_RELAIS_URL: http://relais:8000
       MBILING_RELAIS_JETON: ${MBILING_RELAIS_JETON_INTERNE:?généré par installer.sh}
       MBILING_RELAIS_URL_PUBLIQUE: wss://${MBILING_DOMAINE}/mains
@@ -70,6 +76,53 @@ services:
       # Le code du Relais suit le dépôt (git pull), sans reconstruire l'image du moteur.
       - ../mbiling_cloud:/opt/mbiling/mbiling_cloud:ro
       - ${MBILING_DONNEES}/relais:/opt/data
+    networks:
+      - interne
+
+  # Mbiling Comptes, partie identité (phase 1, lot 1) : Keycloak, servi par la passerelle sous
+  # /comptes. Inscription, connexion (email, puis Google et Apple), double authentification,
+  # mot de passe oublié. Démarré par installer.sh seulement si MBILING_COMPTES=1.
+  comptes:
+    image: ${MBILING_IMAGE_KEYCLOAK:?voir .env.exemple}
+    profiles: ["comptes"]
+    restart: unless-stopped
+    command: ["start", "--import-realm"]
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://comptes-db:5432/comptes
+      KC_DB_USERNAME: comptes
+      KC_DB_PASSWORD: ${MBILING_COMPTES_DB_MOT_DE_PASSE:?généré par installer.sh}
+      # Adresse publique (derrière le tunnel et la passerelle) ; l'administration n'est servie
+      # qu'en local, par un tunnel SSH vers 127.0.0.1:MBILING_COMPTES_PORT_ADMIN.
+      KC_HOSTNAME: https://${MBILING_DOMAINE}/comptes
+      KC_HOSTNAME_ADMIN: http://127.0.0.1:${MBILING_COMPTES_PORT_ADMIN:?voir .env.exemple}/comptes
+      KC_HTTP_RELATIVE_PATH: /comptes
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY_HEADERS: xforwarded
+      KC_HEALTH_ENABLED: "true"
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${MBILING_COMPTES_ADMIN_MOT_DE_PASSE:?généré par installer.sh}
+    volumes:
+      # Importé une seule fois, à la création du royaume ; ensuite comptes/configurer.sh l'aligne sur .env.
+      - ./comptes/royaume-mbiling.json:/opt/keycloak/data/import/royaume-mbiling.json:ro
+    ports:
+      - "127.0.0.1:${MBILING_COMPTES_PORT_ADMIN}:8080"
+    mem_limit: ${MBILING_COMPTES_MEMOIRE:?voir .env.exemple}
+    depends_on:
+      - comptes-db
+    networks:
+      - interne
+
+  comptes-db:
+    image: ${MBILING_IMAGE_POSTGRES:?voir .env.exemple}
+    profiles: ["comptes"]
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: comptes
+      POSTGRES_USER: comptes
+      POSTGRES_PASSWORD: ${MBILING_COMPTES_DB_MOT_DE_PASSE:?généré par installer.sh}
+    volumes:
+      - ${MBILING_DONNEES}/comptes/postgres:/var/lib/postgresql/data
     networks:
       - interne
 

@@ -19,7 +19,8 @@ grep -E '^[A-Z_]+=' "$dossier/.env.exemple" | while IFS= read -r ligne; do
 done
 
 # Jetons internes : générés une seule fois, longs et aléatoires, conservés dans .env.
-for nom in MBILING_JETON_CELLULE MBILING_RELAIS_JETON_INTERNE MBILING_JETON_APPAREIL_PC_TEST_1; do
+for nom in MBILING_JETON_CELLULE MBILING_RELAIS_JETON_INTERNE MBILING_JETON_APPAREIL_PC_TEST_1 \
+	MBILING_COMPTES_ADMIN_MOT_DE_PASSE MBILING_COMPTES_DB_MOT_DE_PASSE MBILING_COMPTES_SECRET_CELLULE; do
 	if ! grep -qE "^$nom=.+" "$env_fichier"; then
 		sed -i "/^$nom=/d" "$env_fichier"
 		echo "$nom=$(openssl rand -base64 48 | tr -d '\n/+=' | cut -c1-48)" >>"$env_fichier"
@@ -52,12 +53,49 @@ echo "MBILING_CONNEXION_EMPREINTE='$empreinte_mdp'" >>"$env_fichier"
 # Exportée : pour docker compose, l'environnement du shell passe avant le fichier .env.
 export MBILING_CONNEXION_EMPREINTE="$empreinte_mdp"
 
+# Connexion des utilisateurs à la cellule (MBILING_CONNEXION) : un seul des deux fournisseurs du
+# moteur reçoit ses réglages, l'autre reste vide donc inactif. Écrit dans .env, pour qu'un
+# « docker compose up » lancé à la main redémarre la cellule avec le même mode.
+case "${MBILING_CONNEXION:-motdepasse}" in
+motdepasse)
+	basic_identifiant="$MBILING_CONNEXION_IDENTIFIANT" basic_empreinte="$empreinte_mdp"
+	oidc_emetteur="" oidc_client="" oidc_secret=""
+	;;
+comptes)
+	if [ "${MBILING_COMPTES:-0}" != "1" ]; then
+		echo "MBILING_CONNEXION=comptes demande le serveur de comptes (MBILING_COMPTES=1)." >&2
+		exit 1
+	fi
+	basic_identifiant="" basic_empreinte=""
+	oidc_emetteur="https://$MBILING_DOMAINE/comptes/realms/mbiling"
+	oidc_client="cellule" oidc_secret="$MBILING_COMPTES_SECRET_CELLULE"
+	;;
+*)
+	echo "MBILING_CONNEXION doit valoir « motdepasse » ou « comptes »." >&2
+	exit 1
+	;;
+esac
+sed -i -E '/^MBILING_CELLULE_(BASIC|OIDC)_[A-Z]+=/d' "$env_fichier"
+{
+	echo "MBILING_CELLULE_BASIC_IDENTIFIANT='$basic_identifiant'"
+	echo "MBILING_CELLULE_BASIC_EMPREINTE='$basic_empreinte'"
+	echo "MBILING_CELLULE_OIDC_EMETTEUR='$oidc_emetteur'"
+	echo "MBILING_CELLULE_OIDC_CLIENT='$oidc_client'"
+	echo "MBILING_CELLULE_OIDC_SECRET='$oidc_secret'"
+} >>"$env_fichier"
+export MBILING_CELLULE_BASIC_IDENTIFIANT="$basic_identifiant" MBILING_CELLULE_BASIC_EMPREINTE="$basic_empreinte" \
+	MBILING_CELLULE_OIDC_EMETTEUR="$oidc_emetteur" MBILING_CELLULE_OIDC_CLIENT="$oidc_client" \
+	MBILING_CELLULE_OIDC_SECRET="$oidc_secret"
+
 compose() { sudo docker compose --project-directory "$dossier" "${profils[@]}" "$@"; }
 
 # Dossiers de données et de sauvegarde.
 cellule_donnees="$MBILING_DONNEES/cellules/$MBILING_ORGANISATION/data"
 sudo install -d -m 750 "$MBILING_DONNEES" "$MBILING_DONNEES/cellules" "$MBILING_DONNEES/relais" "$cellule_donnees"
 sudo install -d -m 700 "$MBILING_SAUVEGARDES"
+if [ "${MBILING_COMPTES:-0}" = "1" ]; then
+	sudo install -d -m 700 "$MBILING_DONNEES/comptes"
+fi
 
 # Le modèle d'IA de la cellule : un fournisseur direct (MBILING_MODELE au format fournisseur:modèle),
 # ou une passerelle compatible OpenAI (MBILING_IA_URL, ex. OmniRoute) avec, en option, un modèle de
@@ -129,8 +167,17 @@ if sudo test -f "$MBILING_JETON_TUNNEL_FICHIER"; then
 else
 	echo "Pas de jeton de tunnel ($MBILING_JETON_TUNNEL_FICHIER) : accès local seulement."
 fi
+if [ "${MBILING_COMPTES:-0}" = "1" ]; then
+	profils+=(--profile comptes)
+fi
 
 compose up -d --remove-orphans
+
+# Serveur de comptes : réglages qui dépendent du serveur (adresse de retour, secret de la
+# cellule, inscription, emails), réappliqués à chaque installation.
+if [ "${MBILING_COMPTES:-0}" = "1" ]; then
+	"$dossier/comptes/configurer.sh"
+fi
 
 # Caddy ne relit pas seul son fichier monté (administration désactivée) : on ne le
 # redémarre que si le Caddyfile a changé depuis la dernière installation.
@@ -147,6 +194,13 @@ for profil in $MBILING_PROFILS; do
 		compose exec -T -u mbiling -e HOME=/opt/data cellule mbiling profile create "$profil" --clone
 	fi
 done
+
+# Connexion par les comptes : « Continuer avec Google / Apple » du Desktop va droit à la page de ce
+# fournisseur sur le serveur de comptes (paramètre kc_idp_hint de Keycloak).
+if [ "${MBILING_CONNEXION:-motdepasse}" = "comptes" ]; then
+	compose exec -T -u mbiling -e HOME=/opt/data cellule \
+		mbiling config set dashboard.oauth.idp_hint.param kc_idp_hint >/dev/null
+fi
 
 # Après la création des profils, pour qu'ils reçoivent aussi les secrets ; la cellule relit
 # ses .env au redémarrage.
