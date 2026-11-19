@@ -92,7 +92,10 @@ kc get "authentication/flows/$flux/executions" -r mbiling | python3 -c '
 import json, re, sys
 for e in json.load(sys.stdin):
     nom = e.get("displayName", "")
-    voulu = ("DISABLED" if nom in ("Cookie", "Kerberos", "Identity Provider Redirector", "Condition - user configured")
+    # Ne restent que : identifiant et mot de passe, puis code à 6 chiffres. Toute condition (qui
+    # pourrait sauter l étape du code) et tout autre chemin (cookie, Google, organisations) sont coupés.
+    voulu = ("DISABLED" if nom in ("Cookie", "Kerberos", "Identity Provider Redirector") or nom.startswith("Condition - ")
+             or (e.get("level") == 0 and "Organization" in nom)
              else "REQUIRED" if nom.endswith(" forms") or re.search(r"Conditional (OTP|2FA)", nom) or nom == "OTP Form"
              else None)
     if voulu and e.get("requirement") != voulu:
