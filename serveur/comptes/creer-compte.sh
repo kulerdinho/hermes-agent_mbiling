@@ -2,7 +2,7 @@
 # Crée un compte (tant que l'inscription libre est fermée).
 # Usage : ./comptes/creer-compte.sh [--par-email] adresse@exemple.com [Prénom] [Nom]
 #   --par-email : la personne reçoit un email pour choisir elle-même son mot de passe (lien valable
-#                 12 h) ; personne d'autre ne le connaît. Demande les emails réglés (Management).
+#                 48 h, puis la page mène à Management) ; personne d'autre ne le connaît. Demande les emails réglés (Management).
 #   sinon       : un mot de passe provisoire est affiché une seule fois ici, à changer à la première connexion.
 set -euo pipefail
 
@@ -29,8 +29,10 @@ echo "Compte créé : $email"
 
 if [ "$par_email" = "1" ]; then
 	id="$(kc get users -r mbiling -q "email=$email" -q exact=true --fields id --format csv --noquotes | tr -d '\r')"
-	kc update "users/$id/execute-actions-email" -r mbiling -q lifespan=43200 -b '["UPDATE_PASSWORD"]'
-	echo "Email envoyé à $email pour choisir son mot de passe (lien valable 12 h)."
+	# Une fois le mot de passe choisi, la page mène à Management (sinon elle s'arrête sur « compte mis à jour »).
+	kc update "users/$id/execute-actions-email" -r mbiling -q lifespan=172800 \
+		-q client_id=management -q "redirect_uri=https://$MBILING_DOMAINE/management/" -b '["UPDATE_PASSWORD"]'
+	echo "Email envoyé à $email pour choisir son mot de passe (lien valable 48 h)."
 else
 	provisoire="$(openssl rand -base64 18 | tr -d '\n/+=' | cut -c1-16)"
 	kc set-password -r mbiling --username "$email" --new-password "$provisoire" --temporary

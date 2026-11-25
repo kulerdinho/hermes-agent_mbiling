@@ -86,7 +86,7 @@ authentification et le mot de passe oublié. La cellule s'y branche par OpenID C
 - **Rôles et permissions :** Super-admin, Admin, Support, Lecteur (`mbiling_cloud/management/droits.json`).
   Donner un rôle : `./comptes/donner-role.sh adresse@exemple.com admin` (`--retirer` pour l'enlever).
 - **Créer un compte sans connaître son mot de passe :** `./comptes/creer-compte.sh --par-email adresse@exemple.com "Prénom" "Nom"`
-  (la personne reçoit un email pour le choisir).
+  (la personne reçoit un email pour le choisir, lien valable 48 h, qui mène ensuite à Management).
 - **Emails (SMTP) :** se règlent dans l'écran « Emails » (mot de passe chiffré, jamais réaffiché, email de test).
   Les lignes `MBILING_EMAIL_*` de `.env` ne servent qu'à la première installation, puis on les vide.
 - **Journal d'audit :** chaque connexion (et refus) et chaque changement, sans aucun mot de passe. Inaltérable :
