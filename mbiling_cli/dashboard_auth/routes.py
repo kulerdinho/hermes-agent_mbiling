@@ -33,7 +33,7 @@ from starlette.concurrency import run_in_threadpool
 from mbiling_cli import webapp_sign_in
 from mbiling_cli.dashboard_auth import (
     get_provider, list_interactive_providers, list_providers, list_session_providers,
-    native_flow)
+    native_flow, retours_applis)
 from mbiling_cli.dashboard_auth import prefix as _prefix_mod
 from mbiling_cli.dashboard_auth.audit import AuditEvent, audit_log
 from mbiling_cli.dashboard_auth.base import (
@@ -317,6 +317,14 @@ def _validate_loopback_redirect_uri(raw: str) -> str:
     return urlunparse(parsed._replace(path=parsed.path or "/"))
 
 
+def _validate_native_redirect_uri(raw: str) -> str:
+    """Mbiling: a phone app's return address listed in ``dashboard.oauth.retours_applis`` (exact
+    match), otherwise the canonical loopback URI of the desktop / CLI."""
+    if retours_applis.est_autorisee(raw):
+        return raw
+    return _validate_loopback_redirect_uri(raw)
+
+
 def _select_native_provider(provider: str):
     """Resolve the provider for a native authorize request. An empty ``provider`` auto-selects
     the ONLY interactive session provider (password providers included — native sign-in brokers
@@ -374,7 +382,7 @@ async def auth_native_authorize(
         raise _http(400, "code_challenge_method must be S256")
     if not code_challenge:
         raise _http(400, "code_challenge required")
-    redirect_uri = _validate_loopback_redirect_uri(redirect_uri)
+    redirect_uri = _validate_native_redirect_uri(redirect_uri)
     p = _select_native_provider(provider)
     if p is None and not provider:
         candidates = list_interactive_providers()

@@ -1031,6 +1031,11 @@ DEFAULT_CONFIG = {
             # Auth0: connection); ``allowed`` lists the hints the desktop may ask for. Empty
             # ``param`` turns it off (the accounts page then shows its own choices).
             "idp_hint": {"param": "", "allowed": ["google", "apple"]},
+            # Mbiling: return addresses of the phone app for the native sign-in
+            # (/auth/native/authorize), e.g. "mbiling://connexion". Exact match, app-specific URI
+            # schemes only (http/https refused); empty = loopback only (desktop, CLI).
+            # Reader: mbiling_cli/dashboard_auth/retours_applis.py.
+            "retours_applis": [],
         },
         # Username/password gate (dashboard_auth/basic plugin, no OAuth IDP). Active when username
         # plus password_hash (preferred) or password (hashed in-memory) are set; empty username =

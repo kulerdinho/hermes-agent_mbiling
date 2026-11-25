@@ -18,6 +18,12 @@ terminal:
 approvals:
   mode: manual
 
+# Mbiling Mobile se connecte comme le Desktop (connexion native par la cellule) et reçoit le
+# retour sur sa propre adresse : elle doit figurer ici, à l'identique.
+dashboard:
+  oauth:
+    retours_applis: ["mbiling://connexion"]
+
 # Les points de restauration enregistreraient des chemins du serveur, pas ceux du PC.
 checkpoints:
   enabled: false
