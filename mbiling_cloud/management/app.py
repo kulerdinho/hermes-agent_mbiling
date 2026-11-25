@@ -139,7 +139,9 @@ def creer_app(config: Config | None = None, *, transport: httpx.BaseTransport | 
             "frame-ancestors 'none'; base-uri 'none'")
         reponse.headers["X-Content-Type-Options"] = "nosniff"
         reponse.headers["Referrer-Policy"] = "no-referrer"
-        reponse.headers["Cache-Control"] = "no-store"
+        # no-transform : Cloudflare ne réécrit pas les pages (sinon il masque les adresses email
+        # derrière un script, que la politique de sécurité ci-dessus bloque à juste titre).
+        reponse.headers["Cache-Control"] = "no-store, no-transform"
         return reponse
 
     def page(nom: str, session: Session | None, statut: int = 200, **contexte: Any) -> HTMLResponse:

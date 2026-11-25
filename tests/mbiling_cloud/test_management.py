@@ -220,4 +220,4 @@ def test_entetes_de_securite(env):
     _, fabriquer, _, _ = env
     rep = fabriquer().get("/management/sante")
     assert "frame-ancestors 'none'" in rep.headers["content-security-policy"]
-    assert rep.headers["cache-control"] == "no-store"
+    assert rep.headers["cache-control"] == "no-store, no-transform"

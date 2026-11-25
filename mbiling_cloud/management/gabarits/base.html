@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="{{ P }}/style.css">
 </head>
 <body>
+  <!--email_off--><!-- Cloudflare : ne pas masquer les adresses email de Management. -->
   <header class="barre">
     <a class="marque" href="{{ P }}/">Mbiling <span>Management</span></a>
     {% if session %}
@@ -31,5 +32,6 @@
     {% if erreurs %}<ul class="erreurs">{% for e in erreurs %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
     {% block contenu %}{% endblock %}
   </main>
+  <!--/email_off-->
 </body>
 </html>
