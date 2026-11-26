@@ -92,9 +92,10 @@ class Keycloak:
         return any(c.get("type") == "otp" for c in rep.json())
 
     def chercher(self, texte: str, maximum: int) -> list[dict[str, Any]]:
-        """Comptes dont l'email, le nom ou l'identifiant contient ``texte``."""
+        """Comptes dont l'email, le nom ou l'identifiant contient ``texte`` (sans ``*``, le serveur de
+        comptes ne cherche qu'en début de mot : « gmail » ne trouverait pas marie@gmail.com)."""
         rep = self._http.get(f"{self._admin}/users", headers=self._entetes_api(),
-                             params={"search": texte, "max": maximum, "briefRepresentation": "true"})
+                             params={"search": f"*{texte.strip('*')}*", "max": maximum, "briefRepresentation": "true"})
         if rep.status_code != 200:
             raise ErreurComptes(f"recherche des comptes impossible ({rep.status_code})")
         return rep.json()

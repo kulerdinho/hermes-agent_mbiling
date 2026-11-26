@@ -35,8 +35,11 @@ class FauxComptesAvecUtilisateurs(FauxComptes):
     def __call__(self, requete: httpx.Request) -> httpx.Response:
         chemin, methode = requete.url.path, requete.method
         if chemin == f"{ADMIN}/users" and methode == "GET":
-            texte = requete.url.params["search"]
-            return httpx.Response(200, json=[c for c in self.comptes.values() if texte in c["email"]])
+            # Comme le serveur de comptes : sans « * » autour, la recherche ne porte que sur le début.
+            motif = requete.url.params["search"]
+            texte = motif.strip("*")
+            trouve = (lambda e: texte in e) if motif.startswith("*") else (lambda e: e.startswith(texte))
+            return httpx.Response(200, json=[c for c in self.comptes.values() if trouve(c["email"])])
         if m := re.fullmatch(rf"{ADMIN}/users/([^/]+)", chemin):
             compte = self.comptes.get(m[1])
             if compte is None:
@@ -99,6 +102,8 @@ def console(tmp_path, monkeypatch):
 def test_chercher_puis_ouvrir_la_fiche_d_un_compte(console):
     ouvrir, _, _ = console
     client = ouvrir(["management-support"])
+    liste = client.get("/management/comptes", params={"q": "exemple.test"})
+    assert f"/management/comptes/{MARIE}" in liste.text and "chef@exemple.test" in liste.text  # « contient »
     liste = client.get("/management/comptes", params={"q": "marie"})
     assert liste.status_code == 200 and f"/management/comptes/{MARIE}" in liste.text
     assert "chef@exemple.test" not in liste.text
