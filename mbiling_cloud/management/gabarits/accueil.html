@@ -4,6 +4,12 @@
 <h1>Bonjour {{ session.nom }}</h1>
 <p class="aide">L'espace d'administration du Cloud Mbiling. Chaque action y est inscrite au journal.</p>
 <div class="cartes">
+  {% if session.peut("comptes.voir") %}
+  <a class="carte" href="{{ P }}/comptes">
+    <h2>Comptes</h2>
+    <p>Chercher un utilisateur, voir ses connexions et ses PC, le suspendre.</p>
+  </a>
+  {% endif %}
   {% if session.peut("email.voir") %}
   <a class="carte" href="{{ P }}/email">
     <h2>Emails</h2>

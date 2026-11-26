@@ -42,6 +42,7 @@ from fastapi.responses import FileResponse, HTMLResponse, RedirectResponse, Resp
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from mbiling_cloud.management.keycloak import ErreurComptes, Keycloak
+from mbiling_cloud.management.relais_client import Relais
 
 ICI = Path(__file__).parent
 P = "/compte"
@@ -91,25 +92,6 @@ class Session:
     sid: str
     csrf: str
     id_token: str
-
-
-class Relais:
-    """Routes internes du Relais des Mains : PC d'un compte, et leur révocation."""
-
-    def __init__(self, url: str, jeton: str, transport: httpx.BaseTransport | None) -> None:
-        self._url = url
-        self._http = httpx.Client(timeout=10, transport=transport, headers={"Authorization": f"Bearer {jeton}"})
-
-    def appareils(self, utilisateur: str) -> list[dict[str, Any]]:
-        rep = self._http.get(f"{self._url}/interne/appareils", params={"utilisateur": utilisateur})
-        rep.raise_for_status()
-        return rep.json()["appareils"]
-
-    def revoquer(self, utilisateur: str, *, session: str = "", identifiant: str = "") -> list[str]:
-        rep = self._http.post(f"{self._url}/interne/appareils/revoquer",
-                              json={"utilisateur": utilisateur, "session": session, "identifiant": identifiant})
-        rep.raise_for_status()
-        return rep.json()["revoques"]
 
 
 def _fernet(cle: str) -> Fernet:

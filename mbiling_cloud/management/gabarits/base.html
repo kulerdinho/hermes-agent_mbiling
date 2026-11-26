@@ -14,6 +14,7 @@
     {% if session %}
     <nav>
       {% if session.peut("accueil.voir") %}<a href="{{ P }}/">Accueil</a>{% endif %}
+      {% if session.peut("comptes.voir") %}<a href="{{ P }}/comptes">Comptes</a>{% endif %}
       {% if session.peut("email.voir") %}<a href="{{ P }}/email">Emails</a>{% endif %}
       {% if session.peut("journal.voir") %}<a href="{{ P }}/journal">Journal</a>{% endif %}
     </nav>

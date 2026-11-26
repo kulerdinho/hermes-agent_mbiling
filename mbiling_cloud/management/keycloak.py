@@ -91,6 +91,34 @@ class Keycloak:
             raise ErreurComptes(f"lecture des facteurs de connexion impossible ({rep.status_code})")
         return any(c.get("type") == "otp" for c in rep.json())
 
+    def chercher(self, texte: str, maximum: int) -> list[dict[str, Any]]:
+        """Comptes dont l'email, le nom ou l'identifiant contient ``texte``."""
+        rep = self._http.get(f"{self._admin}/users", headers=self._entetes_api(),
+                             params={"search": texte, "max": maximum, "briefRepresentation": "true"})
+        if rep.status_code != 200:
+            raise ErreurComptes(f"recherche des comptes impossible ({rep.status_code})")
+        return rep.json()
+
+    def utilisateur(self, utilisateur: str) -> dict[str, Any] | None:
+        rep = self._http.get(f"{self._admin}/users/{utilisateur}", headers=self._entetes_api())
+        if rep.status_code == 404:
+            return None
+        if rep.status_code != 200:
+            raise ErreurComptes(f"lecture du compte impossible ({rep.status_code})")
+        return rep.json()
+
+    def roles_royaume(self, utilisateur: str) -> list[str]:
+        rep = self._http.get(f"{self._admin}/users/{utilisateur}/role-mappings/realm", headers=self._entetes_api())
+        if rep.status_code != 200:
+            raise ErreurComptes(f"lecture des rôles impossible ({rep.status_code})")
+        return [r["name"] for r in rep.json()]
+
+    def activer(self, utilisateur: str, actif: bool) -> None:
+        """Suspend (connexion impossible, données gardées) ou réactive un compte."""
+        rep = self._http.put(f"{self._admin}/users/{utilisateur}", headers=self._entetes_api(), json={"enabled": actif})
+        if rep.status_code != 204:
+            raise ErreurComptes(f"le serveur de comptes a refusé le changement ({rep.status_code})")
+
     def sessions(self, utilisateur: str) -> list[dict[str, Any]]:
         """Sessions ouvertes du compte : id (le ``sid`` des jetons), ipAddress, start, lastAccess (ms),
         clients {id: clientId}."""

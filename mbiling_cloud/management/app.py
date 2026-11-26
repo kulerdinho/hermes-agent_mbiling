@@ -6,6 +6,8 @@ serveur de comptes impose en plus l'OTP à chaque connexion à ce client (flux �
 
 Premier lot : réglages d'envoi des emails (SMTP, mot de passe chiffré, jamais réaffiché, email de
 test), poussés vers le serveur de comptes, et journal d'audit inaltérable.
+Écran Comptes (C9) : chercher un compte, voir ses connexions, ses PC et son journal, le suspendre
+(connexion impossible, sessions fermées, Mains coupées, données gardées) ou le réactiver.
 
 Configuration (variables d'environnement, posées par ``serveur/compose.yaml``) :
   MBILING_MANAGEMENT_URL               adresse publique, ex. https://domaine/management
@@ -16,6 +18,8 @@ Configuration (variables d'environnement, posées par ``serveur/compose.yaml``) 
   MBILING_MANAGEMENT_API_SECRET        secret du compte de service « management-api »
   MBILING_MANAGEMENT_CLE               clé maîtresse (≥ 32 caractères) : chiffre secrets et sessions
   MBILING_MANAGEMENT_BASE              fichier SQLite, ex. /opt/data/management.db
+  MBILING_RELAIS_URL                   Relais des Mains sur le réseau interne, ex. http://relais:8000
+  MBILING_RELAIS_JETON                 jeton interne du Relais
   MBILING_EMAIL_*                      réglages d'emails de .env, importés une seule fois (base vide)
 """
 from __future__ import annotations
@@ -42,6 +46,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from .emails import envoyer_essai
 from .keycloak import ErreurComptes, Keycloak
+from .relais_client import Relais
 from .stockage import Stockage
 
 ICI = Path(__file__).parent
@@ -51,6 +56,7 @@ COOKIE_ETAT = "mbiling_management_etat"
 SMTP = "smtp"
 _HOTE = re.compile(r"^[A-Za-z0-9.-]{1,253}$")
 _EMAIL = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+_ID_COMPTE = re.compile(r"^[A-Za-z0-9-]{1,64}$")
 
 
 @dataclass(frozen=True)
@@ -63,6 +69,8 @@ class Config:
     api_secret: str
     cle: str
     base: Path
+    relais_url: str
+    relais_jeton: str
     client_id: str = "management"
     api_client_id: str = "management-api"
     droits: Path = ICI / "droits.json"
@@ -81,7 +89,8 @@ class Config:
                    client_secret=lire("MBILING_MANAGEMENT_CLIENT_SECRET"),
                    api_secret=lire("MBILING_MANAGEMENT_API_SECRET"),
                    cle=lire("MBILING_MANAGEMENT_CLE"),
-                   base=Path(lire("MBILING_MANAGEMENT_BASE")))
+                   base=Path(lire("MBILING_MANAGEMENT_BASE")),
+                   relais_url=lire("MBILING_RELAIS_URL"), relais_jeton=lire("MBILING_RELAIS_JETON"))
 
 
 def _fernet(cle: str, usage: bytes) -> Fernet:
@@ -112,6 +121,7 @@ def _ip(request: Request) -> str | None:
 
 
 def creer_app(config: Config | None = None, *, transport: httpx.BaseTransport | None = None,
+              transport_relais: httpx.BaseTransport | None = None,
               envoyeur: Callable[[dict[str, Any], str | None, str], None] = envoyer_essai) -> FastAPI:
     config = config or Config.depuis_env()
     droits = json.loads(config.droits.read_text(encoding="utf-8"))
@@ -123,8 +133,9 @@ def creer_app(config: Config | None = None, *, transport: httpx.BaseTransport | 
     comptes = Keycloak(interne=config.comptes_interne, royaume=config.royaume, emetteur=config.emetteur,
                        client_id=config.client_id, client_secret=config.client_secret,
                        api_client_id=config.api_client_id, api_client_secret=config.api_secret, transport=transport)
+    relais = Relais(config.relais_url, config.relais_jeton, transport_relais)
     gabarits = Environment(loader=FileSystemLoader(ICI / "gabarits"), autoescape=select_autoescape(["html"]))
-    gabarits.filters["date"] = lambda t: time.strftime("%d/%m/%Y %H:%M:%S", time.gmtime(t)) + " UTC"
+    gabarits.filters["date"] = lambda t: time.strftime("%d/%m/%Y %H:%M:%S", time.gmtime(t)) + " UTC" if t else "—"
     retour = f"{config.url_publique}/retour"
 
     _importer_smtp_de_env(stockage)
@@ -342,6 +353,110 @@ def creer_app(config: Config | None = None, *, transport: httpx.BaseTransport | 
             return session
         return page("journal.html", session, lignes=stockage.journal(int(droits.get("journal_lignes", 200))),
                     intact=stockage.journal_intact())
+
+    # --- Comptes (C9) ---------------------------------------------------------------------------
+
+    @app.get(f"{P}/comptes")
+    def comptes_liste(request: Request, q: str = "") -> Response:
+        session = exiger(request, "comptes.voir")
+        if not isinstance(session, Session):
+            return session
+        q = q.strip()[:120]
+        trouves: list[dict[str, Any]] = []
+        if q:
+            try:
+                trouves = comptes.chercher(q, int(droits.get("comptes_recherche_max", 50)))
+            except (ErreurComptes, httpx.HTTPError) as erreur:
+                return page("comptes.html", session, 502, q=q, trouves=[], erreurs=[f"Recherche impossible : {erreur}."])
+        return page("comptes.html", session, q=q, trouves=trouves)
+
+    def introuvable(session: Session) -> Response:
+        return page("message.html", session, 404, titre="Compte introuvable", texte="Ce compte n'existe pas.")
+
+    def fiche(session: Session, utilisateur: str, statut: int = 200, **contexte: Any) -> Response:
+        if not _ID_COMPTE.match(utilisateur):
+            return introuvable(session)
+        try:
+            compte = comptes.utilisateur(utilisateur)
+            if compte is None:
+                return introuvable(session)
+            roles = sorted(r for r in comptes.roles_royaume(utilisateur) if r in roles_connus)
+            sessions = comptes.sessions(utilisateur)
+            double = comptes.a_double_authentification(utilisateur)
+            pcs = relais.appareils(utilisateur)
+        except (ErreurComptes, httpx.HTTPError) as erreur:
+            return page("message.html", session, 502, titre="Compte indisponible",
+                        texte=f"Lecture du compte impossible : {erreur}.")
+        lignes = int(droits.get("compte_journal_lignes", 50))
+        return page("compte.html", session, statut, compte=compte, roles=roles, sessions=sessions, pcs=pcs,
+                    double=double, journal=stockage.journal_de(utilisateur, lignes), **contexte)
+
+    @app.get(f"{P}/comptes/{{utilisateur}}")
+    def compte_fiche(request: Request, utilisateur: str) -> Response:
+        session = exiger(request, "comptes.voir")
+        if not isinstance(session, Session):
+            return session
+        return fiche(session, utilisateur)
+
+    async def changement(request: Request, utilisateur: str) -> tuple[Session | None, Any, Response | None]:
+        session = exiger(request, "comptes.suspendre")
+        if not isinstance(session, Session):
+            return None, None, session
+        f = await request.form()
+        if not csrf_valide(session, f):
+            return session, f, page("message.html", session, 403, titre="Action refusée",
+                                    texte="Jeton de formulaire invalide.")
+        if not _ID_COMPTE.match(utilisateur):
+            return session, f, introuvable(session)
+        return session, f, None
+
+    @app.post(f"{P}/comptes/{{utilisateur}}/suspendre")
+    async def compte_suspendre(request: Request, utilisateur: str) -> Response:
+        session, f, refus = await changement(request, utilisateur)
+        if refus is not None:
+            return refus
+        motif = str(f.get("motif", "")).strip()[:500]
+        if utilisateur == session.sub:
+            return fiche(session, utilisateur, 400, erreurs=["Vous ne pouvez pas suspendre votre propre compte."])
+        if not motif:
+            return fiche(session, utilisateur, 400, erreurs=["Indiquez le motif de la suspension."])
+        try:
+            compte = comptes.utilisateur(utilisateur)
+            if compte is None:
+                return introuvable(session)
+            if (any(r in roles_connus for r in comptes.roles_royaume(utilisateur))
+                    and not session.peut("comptes.suspendre_management")):
+                return fiche(session, utilisateur, 403,
+                             erreurs=["Seul un Super-admin peut suspendre un compte de l'équipe Management."])
+            # Ordre voulu : plus de nouvelle connexion, puis fermeture des sessions ouvertes (la
+            # cellule en est prévenue aussitôt), puis Mains coupées. Les données restent.
+            comptes.activer(utilisateur, False)
+            comptes.deconnecter_partout(utilisateur)
+            pcs = relais.revoquer(utilisateur)
+        except (ErreurComptes, httpx.HTTPError) as erreur:
+            stockage.journaliser(session.email, "suspension en échec",
+                                 {"utilisateur": utilisateur, "erreur": str(erreur)}, _ip(request))
+            return fiche(session, utilisateur, 502, erreurs=[f"Suspension incomplète : {erreur}. Réessayez."])
+        stockage.journaliser(session.email, "compte suspendu", {
+            "utilisateur": utilisateur, "email": compte.get("email", ""), "motif": motif, "pc_revoques": pcs},
+            _ip(request))
+        return fiche(session, utilisateur, message="Compte suspendu : connexions fermées, PC révoqués, données gardées.")
+
+    @app.post(f"{P}/comptes/{{utilisateur}}/reactiver")
+    async def compte_reactiver(request: Request, utilisateur: str) -> Response:
+        session, _, refus = await changement(request, utilisateur)
+        if refus is not None:
+            return refus
+        try:
+            compte = comptes.utilisateur(utilisateur)
+            if compte is None:
+                return introuvable(session)
+            comptes.activer(utilisateur, True)
+        except (ErreurComptes, httpx.HTTPError) as erreur:
+            return fiche(session, utilisateur, 502, erreurs=[f"Réactivation impossible : {erreur}."])
+        stockage.journaliser(session.email, "compte réactivé",
+                             {"utilisateur": utilisateur, "email": compte.get("email", "")}, _ip(request))
+        return fiche(session, utilisateur, message="Compte réactivé : il peut de nouveau se connecter.")
 
     return app
 

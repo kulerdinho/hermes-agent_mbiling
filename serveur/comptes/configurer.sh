@@ -74,8 +74,8 @@ kc update "clients/$id_management" -r mbiling \
 	-s "webOrigins=[\"https://$MBILING_DOMAINE\"]" \
 	-s "attributes.\"post.logout.redirect.uris\"=https://$MBILING_DOMAINE/management/"
 
-# Le compte de service « management-api » : Management règle le royaume (emails) et lit les facteurs
-# de connexion des utilisateurs (double authentification), rien d'autre.
+# Le compte de service « management-api » : Management règle le royaume (emails), lit les comptes et
+# leurs facteurs de connexion, et les suspend ou réactive (écran Comptes), rien d'autre.
 if [ -z "$(id_client management-api)" ]; then
 	compose exec -T comptes /opt/keycloak/bin/kcadm.sh create clients -r mbiling --config /tmp/kcadm.config -f - >/dev/null <<'JSON'
 {"clientId": "management-api", "name": "Management Mbiling (API)", "enabled": true, "protocol": "openid-connect",
@@ -85,7 +85,7 @@ JSON
 fi
 kc update "clients/$(id_client management-api)" -r mbiling -s "secret=$MBILING_MANAGEMENT_API_SECRET"
 kc add-roles -r mbiling --uusername service-account-management-api --cclientid realm-management \
-	--rolename manage-realm --rolename view-users
+	--rolename manage-realm --rolename view-users --rolename manage-users
 
 # --- Mon compte (espace de chaque utilisateur) ---------------------------------------------------
 

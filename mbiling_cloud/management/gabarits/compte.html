@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block titre %}{{ compte.email or compte.username }}{% endblock %}
+{% block contenu %}
+<p><a href="{{ P }}/comptes">← Comptes</a></p>
+<h1>{{ compte.email or compte.username }}</h1>
+<div class="cartes">
+  <div class="carte">
+    <h2>Compte</h2>
+    <p>{{ compte.firstName or "" }} {{ compte.lastName or "" }}<br>
+    Créé le {{ ((compte.createdTimestamp or 0) / 1000) | date }}<br>
+    Email {% if compte.emailVerified %}vérifié{% else %}non vérifié{% endif %}<br>
+    Double authentification : {% if double %}oui{% else %}non{% endif %}<br>
+    {% if roles %}Management : {% for r in roles %}{{ roles_connus[r].libelle }}{% if not loop.last %}, {% endif %}{% endfor %}<br>{% endif %}
+    Identifiant : <code>{{ compte.id }}</code></p>
+  </div>
+  <div class="carte">
+    <h2>État</h2>
+    {% if compte.enabled %}
+      <p class="ok">Actif</p>
+      {% if session.peut("comptes.suspendre") %}
+      <form method="post" action="{{ P }}/comptes/{{ compte.id }}/suspendre" class="formulaire">
+        <input type="hidden" name="csrf" value="{{ session.csrf }}">
+        <label>Motif (inscrit au journal)
+          <input type="text" name="motif" maxlength="500" required>
+        </label>
+        <p class="aide">Connexion impossible, connexions ouvertes fermées, PC révoqués. Ses données sont gardées.</p>
+        <button type="submit">Suspendre le compte</button>
+      </form>
+      {% endif %}
+    {% else %}
+      <p class="erreurs">Suspendu : connexion impossible.</p>
+      {% if session.peut("comptes.suspendre") %}
+      <form method="post" action="{{ P }}/comptes/{{ compte.id }}/reactiver">
+        <input type="hidden" name="csrf" value="{{ session.csrf }}">
+        <button type="submit" class="secondaire">Réactiver le compte</button>
+      </form>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+
+<h2 class="section">Connexions ouvertes</h2>
+<table>
+  <thead><tr><th>Applications</th><th>Depuis</th><th>Dernière activité</th><th>Adresse IP</th></tr></thead>
+  <tbody>
+  {% for s in sessions %}
+    <tr><td>{{ (s.clients or {}).values() | join(", ") }}</td><td>{{ ((s.start or 0) / 1000) | date }}</td>
+        <td>{{ ((s.lastAccess or 0) / 1000) | date }}</td><td>{{ s.ipAddress or "" }}</td></tr>
+  {% else %}
+    <tr><td colspan="4">Aucune connexion ouverte.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h2 class="section">PC (Mains)</h2>
+<table>
+  <thead><tr><th>Nom</th><th>Système</th><th>Inscrit le</th><th>Dernière connexion</th><th>Mains</th></tr></thead>
+  <tbody>
+  {% for pc in pcs %}
+    <tr><td>{{ pc.nom or "PC sans nom" }}</td><td>{{ pc.systeme or "" }}</td><td>{{ pc.cree | date }}</td>
+        <td>{{ pc.derniere_connexion | date }}</td><td>{% if pc.connecte %}connectées{% else %}hors ligne{% endif %}</td></tr>
+  {% else %}
+    <tr><td colspan="5">Aucun PC inscrit.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<h2 class="section">Journal de ce compte</h2>
+<table>
+  <thead><tr><th>Date</th><th>Par</th><th>Action</th><th>Détail</th></tr></thead>
+  <tbody>
+  {% for l in journal %}
+    <tr><td>{{ l.quand | date }}</td><td>{{ l.qui }}</td><td>{{ l.action }}</td><td><code>{{ l.detail | tojson }}</code></td></tr>
+  {% else %}
+    <tr><td colspan="4">Aucune action de l'équipe sur ce compte.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

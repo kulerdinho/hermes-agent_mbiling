@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block titre %}Comptes{% endblock %}
+{% block contenu %}
+<h1>Comptes</h1>
+<form method="get" action="{{ P }}/comptes" class="formulaire">
+  <label>Chercher un compte
+    <input type="search" name="q" value="{{ q }}" placeholder="email, nom ou identifiant" autofocus>
+  </label>
+  <button type="submit">Chercher</button>
+</form>
+{% if q %}
+<table>
+  <thead><tr><th>Email</th><th>Nom</th><th>État</th></tr></thead>
+  <tbody>
+  {% for c in trouves %}
+    <tr>
+      <td><a href="{{ P }}/comptes/{{ c.id }}">{{ c.email or c.username }}</a></td>
+      <td>{{ c.firstName or "" }} {{ c.lastName or "" }}</td>
+      <td>{% if c.enabled %}<span class="ok">Actif</span>{% else %}<span class="erreurs">Suspendu</span>{% endif %}</td>
+    </tr>
+  {% else %}
+    <tr><td colspan="3">Aucun compte ne correspond.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endblock %}

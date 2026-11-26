@@ -100,6 +100,14 @@ class Stockage:
         return [{"id": l[0], "quand": l[1], "qui": l[2], "action": l[3], "detail": json.loads(l[4]), "ip": l[5]}
                 for l in lignes]
 
+    def journal_de(self, utilisateur: str, limite: int) -> list[dict[str, Any]]:
+        """Lignes du journal qui concernent un compte (champ ``utilisateur`` du détail)."""
+        lignes = self._db.execute(
+            "SELECT id, quand, qui, action, detail, ip FROM journal WHERE json_extract(detail, '$.utilisateur') = ? "
+            "ORDER BY id DESC LIMIT ?", (utilisateur, limite)).fetchall()
+        return [{"id": l[0], "quand": l[1], "qui": l[2], "action": l[3], "detail": json.loads(l[4]), "ip": l[5]}
+                for l in lignes]
+
     def journal_intact(self) -> bool:
         precedent = _ORIGINE
         for quand, qui, action, detail, ip, prec, emp in self._db.execute(

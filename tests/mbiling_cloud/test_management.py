@@ -67,7 +67,8 @@ def env(tmp_path, monkeypatch):
     faux = FauxComptes()
     envois: list[tuple] = []
     config = Config(url_publique=URL, emetteur=EMETTEUR, comptes_interne=INTERNE, royaume="mbiling",
-                    client_secret="s-client", api_secret="s-api", cle="c" * 40, base=tmp_path / "m.db")
+                    client_secret="s-client", api_secret="s-api", cle="c" * 40, base=tmp_path / "m.db",
+                    relais_url="http://relais:8000", relais_jeton="jeton-relais")
 
     def fabriquer():
         app = creer_app(config, transport=httpx.MockTransport(faux),

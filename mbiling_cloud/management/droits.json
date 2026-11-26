@@ -1,11 +1,13 @@
 {
-  "_note": "Rôles de Management et leurs permissions (valeurs de départ). Les rôles sont des rôles du royaume « mbiling » du serveur de comptes. « * » = toutes les permissions.",
+  "_note": "Rôles de Management et leurs permissions (valeurs de départ). Les rôles sont des rôles du royaume « mbiling » du serveur de comptes. « * » = toutes les permissions. « comptes.suspendre_management » (suspendre un compte qui a lui-même un rôle Management) n'est donné qu'au Super-admin.",
   "session_minutes": 480,
   "journal_lignes": 200,
+  "comptes_recherche_max": 50,
+  "compte_journal_lignes": 50,
   "roles": {
     "management-superadmin": {"libelle": "Super-admin", "permissions": ["*"]},
-    "management-admin": {"libelle": "Admin", "permissions": ["accueil.voir", "email.voir", "email.modifier", "journal.voir"]},
-    "management-support": {"libelle": "Support", "permissions": ["accueil.voir", "email.voir", "journal.voir"]},
+    "management-admin": {"libelle": "Admin", "permissions": ["accueil.voir", "email.voir", "email.modifier", "journal.voir", "comptes.voir", "comptes.suspendre"]},
+    "management-support": {"libelle": "Support", "permissions": ["accueil.voir", "email.voir", "journal.voir", "comptes.voir"]},
     "management-lecteur": {"libelle": "Lecteur", "permissions": ["accueil.voir", "email.voir"]}
   }
 }

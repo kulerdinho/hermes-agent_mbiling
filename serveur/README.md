@@ -102,6 +102,10 @@ compte du serveur de comptes y entre et n'y voit que ce qui le concerne.
   Donner un rôle : `./comptes/donner-role.sh adresse@exemple.com admin` (`--retirer` pour l'enlever).
 - **Créer un compte sans connaître son mot de passe :** `./comptes/creer-compte.sh --par-email adresse@exemple.com "Prénom" "Nom"`
   (la personne reçoit un email pour le choisir, lien valable 48 h, qui mène ensuite à Management).
+- **Comptes :** chercher un utilisateur, voir ses connexions, ses PC et le journal des actions de l'équipe
+  sur ce compte. « Suspendre » (motif obligatoire, inscrit au journal) désactive le compte au serveur de
+  comptes, ferme ses connexions (la cellule en est prévenue aussitôt) et révoque ses PC ; ses données
+  restent. Seul un Super-admin suspend un compte de l'équipe Management ; personne ne se suspend soi-même.
 - **Emails (SMTP) :** se règlent dans l'écran « Emails » (mot de passe chiffré, jamais réaffiché, email de test).
   Les lignes `MBILING_EMAIL_*` de `.env` ne servent qu'à la première installation, puis on les vide.
 - **Journal d'audit :** chaque connexion (et refus) et chaque changement, sans aucun mot de passe. Inaltérable :

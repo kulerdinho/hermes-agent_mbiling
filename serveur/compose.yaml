@@ -131,6 +131,9 @@ services:
       MBILING_MANAGEMENT_API_SECRET: ${MBILING_MANAGEMENT_API_SECRET:?généré par installer.sh}
       MBILING_MANAGEMENT_CLE: ${MBILING_MANAGEMENT_CLE:?généré par installer.sh}
       MBILING_MANAGEMENT_BASE: /opt/data/management.db
+      # Écran Comptes : PC d'un compte, et leur révocation quand on le suspend.
+      MBILING_RELAIS_URL: http://relais:8000
+      MBILING_RELAIS_JETON: ${MBILING_RELAIS_JETON_INTERNE:?généré par installer.sh}
       # Importés une seule fois, à la création de la base de Management (puis vidés dans .env).
       MBILING_EMAIL_SERVEUR: ${MBILING_EMAIL_SERVEUR:-}
       MBILING_EMAIL_PORT: ${MBILING_EMAIL_PORT:-}
