@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block titre %}Mes appareils{% endblock %}
+{% block contenu %}
+<h1>Mes appareils</h1>
+<p class="aide">Les appareils et navigateurs connectés à votre compte. Révoquer un appareil le déconnecte
+aussitôt : il revient à la page de connexion, et l'agent ne peut plus utiliser ce PC.</p>
+<table>
+  <thead><tr><th>Appareil</th><th>Connexion</th><th>Dernière activité</th><th>Adresse IP</th><th></th></tr></thead>
+  <tbody>
+  {% for l in lignes %}
+    <tr>
+      <td>
+        {% for pc in l.pcs %}
+          <strong>{{ pc.nom or "PC sans nom" }}</strong>{% if pc.systeme %} <span class="aide">({{ pc.systeme }})</span>{% endif %}
+          <br><span class="aide">Mains {% if pc.connecte %}connectées{% else %}hors ligne{% endif %}</span>{% if not loop.last %}<br>{% endif %}
+        {% else %}
+          <strong>Navigateur</strong>
+        {% endfor %}
+        {% if l.courante %}<br><span class="role">cet appareil</span>{% endif %}
+      </td>
+      <td>
+        {% if l.session %}{{ l.applications | join(", ") }}<br><span class="aide">depuis le {{ l.debut | date }}</span>
+        {% else %}<span class="aide">Session terminée, PC encore autorisé</span>{% endif %}
+      </td>
+      <td>{{ l.activite | date }}</td>
+      <td>{{ l.ip }}</td>
+      <td>
+        <form method="post" action="{{ P }}/appareils/revoquer">
+          <input type="hidden" name="csrf" value="{{ session.csrf }}">
+          {% if l.session %}<input type="hidden" name="session" value="{{ l.session }}">
+          {% else %}<input type="hidden" name="appareil" value="{{ l.pcs[0].identifiant }}">{% endif %}
+          <button type="submit" class="secondaire">Révoquer</button>
+        </form>
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="5">Aucun appareil connecté.</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+<form method="post" action="{{ P }}/appareils/tout" class="formulaire">
+  <input type="hidden" name="csrf" value="{{ session.csrf }}">
+  <p class="aide">Vous pensez qu'un appareil inconnu utilise votre compte ? Déconnectez tout, puis changez votre mot de passe.</p>
+  <button type="submit">Déconnecter tous mes appareils</button>
+</form>
+{% endblock %}

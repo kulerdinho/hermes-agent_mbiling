@@ -91,6 +91,26 @@ class Keycloak:
             raise ErreurComptes(f"lecture des facteurs de connexion impossible ({rep.status_code})")
         return any(c.get("type") == "otp" for c in rep.json())
 
+    def sessions(self, utilisateur: str) -> list[dict[str, Any]]:
+        """Sessions ouvertes du compte : id (le ``sid`` des jetons), ipAddress, start, lastAccess (ms),
+        clients {id: clientId}."""
+        rep = self._http.get(f"{self._admin}/users/{utilisateur}/sessions", headers=self._entetes_api())
+        if rep.status_code != 200:
+            raise ErreurComptes(f"lecture des sessions impossible ({rep.status_code})")
+        return rep.json()
+
+    def fermer_session(self, session: str) -> None:
+        """Ferme une session ; le serveur de comptes prévient aussitôt les cellules (déconnexion poussée)."""
+        rep = self._http.delete(f"{self._admin}/sessions/{session}", headers=self._entetes_api())
+        if rep.status_code not in (204, 404):
+            raise ErreurComptes(f"fermeture de la session impossible ({rep.status_code})")
+
+    def deconnecter_partout(self, utilisateur: str) -> None:
+        """Ferme toutes les sessions du compte (« Déconnecter tous mes appareils »)."""
+        rep = self._http.post(f"{self._admin}/users/{utilisateur}/logout", headers=self._entetes_api())
+        if rep.status_code != 204:
+            raise ErreurComptes(f"déconnexion du compte impossible ({rep.status_code})")
+
     def appliquer_smtp(self, smtp: dict[str, Any], mot_de_passe: str | None) -> None:
         """Pose les réglages d'envoi du royaume, et active la vérification des adresses."""
         serveur = {

@@ -30,11 +30,16 @@ for essai in $(seq 1 60); do
 done
 
 # La cellule : son adresse de retour publique et son secret (le même que dans sa configuration).
+# Déconnexion poussée : quand une session se ferme (« Mon compte », Management), le serveur de comptes
+# prévient aussitôt la cellule par le réseau interne, qui refuse alors les jetons de cette session.
 id_cellule="$(kc get clients -r mbiling -q clientId=cellule --fields id --format csv --noquotes | tr -d '\r')"
 kc update "clients/$id_cellule" -r mbiling \
 	-s "secret=$MBILING_COMPTES_SECRET_CELLULE" \
 	-s "redirectUris=[\"https://$MBILING_DOMAINE/auth/callback\"]" \
-	-s "webOrigins=[\"https://$MBILING_DOMAINE\"]"
+	-s "webOrigins=[\"https://$MBILING_DOMAINE\"]" \
+	-s "frontchannelLogout=false" \
+	-s "attributes.\"backchannel.logout.url\"=http://cellule:9119/auth/backchannel-logout" \
+	-s "attributes.\"backchannel.logout.session.required\"=true"
 
 # Inscription libre : fermée tant qu'une seule cellule de test sert tous les comptes (sinon, tout
 # inscrit utiliserait la cellule de test et sa clé d'IA). Les comptes de test sont créés à la main.
@@ -81,6 +86,26 @@ fi
 kc update "clients/$(id_client management-api)" -r mbiling -s "secret=$MBILING_MANAGEMENT_API_SECRET"
 kc add-roles -r mbiling --uusername service-account-management-api --cclientid realm-management \
 	--rolename manage-realm --rolename view-users
+
+# --- Mon compte (espace de chaque utilisateur) ---------------------------------------------------
+
+# Le client « compte » : connexion de tout utilisateur (code + PKCE), et compte de service qui lit et
+# ferme les sessions de cet utilisateur (« Mes appareils »), rien d'autre.
+if [ -z "$(id_client compte)" ]; then
+	compose exec -T comptes /opt/keycloak/bin/kcadm.sh create clients -r mbiling --config /tmp/kcadm.config -f - >/dev/null <<'JSON'
+{"clientId": "compte", "name": "Mon compte Mbiling", "enabled": true, "protocol": "openid-connect",
+ "publicClient": false, "clientAuthenticatorType": "client-secret", "standardFlowEnabled": true,
+ "implicitFlowEnabled": false, "directAccessGrantsEnabled": false, "serviceAccountsEnabled": true,
+ "attributes": {"pkce.code.challenge.method": "S256"}}
+JSON
+fi
+kc update "clients/$(id_client compte)" -r mbiling \
+	-s "secret=$MBILING_COMPTE_CLIENT_SECRET" \
+	-s "redirectUris=[\"https://$MBILING_DOMAINE/compte/retour\"]" \
+	-s "webOrigins=[\"https://$MBILING_DOMAINE\"]" \
+	-s "attributes.\"post.logout.redirect.uris\"=https://$MBILING_DOMAINE/compte/"
+kc add-roles -r mbiling --uusername service-account-compte --cclientid realm-management \
+	--rolename view-users --rolename manage-users
 
 # Connexion à Management : double authentification TOUJOURS demandée (configurée au premier passage),
 # sans reprise d'une session ouverte ailleurs (cookie) ni connexion Google/Apple.

@@ -146,6 +146,32 @@ services:
     networks:
       - interne
 
+  # Mon compte : l'espace de chaque utilisateur (https://MBILING_DOMAINE/compte), d'abord « Mes
+  # appareils » (révoquer un PC, tout déconnecter). Même image que le moteur ; son code suit le dépôt.
+  compte:
+    image: ${MBILING_IMAGE_MOTEUR:?voir .env.exemple}
+    profiles: ["comptes"]
+    restart: unless-stopped
+    command: ["/opt/mbiling/.venv/bin/python", "-m", "uvicorn", "mbiling_cloud.compte.app:creer_app",
+              "--factory", "--host", "0.0.0.0", "--port", "8110", "--log-level", "warning", "--proxy-headers"]
+    environment:
+      MBILING_COMPTE_URL: https://${MBILING_DOMAINE}/compte
+      MBILING_COMPTE_EMETTEUR: https://${MBILING_DOMAINE}/comptes/realms/mbiling
+      MBILING_COMPTE_COMPTES_INTERNE: http://comptes:8080/comptes
+      MBILING_COMPTE_ROYAUME: mbiling
+      MBILING_COMPTE_CLIENT_SECRET: ${MBILING_COMPTE_CLIENT_SECRET:?généré par installer.sh}
+      MBILING_COMPTE_CLE: ${MBILING_COMPTE_CLE:?généré par installer.sh}
+      MBILING_RELAIS_URL: http://relais:8000
+      MBILING_RELAIS_JETON: ${MBILING_RELAIS_JETON_INTERNE:?généré par installer.sh}
+    volumes:
+      - ../mbiling_cloud:/opt/mbiling/mbiling_cloud:ro
+    mem_limit: 256m
+    depends_on:
+      - comptes
+      - relais
+    networks:
+      - interne
+
   comptes-db:
     image: ${MBILING_IMAGE_POSTGRES:?voir .env.exemple}
     profiles: ["comptes"]

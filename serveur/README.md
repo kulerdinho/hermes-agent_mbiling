@@ -77,6 +77,21 @@ authentification et le mot de passe oublié. La cellule s'y branche par OpenID C
   `http://127.0.0.1:8091/comptes/admin`, identifiant `admin`, mot de passe `MBILING_COMPTES_ADMIN_MOT_DE_PASSE`.
 - **Sauvegarde :** la base des comptes est exportée chaque nuit (`pg_dump`) à côté de l'archive des données.
 
+## Mon compte (espace de chaque utilisateur)
+
+`https://MBILING_DOMAINE/compte`, servi par le service `compte` (code : `mbiling_cloud/compte/`). Tout
+compte du serveur de comptes y entre et n'y voit que ce qui le concerne.
+
+- **Mes appareils :** ses connexions ouvertes et les PC dont les Mains sont inscrites. « Révoquer »
+  ferme la session au serveur de comptes et révoque les PC de cette session au Relais ; « Déconnecter
+  tous mes appareils » fait de même pour tout le compte.
+- **Effet en quelques secondes :** le serveur de comptes prévient la cellule par une déconnexion
+  poussée (`http://cellule:9119/auth/backchannel-logout`, réseau interne ; la passerelle répond 404
+  depuis Internet). La cellule refuse alors les jetons de la session, le renouvellement échoue, et le
+  Desktop revient à la page de connexion ; ses Mains sont coupées et leur jeton refusé.
+- **Client `compte`** du royaume (créé par `comptes/configurer.sh`) : connexion de l'utilisateur, et
+  compte de service limité à `view-users` et `manage-users` (lire et fermer des sessions).
+
 ## Management (espace d'administration)
 
 `https://MBILING_DOMAINE/management`, servi par le service `management` (code : `mbiling_cloud/management/`).

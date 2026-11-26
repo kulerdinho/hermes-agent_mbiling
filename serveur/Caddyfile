@@ -36,6 +36,14 @@
 	handle @management {
 		reverse_proxy management:8100
 	}
+	@compte path /compte /compte/*
+	handle @compte {
+		reverse_proxy compte:8110
+	}
+	# Déconnexion poussée : seul le serveur de comptes l'envoie, par le réseau interne.
+	handle /auth/backchannel-logout {
+		respond 404
+	}
 
 	# Les Mains (PC de l'utilisateur) se connectent au Relais en WebSocket.
 	handle /mains {

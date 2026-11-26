@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{% block titre %}Mon compte{% endblock %} — Mbiling</title>
+  <link rel="stylesheet" href="{{ P }}/style.css">
+</head>
+<body>
+  <!--email_off--><!-- Cloudflare : ne pas masquer les adresses email. -->
+  <header class="barre">
+    <a class="marque" href="{{ P }}/">Mbiling <span>Mon compte</span></a>
+    {% if session %}
+    <nav>
+      <a href="{{ P }}/appareils">Mes appareils</a>
+    </nav>
+    <div class="moi">
+      <span>{{ session.email }}</span>
+      <form method="post" action="{{ P }}/deconnexion">
+        <input type="hidden" name="csrf" value="{{ session.csrf }}">
+        <button type="submit" class="discret">Se déconnecter</button>
+      </form>
+    </div>
+    {% endif %}
+  </header>
+  <main>
+    {% if message %}<p class="ok">{{ message }}</p>{% endif %}
+    {% if erreurs %}<ul class="erreurs">{% for e in erreurs %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+    {% block contenu %}{% endblock %}
+  </main>
+  <!--/email_off-->
+</body>
+</html>
