@@ -197,6 +197,12 @@ for profil in $MBILING_PROFILS; do
 	fi
 done
 
+# Adresse publique de la cellule : derrière la passerelle et le tunnel, la cellule ne voit que du
+# http interne ; sans elle, l'adresse de retour envoyée au serveur de comptes serait en http://, et
+# Keycloak la refuse (« redirect_uri invalide »).
+compose exec -T -u mbiling -e HOME=/opt/data cellule \
+	mbiling config set dashboard.public_url "https://$MBILING_DOMAINE" >/dev/null
+
 # Connexion par les comptes : « Continuer avec Google / Apple » du Desktop va droit à la page de ce
 # fournisseur sur le serveur de comptes (paramètre kc_idp_hint de Keycloak).
 if [ "${MBILING_CONNEXION:-motdepasse}" = "comptes" ]; then
