@@ -40,8 +40,9 @@ async def inscrire(demande: DemandeAppareil, request: Request) -> dict[str, Any]
     organisation_session = getattr(session, "org_id", None) if session is not None else None
     if organisation_session and organisation_session != config.organisation:
         raise HTTPException(status_code=403, detail="ce compte n'appartient pas à l'organisation de ce serveur")
+    utilisateur, sid = _compte_et_session(session)
     try:
-        inscrit = await asyncio.to_thread(inscrire_appareil, config, demande.nom.strip()[:120])
+        inscrit = await asyncio.to_thread(inscrire_appareil, config, demande.nom.strip()[:120], utilisateur, sid)
     except MainsIndisponibles as exc:
         raise HTTPException(status_code=503, detail=str(exc)) from exc
     return {
@@ -49,3 +50,16 @@ async def inscrire(demande: DemandeAppareil, request: Request) -> dict[str, Any]
         "jeton": inscrit["jeton"],
         "relais_url": os.environ.get("MBILING_RELAIS_URL_PUBLIQUE") or None,
     }
+
+
+def _compte_et_session(session: Any) -> tuple[str, str]:
+    """Le compte (``sub``) et la session de connexion (``sid``) qui inscrivent le PC. Le jeton
+    d'identité a déjà été vérifié par la porte d'entrée : on ne fait qu'en lire le ``sid``."""
+    if session is None:
+        return "", ""
+    import jwt
+    try:
+        sid = jwt.decode(getattr(session, "access_token", "") or "", options={"verify_signature": False}).get("sid") or ""
+    except jwt.PyJWTError:  # jeton non JWT (autre fournisseur de connexion) : pas de session à rattacher
+        sid = ""
+    return str(getattr(session, "user_id", "") or ""), str(sid)

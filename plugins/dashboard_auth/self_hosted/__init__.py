@@ -21,7 +21,8 @@ from typing import Any, Dict, Optional
 
 import httpx
 
-from mbiling_cli.dashboard_auth import LoginStart, ProviderError, Session
+from mbiling_cli.dashboard_auth import InvalidCodeError, LoginStart, ProviderError, Session
+from plugins.dashboard_auth.self_hosted import deconnexions
 from plugins.dashboard_auth._shared import (
     DEFAULT_TOKEN_LEEWAY_SECONDS,
     JSON_HEADERS,
@@ -55,6 +56,9 @@ _DISCOVERY_TIMEOUT_SEC = 10.0
 # Discovery is effectively static; a soft TTL lets a long-running dashboard
 # pick up an IDP endpoint migration within the hour.
 _DISCOVERY_CACHE_TTL_SEC = 3600
+# How long a back-channel-closed session is remembered: longer than any ID token can live (an
+# IDP issues them for minutes to hours), so no still-unexpired token of that session can return.
+_RETENTION_DECONNEXION_SEC = 2 * 86400
 
 LAST_SKIP_REASON: str = ""
 
@@ -263,9 +267,31 @@ class SelfHostedOIDCProvider(JwtOAuthProvider):
 
     def _verify_id_token(self, id_token: str) -> dict[str, Any]:
         issuer = self._get_discovery()["issuer"]
-        return verify_jwt(
+        claims = verify_jwt(
             id_token, self._get_jwks_client(), algorithms=list(_ALLOWED_ID_TOKEN_ALGS),
             audience=self._client_id, issuer=issuer, label="ID token", leeway=self._id_token_leeway)
+        # Session closed by the IDP (back-channel logout): the token is still unexpired but must
+        # not open anything; None from verify_session makes the gate try a refresh, which the IDP
+        # refuses for a closed session, so the client is sent back to sign-in.
+        if deconnexions.est_fermee(claims):
+            raise InvalidCodeError("ID token belongs to a session closed by the identity provider")
+        return claims
+
+    def backchannel_logout(self, logout_token: str) -> None:
+        """OIDC Back-Channel Logout 1.0: verify the IDP-signed logout token, then remember the
+        closed session (or every session of the user) until its ID tokens have expired.
+        Raises ``InvalidCodeError`` for a token that is not a valid logout token for this client."""
+        import jwt  # lazy, like verify_jwt
+        issuer = self._get_discovery()["issuer"]
+        try:
+            cle = self._get_jwks_client().get_signing_key_from_jwt(logout_token)
+            claims = jwt.decode(logout_token, cle.key, algorithms=list(_ALLOWED_ID_TOKEN_ALGS),
+                                audience=self._client_id, issuer=issuer, leeway=self._id_token_leeway,
+                                options={"require": ["iat", "aud", "iss", "jti"]})
+            sid, sub = deconnexions.verifier_logout_token(claims)
+        except (jwt.PyJWTError, ValueError) as exc:
+            raise InvalidCodeError(f"invalid logout token: {exc}") from exc
+        deconnexions.fermer(sid=sid, sub=sub if not sid else "", garder_jusqua=time.time() + _RETENTION_DECONNEXION_SEC)
 
     _claims_for = _verify_id_token
 

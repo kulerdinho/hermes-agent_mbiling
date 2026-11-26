@@ -42,7 +42,7 @@ import time
 import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, AsyncIterator
+from typing import Any, AsyncIterator, Callable
 
 from fastapi import FastAPI, Header, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import Response, StreamingResponse
@@ -108,16 +108,34 @@ class RegistreAppareils:
         provisoire.write_text(json.dumps(self.fiches, ensure_ascii=False, indent=2), encoding="utf-8")
         os.replace(provisoire, self.chemin)
 
-    def inscrire(self, organisation: str, nom: str) -> tuple[str, str]:
+    def inscrire(self, organisation: str, nom: str, utilisateur: str = "", session: str = "") -> tuple[str, str]:
+        """``utilisateur`` (sub) et ``session`` (sid) : le compte qui a inscrit le PC et sa session de
+        connexion, pour la page « Mes appareils » et la révocation."""
         jeton = secrets.token_urlsafe(32)
         identifiant = f"pc-{uuid.uuid4().hex[:12]}"
         with self.verrou:
             self.fiches[empreinte(jeton)] = {
                 "identifiant": identifiant, "organisation": organisation, "nom": nom[:120],
+                "utilisateur": utilisateur, "session": session,
                 "cree": int(time.time()), "revoque": False,
             }
             self._sauver()
         return identifiant, jeton
+
+    def vu(self, identifiant: str, systeme: str) -> None:
+        """Note la dernière connexion des Mains de ce PC, et son système."""
+        with self.verrou:
+            for fiche in self.fiches.values():
+                if fiche["identifiant"] == identifiant:
+                    fiche["derniere_connexion"] = int(time.time())
+                    if systeme:
+                        fiche["systeme"] = systeme[:120]
+            self._sauver()
+
+    def lister(self, utilisateur: str) -> list[dict[str, Any]]:
+        """PC non révoqués inscrits par ce compte (jamais l'empreinte du jeton)."""
+        return [dict(f) for f in self.fiches.values()
+                if utilisateur and f.get("utilisateur") == utilisateur and not f.get("revoque")]
 
     def trouver(self, jeton: str) -> tuple[str, str] | None:
         fiche = self.fiches.get(empreinte(jeton))
@@ -126,15 +144,19 @@ class RegistreAppareils:
         return fiche["identifiant"], fiche["organisation"]
 
     def revoquer(self, identifiant: str) -> bool:
+        return bool(self.revoquer_si(lambda f: f["identifiant"] == identifiant))
+
+    def revoquer_si(self, critere: Callable[[dict[str, Any]], bool]) -> list[str]:
+        """Révoque les PC qui répondent au critère ; rend leurs identifiants."""
         with self.verrou:
-            trouve = False
+            revoques = []
             for fiche in self.fiches.values():
-                if fiche["identifiant"] == identifiant and not fiche.get("revoque"):
+                if not fiche.get("revoque") and critere(fiche):
                     fiche["revoque"] = True
-                    trouve = True
-            if trouve:
+                    revoques.append(fiche["identifiant"])
+            if revoques:
                 self._sauver()
-        return trouve
+        return revoques
 
 
 class Demande(BaseModel):
@@ -148,6 +170,15 @@ class Demande(BaseModel):
 class Inscription(BaseModel):
     organisation: str
     nom: str = ""
+    utilisateur: str = ""
+    session: str = ""
+
+
+class Revocation(BaseModel):
+    """Révoque les PC de ``utilisateur`` : tous, ceux d'une session, ou un seul."""
+    utilisateur: str
+    session: str = ""
+    identifiant: str = ""
 
 
 def creer_app() -> FastAPI:
@@ -192,6 +223,7 @@ def creer_app() -> FastAPI:
             return
         identifiant, organisation = trouve
         appareil = Appareil(identifiant, organisation, socket, premier.get("info") or {})
+        registre.vu(identifiant, str(appareil.info.get("systeme") or ""))
         ancien = connectes.get(organisation)
         connectes[organisation] = appareil
         if ancien:
@@ -335,8 +367,39 @@ def creer_app() -> FastAPI:
         verifier_interne(authorization)
         if not demande.organisation.strip():
             raise HTTPException(status_code=400, detail="organisation requise")
-        identifiant, jeton = registre.inscrire(demande.organisation.strip(), demande.nom.strip())
+        identifiant, jeton = registre.inscrire(demande.organisation.strip(), demande.nom.strip(),
+                                               demande.utilisateur.strip(), demande.session.strip())
         return {"appareil": identifiant, "jeton": jeton}
+
+    async def _deconnecter(identifiants: list[str], raison: str) -> None:
+        for organisation, appareil in list(connectes.items()):
+            if appareil.identifiant in identifiants:
+                del connectes[organisation]
+                await _fermer(appareil, raison)
+
+    @app.get("/interne/appareils")
+    async def lister(utilisateur: str, authorization: str | None = Header(default=None)) -> dict[str, Any]:
+        """PC d'un compte, avec leur état de connexion (page « Mes appareils »)."""
+        verifier_interne(authorization)
+        en_ligne = {a.identifiant for a in connectes.values()}
+        return {"appareils": [{
+            "identifiant": f["identifiant"], "nom": f.get("nom", ""), "systeme": f.get("systeme", ""),
+            "session": f.get("session", ""), "cree": f.get("cree"),
+            "derniere_connexion": f.get("derniere_connexion"), "connecte": f["identifiant"] in en_ligne,
+        } for f in registre.lister(utilisateur.strip())]}
+
+    @app.post("/interne/appareils/revoquer")
+    async def revoquer_pour(demande: Revocation, authorization: str | None = Header(default=None)) -> dict[str, Any]:
+        """Révoque des PC d'un compte, jamais ceux d'un autre : jetons refusés, Mains coupées."""
+        verifier_interne(authorization)
+        utilisateur = demande.utilisateur.strip()
+        if not utilisateur:
+            raise HTTPException(status_code=400, detail="utilisateur requis")
+        revoques = registre.revoquer_si(lambda f: f.get("utilisateur") == utilisateur
+                                        and (not demande.session or f.get("session") == demande.session)
+                                        and (not demande.identifiant or f["identifiant"] == demande.identifiant))
+        await _deconnecter(revoques, "appareil révoqué")
+        return {"revoques": revoques}
 
     @app.delete("/interne/appareils/{identifiant}")
     async def revoquer(identifiant: str, authorization: str | None = Header(default=None)) -> dict[str, Any]:
@@ -344,10 +407,7 @@ def creer_app() -> FastAPI:
         verifier_interne(authorization)
         if not registre.revoquer(identifiant):
             raise HTTPException(status_code=404, detail="appareil inconnu")
-        for organisation, appareil in list(connectes.items()):
-            if appareil.identifiant == identifiant:
-                del connectes[organisation]
-                await _fermer(appareil, "appareil révoqué")
+        await _deconnecter([identifiant], "appareil révoqué")
         return {"revoque": identifiant}
 
     @app.get("/interne/appareil/{organisation}")

@@ -55,11 +55,13 @@ def _connexion(config: ConfigRelais, delai: float | None) -> tuple[http.client.H
     return classe(u.hostname, u.port, timeout=delai), (u.path or "")
 
 
-def inscrire_appareil(config: ConfigRelais, nom: str) -> dict:
-    """Inscrit un PC de l'organisation auprès du Relais : renvoie {"appareil", "jeton"} (jeton rendu une fois)."""
+def inscrire_appareil(config: ConfigRelais, nom: str, utilisateur: str = "", session: str = "") -> dict:
+    """Inscrit un PC de l'organisation auprès du Relais : renvoie {"appareil", "jeton"} (jeton rendu une fois).
+    ``utilisateur`` et ``session`` : le compte connecté et sa session, pour « Mes appareils » et la révocation."""
     conn, base = _connexion(config, config.delai_connexion_s)
     try:
-        corps = json.dumps({"organisation": config.organisation, "nom": nom}).encode("utf-8")
+        corps = json.dumps({"organisation": config.organisation, "nom": nom,
+                            "utilisateur": utilisateur, "session": session}).encode("utf-8")
         conn.request("POST", f"{base}/interne/appareils", body=corps, headers={
             "Authorization": f"Bearer {config.jeton}", "Content-Type": "application/json"})
         rep = conn.getresponse()

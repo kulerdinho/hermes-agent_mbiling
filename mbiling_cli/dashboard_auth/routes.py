@@ -249,6 +249,31 @@ async def auth_login(request: Request, provider: str, next: str = ""):
     return resp
 
 
+# --- Public: OIDC Back-Channel Logout 1.0 (IDP -> gateway) ------------------
+
+@router.post("/auth/backchannel-logout", name="auth_backchannel_logout")
+async def auth_backchannel_logout(request: Request):
+    """The IDP tells us a session is closed (device revoked, sign-out everywhere, password
+    changed). Public on purpose, like ``/api/cron/fire``: the IDP-signed logout token, checked by
+    the provider, is the security boundary. 200 once one provider accepted it, else 400."""
+    form = await request.form()
+    token = str(form.get("logout_token") or "")
+    entetes = {"Cache-Control": "no-store"}
+    if token:
+        for p in list_providers():
+            handler = getattr(p, "backchannel_logout", None)
+            if handler is None:
+                continue
+            try:
+                await run_in_threadpool(handler, token)
+            except InvalidCodeError:
+                continue
+            except ProviderError as e:
+                raise _http(503, f"Auth provider {str(e)!r} unreachable")
+            return JSONResponse({}, headers=entetes)
+    return JSONResponse({"error": "invalid_request"}, status_code=400, headers=entetes)
+
+
 # --- Public: RFC 8252 native-app authorization (system browser + loopback + PKCE)
 
 # RFC 8252 loopback IP literals -> their canonical URL authority spelling.
